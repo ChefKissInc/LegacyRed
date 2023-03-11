@@ -206,10 +206,10 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
             {"_Carrizo_RLC_UCODE", orgCzRlcUcode}, {"_Carrizo_ME_UCODE", orgCzMeUcode},
             {"_Carrizo_CE_UCODE", orgCzCeUcode}, {"_Carrizo_PFP_UCODE", orgCzPfpUcode},
             {"_Carrizo_MEC1_UCODE", orgCzMecUcode}, {"_Carrizo_MEC2_UCODE", orgCzMec2Ucode},
-            {"_Carrizo_SDMA0_UCODE", orgCzSdma0Ucode}, {"_Carrizo_SDMA1_UCODE", orgCzSdma1Ucode},
+            //{"_Carrizo_SDMA0_UCODE", orgCzSdma0Ucode}, {"_Carrizo_SDMA1_UCODE", orgCzSdma1Ucode},
             {"_Stoney_RLC_UCODE", orgStnyRlcUcode}, {"_Stoney_ME_UCODE", orgStnyMeUcode},
             {"_Stoney_CE_UCODE", orgStnyCeUcode}, {"_Stoney_PFP_UCODE", orgStnyPfpUcode},
-            {"_Stoney_MEC1_UCODE", orgStnyMecUcode}, {"_Stoney_SDMA0_UCODE", orgStnySdmaUcode},
+            //{"_Stoney_MEC1_UCODE", orgStnyMecUcode}, {"_Stoney_SDMA0_UCODE", orgStnySdmaUcode},
             //{"_Raven_SendMsgToSmc", orgRavenSendMsgToSmc},
             //{"_Renoir_SendMsgToSmc", orgRenoirSendMsgToSmc},
         };
