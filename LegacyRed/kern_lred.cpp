@@ -80,25 +80,29 @@ void LRed::processPatcher(KernelPatcher &patcher) {
 
     devInfo->processSwitchOff();
 
-    if (!devInfo->videoBuiltin) {
-        SYSLOG(MODULE_SHORT, "videoBuiltin null");
-        DeviceInfo::deleter(devInfo);
-        return;
-    }
+	auto *videoBuiltin = devInfo->videoBuiltin;
+	if (!videoBuiltin) {
+		SYSLOG(MODULE_SHORT, "videoBuiltin null");
+		for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
+			if (!OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video)) { continue; }
+			if (WIOKit::readPCIConfigValue(devInfo->videoExternal[i].video, WIOKit::kIOPCIConfigVendorID) ==
+				WIOKit::VendorID::ATIAMD) {
+				videoBuiltin = devInfo->videoExternal[i].video;
+				break;
+			}
+		}
+	}
 
-    auto *iGPU = OSDynamicCast(IOPCIDevice, devInfo->videoBuiltin);
-    if (!iGPU) {
-        SYSLOG(MODULE_SHORT, "videoBuiltin is not IOPCIDevice");
-        DeviceInfo::deleter(devInfo);
-        return;
-    }
-    PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, MODULE_SHORT,
-        "videoBuiltin is not AMD");
+	PANIC_COND(!videoBuiltin, MODULE_SHORT, "videoBuiltin null");
+	auto *iGPU = OSDynamicCast(IOPCIDevice, videoBuiltin);
+	PANIC_COND(!iGPU, MODULE_SHORT, "videoBuiltin is not IOPCIDevice");
+	PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, MODULE_SHORT,
+		"videoBuiltin is not AMD");
 
-    callbackLRed->iGPU = iGPU;
+	callbackLRed->iGPU = iGPU;
 
-    WIOKit::renameDevice(iGPU, "IGPU");
-    WIOKit::awaitPublishing(iGPU);
+	WIOKit::renameDevice(iGPU, "IGPU");
+	WIOKit::awaitPublishing(iGPU);
 
     static uint8_t builtin[] = {0x01};
     iGPU->setProperty("built-in", builtin, sizeof(builtin));
