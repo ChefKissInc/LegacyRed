@@ -234,7 +234,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
             "Failed to route AMDRadeonX4000HWLibs symbols");
-		
+
         auto *asicName = callbackLRed->getASICName();
         // TODO: Inject all parts of RLC firmware
         // Disabled firmware injection due to bad code
@@ -282,7 +282,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         orgChannelTypes[5] = 1;     // Fix createAccelChannels
         orgChannelTypes[11] = 0;    // Fix getPagingChannel
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-		*/
+                */
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN28AMDRadeonX4000_AMDCIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
@@ -312,18 +312,18 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
          * `AMDRadeonX4000_AMDHardware::startHWEngines`
          * Make for loop stop at 1 instead of 2 since we only have one SDMA engine.
          */
-		/*
-        if (this->chipType == ChipType::Stoney) {
-            const uint8_t find[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74,
-                0x50};    // probably broken
-            const uint8_t repl[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
-            static_assert(arrsize(find) == arrsize(repl));
-            KernelPatcher::LookupPatch patch = {&kextRadeonX4000, find, repl, arrsize(find), 1};
-            patcher.applyLookupPatch(&patch);
-            patcher.clearError();
-            DBGLOG("lred", "-- Stoney Singular SDMA patch done, Let's hope we didn't break X4000 --");
-        }
-		 */ // High chances are that this patch is broken, Will do eventually.
+        /*
+if (this->chipType == ChipType::Stoney) {
+    const uint8_t find[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74,
+        0x50};    // probably broken
+    const uint8_t repl[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
+    static_assert(arrsize(find) == arrsize(repl));
+    KernelPatcher::LookupPatch patch = {&kextRadeonX4000, find, repl, arrsize(find), 1};
+    patcher.applyLookupPatch(&patch);
+    patcher.clearError();
+    DBGLOG("lred", "-- Stoney Singular SDMA patch done, Let's hope we didn't break X4000 --");
+}
+         */ // High chances are that this patch is broken, Will do eventually.
 
     } else if (kextAMD8000Controller.loadIndex == index) {
         KernelPatcher::RouteRequest requests[] = {
