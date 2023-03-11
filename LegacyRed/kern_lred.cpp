@@ -266,7 +266,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         uint32_t *orgChannelTypes = nullptr;
 
         KernelPatcher::SolveRequest solveRequests[] = {
-            {"__ZN29AMDRadeonX4000_AMDGCIPM4EngineC1Ev", orgGFX9PM4EngineConstructor},
+            {"__ZN29AMDRadeonX4000_AMDCIPM4EngineC1Ev", orgGFX9PM4EngineConstructor},
             //{"__ZN32AMDRadeonX5000_AMDGFX9SDMAEngineC1Ev", orgGFX9SDMAEngineConstructor},
             //{"__ZZN37AMDRadeonX5000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
             //{"__ZN39AMDRadeonX5000_AMDAccelSharedUserClient5startEP9IOService", orgAccelSharedUCStart},
