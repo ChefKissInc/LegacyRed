@@ -11,7 +11,7 @@
 #include <Headers/kern_devinfo.hpp>
 
 static const char *pathRadeonX4000HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
-                                           "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs";
+                                           "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4050HWLibs";
 static const char *pathRadeonFramebuffer =
     "/System/Library/Extensions/AMDFramebuffer.kext/Contents/MacOS/AMDFramebuffer";
 
@@ -25,7 +25,7 @@ static const char *pathRadeonSupport = "/System/Library/Extensions/AMDSupport.ke
 static const char *pathAMD9000Controller =
     "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9000Controller";
 
-static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4000HWLibs", &pathRadeonX4000HWLibs, 1,
+static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4050HWLibs", &pathRadeonX4000HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 static KernelPatcher::KextInfo kextRadeonFramebuffer {"com.apple.kext.AMDFramebuffer", &pathRadeonFramebuffer, 1, {},
