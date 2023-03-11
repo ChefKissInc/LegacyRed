@@ -184,22 +184,6 @@ class LRed {
         return this->readReg32(MP_BASE + mmMP1_SMN_C2PMSG_82) >> 8;
     }
 
-    inline static void injectGFXFirmware(const char *filename, GcFwConstant *fw, GcFwConstant *jt = nullptr) {
-        auto &fwDesc = getFWDescByName(filename);
-        auto *fwHeader = reinterpret_cast<const GfxFwHeaderV1 *>(fwDesc.data);
-        fw->addr = 0x0;
-        fw->size = fwHeader->ucodeSize;
-        fw->data = fwDesc.data + fwHeader->ucodeOff;
-        DBGLOG("lred", "Injected %s!", filename);
-
-        if (jt) {
-            jt->addr = fwHeader->jtOff;
-            jt->size = fwHeader->jtSize;
-            jt->data = fwDesc.data + fwHeader->ucodeOff + fwHeader->jtOff;
-            DBGLOG("lred", "Injected %s <jt>!", filename);
-        }
-    }
-
     OSData *vbiosData = nullptr;
     ChipType chipType = ChipType::Unknown;
     uint64_t fbOffset {};

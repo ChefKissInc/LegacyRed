@@ -61,7 +61,6 @@ static constexpr Model dev15d8[] = {
 
 static constexpr DevicePair devices[] = {
     {0x15d8, dev15d8, arrsize(dev15d8)},
-    {0x15dd, dev15dd, arrsize(dev15dd)},
 };
 
 inline const char *getBranding(uint16_t dev, uint16_t rev) {

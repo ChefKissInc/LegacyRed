@@ -340,30 +340,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         char filename[128];
         auto *asicName = callbackLRed->getASICName();
         // TODO: Inject all parts of RLC firmware
-        injectGFXFirmware(filename, callbackLRed->orgCzRlcUcode);
-        snprintf(filename, 128, "%s_me.bin", asicName);
-        injectGFXFirmware(filename, callbackLRed->orgCzMeUcode);
-        snprintf(filename, 128, "%s_ce.bin", asicName);
-        injectGFXFirmware(filename, callbackLRed->orgCzCeUcode);
-        snprintf(filename, 128, "%s_pfp.bin", asicName);
-        injectGFXFirmware(filename, callbackLRed->orgCzPfpUcode);
-        snprintf(filename, 128, "%s_mec.bin", asicName);
-        injectGFXFirmware(filename, callbackLRed->orgCzMecUcode);
-        if (this->chipType == ChipType::Carrizo) {
-            snprintf(filename, 128, "%s_mec2.bin", asicName);
-            injectGFXFirmware(filename, callbackLRed->orgCzMec2Ucode);
-        }
-
-        snprintf(filename, 128, "%s_sdma.bin", asicName);
-        auto &fwDesc = getFWDescByName(filename);
-        auto *sdmaFwHeader = reinterpret_cast<const SdmaFwHeaderV1 *>(fwDesc.data);
-        callbackLRed->orgCzSdma0Ucode->size = sdmaFwHeader->ucodeSize;
-        callbackLRed->orgCzSdma0Ucode->data = fwDesc.data + sdmaFwHeader->ucodeOff;
-        callbackLRed->orgCzSdma1Ucode->size = sdmaFwHeader->ucodeSize;
-        callbackLRed->orgCzSdma1Ucode->data = fwDesc.data + sdmaFwHeader->ucodeOff;
-        DBGLOG("lred", "Injected %s!", filename);
-        MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-
+        // Disabled firmware injection due to bad code
     } else if (kextRadeonFramebuffer.loadIndex == index) {
         /*        KernelPatcher::SolveRequest solveRequests[] = {
                     {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
@@ -385,35 +362,6 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
                 PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
                     "Failed to route AMDRadeonX6000Framebuffer symbols");
         */
-        /** Neutralise VRAM Info creation null check to proceed with Controller Core Services initialisation. */
-        const uint8_t find_null_check1[] = {0x48, 0x89, 0x83, 0x90, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC0, 0x0F, 0x84,
-            0x89, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x7B, 0x18};
-        const uint8_t repl_null_check1[] = {0x48, 0x89, 0x83, 0x90, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x48, 0x8B, 0x7B, 0x18};
-        static_assert(arrsize(find_null_check1) == arrsize(repl_null_check1), "Find/replace patch size mismatch");
-
-        /** Neutralise PSP Firmware Info creation null check to proceed with Controller Core Services
-           initialisation. */
-        const uint8_t find_null_check2[] = {0x48, 0x89, 0x83, 0x88, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC0, 0x0F, 0x84,
-            0xA1, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x7B, 0x18};
-        const uint8_t repl_null_check2[] = {0x48, 0x89, 0x83, 0x88, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x90, 0x90, 0x48, 0x8B, 0x7B, 0x18};
-        static_assert(arrsize(find_null_check2) == arrsize(repl_null_check2), "Find/replace patch size mismatch");
-
-        /** Neutralise VRAM Info null check inside `AmdAtomFwServices::getFirmwareInfo`. */
-        const uint8_t find_null_check3[] = {0x48, 0x83, 0xBB, 0x90, 0x00, 0x00, 0x00, 0x00, 0x0F, 0x84, 0x90, 0x00,
-            0x00, 0x00, 0x49, 0x89, 0xF7, 0xBA, 0x60, 0x00, 0x00, 0x00};
-        const uint8_t repl_null_check3[] = {0x48, 0x83, 0xBB, 0x90, 0x00, 0x00, 0x00, 0x00, 0x90, 0x90, 0x90, 0x90,
-            0x90, 0x90, 0x49, 0x89, 0xF7, 0xBA, 0x60, 0x00, 0x00, 0x00};
-        static_assert(arrsize(find_null_check3) == arrsize(repl_null_check3), "Find/replace patch size mismatch");
-
-        /** Tell AGDC that we're an iGPU */
-        const uint8_t find_getVendorInfo[] = {0xc7, 0x03, 0x00, 0x00, 0x03, 0x00, 0x48, 0xb8, 0x02, 0x10, 0x00, 0x00,
-            0x02, 0x00, 0x00, 0x00};
-        const uint8_t repl_getVendorInfo[] = {0xc7, 0x03, 0x00, 0x00, 0x03, 0x00, 0x48, 0xb8, 0x02, 0x10, 0x00, 0x00,
-            0x01, 0x00, 0x00, 0x00};
-        static_assert(arrsize(find_getVendorInfo) == arrsize(repl_getVendorInfo), "Find/replace patch size mismatch");
-
     } else if (kextRadeonX4000.loadIndex == index) {
         uint32_t *orgChannelTypes = nullptr;
 
