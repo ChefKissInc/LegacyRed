@@ -14,7 +14,6 @@ static const char *pathRadeonX4000HWLibs = "/System/Library/Extensions/AMDRadeon
                                            "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs";
 static const char *pathRadeonFramebuffer =
     "/System/Library/Extensions/AMDFramebuffer.kext/Contents/MacOS/AMDFramebuffer";
-// static const char *pathRadeonX6000 = "/System/Library/Extensions/AMDRadeonX6000.kext/Contents/MacOS/AMDRadeonX6000";
 
 static const char *pathRadeonX4000 = "/System/Library/Extensions/AMDRadeonX4000.kext/Contents/MacOS/AMDRadeonX4000";
 
@@ -32,9 +31,6 @@ static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX
 static KernelPatcher::KextInfo kextRadeonFramebuffer {"com.apple.kext.AMDFramebuffer", &pathRadeonFramebuffer, 1, {},
     {}, KernelPatcher::KextInfo::Unloaded};
 
-// static KernelPatcher::KextInfo kextRadeonX6000 = {"com.apple.kext.AMDRadeonX6000",
-// lvduvvuosvgvghgggg&pathRadeonX6000, 1, {}, {},
-//   KernelPatcher::KextInfo::Unloaded};
 static KernelPatcher::KextInfo kextAMD8000Controller = {"com.apple.kext.AMD8000Controller", &pathAMD8000Controller, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
@@ -68,102 +64,7 @@ void LRed::init() {
 void LRed::deinit() {
     if (this->vbiosData) { this->vbiosData->release(); }
 }
-/*
-void LRed::processPatcher(KernelPatcher &patcher) {
-    auto *devInfo = DeviceInfo::create();
-    PANIC_COND(!devInfo, "lred", "Failed to create DeviceInfo");
-    devInfo->processSwitchOff();
-    PANIC_COND(!devInfo->videoBuiltin, "lred", "videoBuiltin null");
-    auto *obj = OSDynamicCast(IOPCIDevice, devInfo->videoBuiltin);
-    PANIC_COND(!obj, "lred", "videoBuiltin is not IOPCIDevice");
-    PANIC_COND(WIOKit::readPCIConfigValue(obj, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, "lred",
-        "videoBuiltin is not AMD");
-    callbackLRed->videoBuiltin = obj;
 
-    WIOKit::renameDevice(obj, "IGPU");
-    WIOKit::awaitPublishing(obj);
-    static uint8_t builtin[] = {0x01};
-    obj->setProperty("built-in", builtin, sizeof(builtin));
-    // TODO: Fix model name
-
-    if (obj->getProperty("ATY,bin_image")) {
-        DBGLOG("lred", "VBIOS manually overridden");
-    } else {
-        if (!callbackLRed->getVBIOSFromVFCT(obj)) {
-            DBGLOG("lred", "Failed to get VBIOS from VFCT, trying to get it from VRAM");
-            PANIC_COND(!callbackLRed->getVBIOSFromVRAM(obj), "lred", "Failed to get VBIOS from VRAM");
-        }
-    }
-
-    callbackLRed->rmmio = obj->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5, kIOMemoryMapCacheModeWriteThrough);
-    PANIC_COND(!callbackLRed->rmmio || !callbackLRed->rmmio->getLength(), "lred", "Failed to map RMMIO");
-    callbackLRed->rmmioPtr = reinterpret_cast<uint32_t *>(callbackLRed->rmmio->getVirtualAddress());
-
-    auto revision = (callbackLRed->readReg32(0xD2F) & 0xF000000) >> 0x18;
-    switch (WIOKit::readPCIConfigValue(obj, WIOKit::kIOPCIConfigDeviceID)) {
-        case 0x15D8:
-                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-            break;
-        case 0x15DD:
-                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-                        break;
-        case 0x164C:
-            [[fallthrough]];
-        case 0x1636:
-                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-                        break;
-        case 0x15E7:
-            [[fallthrough]];
-        case 0x1638:
-                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-                        break;
-                case 0x9850:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9851:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9852:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9853:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9854:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9855:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9856:
-                        callbackLRed->chipType = ChipType::Mullins;
-                        DBGLOG("lred", "Detected APU as Mullins");
-                        break;
-                case 0x9874:
-                        callbackLRed->chipType = ChipType::Carrizo;
-                        DBGLOG("lred", "Detected APU as Carrizo");
-                        break;
-                case 0x98E4:
-                        callbackLRed->chipType = ChipType::Stoney;
-                        DBGLOG("lred", "Detected APU as Stoney");
-                        break;
-        default:
-            PANIC("lred", "Unknown device ID");
-    }
-
-    KernelPatcher::RouteRequest requests[] = {
-        {"__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass", wrapSafeMetaCast, orgSafeMetaCast},
-    };
-    PANIC_COND(!patcher.routeMultiple(KernelPatcher::KernelID, requests), "lred",
-        "Failed to route OSMetaClassBase::safeMetaCast");
-}
-*/
 void LRed::processPatcher(KernelPatcher &patcher) {
     KernelPatcher::RouteRequest requests[] = {
         {"__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass", wrapSafeMetaCast, orgSafeMetaCast},
@@ -328,7 +229,6 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
             {"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
             {"_Cail_MCILTrace0", wrapCailMCILTrace0, orgCailMCILTrace0},
             {"_Cail_MCILTrace1", wrapCailMCILTrace1, orgCailMCILTrace1},
-            {"_Cail_MCILTrace2", wrapCailMCILTrace0, orgCailMCILTrace0},
             {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
             {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
         };
