@@ -4,9 +4,9 @@
 //  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-
 #include "kern_lred.hpp"
 #include "kern_amd.hpp"
+#include "kern_model.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_devinfo.hpp>
 
@@ -14,30 +14,32 @@ static const char *pathRadeonX4000HWLibs = "/System/Library/Extensions/AMDRadeon
                                            "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs";
 static const char *pathRadeonFramebuffer =
     "/System/Library/Extensions/AMDFramebuffer.kext/Contents/MacOS/AMDFramebuffer";
-//static const char *pathRadeonX6000 = "/System/Library/Extensions/AMDRadeonX6000.kext/Contents/MacOS/AMDRadeonX6000";
+// static const char *pathRadeonX6000 = "/System/Library/Extensions/AMDRadeonX6000.kext/Contents/MacOS/AMDRadeonX6000";
 
 static const char *pathRadeonX4000 = "/System/Library/Extensions/AMDRadeonX4000.kext/Contents/MacOS/AMDRadeonX4000";
 
-static const char *pathAMD8000Controller = "/System/Library/Extensions/AMD8000Controller.kext/Contents/MacOS/AMD8000Controller";
+static const char *pathAMD8000Controller =
+    "/System/Library/Extensions/AMD8000Controller.kext/Contents/MacOS/AMD8000Controller";
 
-static const char *pathRadeonSupport =
-	"/System/Library/Extensions/AMDSupport.kext/Contents/MacOS/AMDSupport";
+static const char *pathRadeonSupport = "/System/Library/Extensions/AMDSupport.kext/Contents/MacOS/AMDSupport";
 
-static const char *pathAMD9000Controller = "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9000Controller";
+static const char *pathAMD9000Controller =
+    "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9000Controller";
 
 static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4000HWLibs", &pathRadeonX4000HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
-static KernelPatcher::KextInfo kextRadeonFramebuffer {"com.apple.kext.AMDFramebuffer",
-    &pathRadeonFramebuffer, 1, {}, {}, KernelPatcher::KextInfo::Unloaded};
+static KernelPatcher::KextInfo kextRadeonFramebuffer {"com.apple.kext.AMDFramebuffer", &pathRadeonFramebuffer, 1, {},
+    {}, KernelPatcher::KextInfo::Unloaded};
 
-//static KernelPatcher::KextInfo kextRadeonX6000 = {"com.apple.kext.AMDRadeonX6000", lvduvvuosvgvghgggg&pathRadeonX6000, 1, {}, {},
-  //  KernelPatcher::KextInfo::Unloaded};
-static KernelPatcher::KextInfo kextAMD8000Controller = {"com.apple.kext.AMD8000Controller", &pathAMD8000Controller, 1, {}, {},
-	KernelPatcher::KextInfo::Unloaded};
+// static KernelPatcher::KextInfo kextRadeonX6000 = {"com.apple.kext.AMDRadeonX6000",
+// lvduvvuosvgvghgggg&pathRadeonX6000, 1, {}, {},
+//   KernelPatcher::KextInfo::Unloaded};
+static KernelPatcher::KextInfo kextAMD8000Controller = {"com.apple.kext.AMD8000Controller", &pathAMD8000Controller, 1,
+    {}, {}, KernelPatcher::KextInfo::Unloaded};
 
-static KernelPatcher::KextInfo kextAMD9000Controller = {"com.apple.kext.AMD9000Controller", &pathAMD9000Controller, 1, {}, {},
-	KernelPatcher::KextInfo::Unloaded};
+static KernelPatcher::KextInfo kextAMD9000Controller = {"com.apple.kext.AMD9000Controller", &pathAMD9000Controller, 1,
+    {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 static KernelPatcher::KextInfo kextRadeonX4000 {"com.apple.kext.AMDRadeonX4000", &pathRadeonX4000, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
@@ -53,7 +55,7 @@ void LRed::init() {
     lilu.onKextLoadForce(&kextRadeonX4000HWLibs);
     lilu.onKextLoadForce(&kextRadeonFramebuffer);
     lilu.onKextLoad(&kextAMD8000Controller);
-	lilu.onKextLoad(&kextAMD9000Controller);
+    lilu.onKextLoad(&kextAMD9000Controller);
     lilu.onKextLoadForce(&kextRadeonX4000);
     lilu.onKextLoadForce(    // For compatibility
         nullptr, 0,
@@ -66,7 +68,7 @@ void LRed::init() {
 void LRed::deinit() {
     if (this->vbiosData) { this->vbiosData->release(); }
 }
-
+/*
 void LRed::processPatcher(KernelPatcher &patcher) {
     auto *devInfo = DeviceInfo::create();
     PANIC_COND(!devInfo, "lred", "Failed to create DeviceInfo");
@@ -100,57 +102,57 @@ void LRed::processPatcher(KernelPatcher &patcher) {
     auto revision = (callbackLRed->readReg32(0xD2F) & 0xF000000) >> 0x18;
     switch (WIOKit::readPCIConfigValue(obj, WIOKit::kIOPCIConfigDeviceID)) {
         case 0x15D8:
-			PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
             break;
         case 0x15DD:
-			PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-			break;
+                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+                        break;
         case 0x164C:
             [[fallthrough]];
         case 0x1636:
-			PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-			break;
+                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+                        break;
         case 0x15E7:
             [[fallthrough]];
         case 0x1638:
-			PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
-			break;
-		case 0x9850:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9851:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9852:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9853:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9854:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9855:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9856:
-			callbackLRed->asicType = ASICType::Mullins;
-			DBGLOG("lred", "Detected APU as Mullins");
-			break;
-		case 0x9874:
-			callbackLRed->asicType = ASICType::Carrizo;
-			DBGLOG("lred", "Detected APU as Carrizo");
-			break;
-		case 0x98E4:
-			callbackLRed->asicType = ASICType::Stoney;
-			DBGLOG("lred", "Detected APU as Stoney");
-			break;
+                        PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+                        break;
+                case 0x9850:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9851:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9852:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9853:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9854:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9855:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9856:
+                        callbackLRed->chipType = ChipType::Mullins;
+                        DBGLOG("lred", "Detected APU as Mullins");
+                        break;
+                case 0x9874:
+                        callbackLRed->chipType = ChipType::Carrizo;
+                        DBGLOG("lred", "Detected APU as Carrizo");
+                        break;
+                case 0x98E4:
+                        callbackLRed->chipType = ChipType::Stoney;
+                        DBGLOG("lred", "Detected APU as Stoney");
+                        break;
         default:
             PANIC("lred", "Unknown device ID");
     }
@@ -161,7 +163,122 @@ void LRed::processPatcher(KernelPatcher &patcher) {
     PANIC_COND(!patcher.routeMultiple(KernelPatcher::KernelID, requests), "lred",
         "Failed to route OSMetaClassBase::safeMetaCast");
 }
+*/
+void LRed::processPatcher(KernelPatcher &patcher) {
+    KernelPatcher::RouteRequest requests[] = {
+        {"__ZN15OSMetaClassBase12safeMetaCastEPKS_PK11OSMetaClass", wrapSafeMetaCast, orgSafeMetaCast},
+    };
+    PANIC_COND(!patcher.routeMultiple(KernelPatcher::KernelID, requests), MODULE_SHORT,
+        "Failed to route OSMetaClassBase::safeMetaCast");
 
+    auto *devInfo = DeviceInfo::create();
+    if (!devInfo) {
+        SYSLOG(MODULE_SHORT, "Failed to create DeviceInfo");
+        return;
+    }
+
+    devInfo->processSwitchOff();
+
+    if (!devInfo->videoBuiltin) {
+        SYSLOG(MODULE_SHORT, "videoBuiltin null");
+        DeviceInfo::deleter(devInfo);
+        return;
+    }
+
+    auto *iGPU = OSDynamicCast(IOPCIDevice, devInfo->videoBuiltin);
+    if (!iGPU) {
+        SYSLOG(MODULE_SHORT, "videoBuiltin is not IOPCIDevice");
+        DeviceInfo::deleter(devInfo);
+        return;
+    }
+    PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, MODULE_SHORT,
+        "videoBuiltin is not AMD");
+
+    callbackLRed->iGPU = iGPU;
+
+    WIOKit::renameDevice(iGPU, "IGPU");
+    WIOKit::awaitPublishing(iGPU);
+
+    static uint8_t builtin[] = {0x01};
+    iGPU->setProperty("built-in", builtin, sizeof(builtin));
+    callbackLRed->deviceId = WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigDeviceID);
+    auto *model = getBranding(callbackLRed->deviceId, WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigRevisionID));
+    if (model) { iGPU->setProperty("model", model); }
+
+    if (UNLIKELY(iGPU->getProperty("ATY,bin_image"))) {
+        DBGLOG(MODULE_SHORT, "VBIOS manually overridden");
+    } else {
+        if (!callbackLRed->getVBIOSFromVFCT(iGPU)) {
+            SYSLOG(MODULE_SHORT, "Failed to get VBIOS from VFCT.");
+            PANIC_COND(!callbackLRed->getVBIOSFromVRAM(iGPU), MODULE_SHORT, "Failed to get VBIOS from VRAM");
+        }
+    }
+
+    callbackLRed->rmmio = iGPU->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
+    PANIC_COND(!callbackLRed->rmmio || !callbackLRed->rmmio->getLength(), MODULE_SHORT, "Failed to map RMMIO");
+    callbackLRed->rmmioPtr = reinterpret_cast<uint32_t *>(callbackLRed->rmmio->getVirtualAddress());
+
+    callbackLRed->fbOffset = static_cast<uint64_t>(callbackLRed->readReg32(0x296B)) << 24;
+    callbackLRed->revision = (callbackLRed->readReg32(0xD2F) & 0xF000000) >> 0x18;
+    switch (callbackLRed->deviceId) {
+        case 0x15D8:
+            PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+            break;
+        case 0x15DD:
+            PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+            break;
+        case 0x164C:
+            [[fallthrough]];
+        case 0x1636:
+            PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+            break;
+        case 0x15E7:
+            [[fallthrough]];
+        case 0x1638:
+            PANIC("lred", "Vega iGPU detected! Use WhateverRed instead");
+            break;
+        case 0x9850:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9851:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9852:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9853:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9854:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9855:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9856:
+            callbackLRed->chipType = ChipType::Mullins;
+            DBGLOG("lred", "Detected APU as Mullins");
+            break;
+        case 0x9874:
+            callbackLRed->chipType = ChipType::Carrizo;
+            DBGLOG("lred", "Detected APU as Carrizo");
+            break;
+        case 0x98E4:
+            callbackLRed->chipType = ChipType::Stoney;
+            DBGLOG("lred", "Detected APU as Stoney");
+            break;
+        default:
+            PANIC("lred", "Unknown device ID");
+    }
+
+    DeviceInfo::deleter(devInfo);
+}
 OSMetaClassBase *LRed::wrapSafeMetaCast(const OSMetaClassBase *anObject, const OSMetaClass *toMeta) {
     auto ret = FunctionCast(wrapSafeMetaCast, callbackLRed->orgSafeMetaCast)(anObject, toMeta);
     if (!ret) {
@@ -177,29 +294,21 @@ OSMetaClassBase *LRed::wrapSafeMetaCast(const OSMetaClassBase *anObject, const O
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
-	if (kextRadeonX4000HWLibs.loadIndex == index) {
+    if (kextRadeonX4000HWLibs.loadIndex == index) {
         KernelPatcher::SolveRequest solveRequests[] = {
             //{"__ZL15deviceTypeTable", orgDeviceTypeTable},
             //{"__ZN11AMDFirmware14createFirmwareEPhjjPKc", orgCreateFirmware},
             //{"__ZN20AMDFirmwareDirectory11putFirmwareE16_AMD_DEVICE_TYPEP11AMDFirmware", orgPutFirmware},
             {"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
                 orgVega10PowerTuneConstructor},
-            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgCapsTableHWLibs},
-            {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
-			{"_Carrizo_RLC_UCODE", orgCzRlcUcode},
-            {"_Carrizo_ME_UCODE", orgCzMeUcode},
-            {"_Carrizo_CE_UCODE", orgCzCeUcode},
-            {"_Carrizo_PFP_UCODE", orgCzPfpUcode},
-            {"_Carrizo_MEC1_UCODE", orgCzMecUcode},
-            {"_Carrizo_MEC2_UCODE", orgCzMec2Ucode},
-            {"_Carrizo_SDMA0_UCODE", orgCzSdma0Ucode},
-            {"_Carrizo_SDMA1_UCODE", orgCzSdma1Ucode},
-			{"_Stoney_RLC_UCODE", orgStnyRlcUcode},
-			{"_Stoney_ME_UCODE", orgStnyMeUcode},
-			{"_Stoney_CE_UCODE", orgStnyCeUcode},
-			{"_Stoney_PFP_UCODE", orgStnyPfpUcode},
-			{"_Stoney_MEC1_UCODE", orgStnyMecUcode},
-			{"_Stoney_SDMA0_UCODE", orgStnySdmaUcode},
+            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgCapsTableHWLibs}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
+            {"_Carrizo_RLC_UCODE", orgCzRlcUcode}, {"_Carrizo_ME_UCODE", orgCzMeUcode},
+            {"_Carrizo_CE_UCODE", orgCzCeUcode}, {"_Carrizo_PFP_UCODE", orgCzPfpUcode},
+            {"_Carrizo_MEC1_UCODE", orgCzMecUcode}, {"_Carrizo_MEC2_UCODE", orgCzMec2Ucode},
+            {"_Carrizo_SDMA0_UCODE", orgCzSdma0Ucode}, {"_Carrizo_SDMA1_UCODE", orgCzSdma1Ucode},
+            {"_Stoney_RLC_UCODE", orgStnyRlcUcode}, {"_Stoney_ME_UCODE", orgStnyMeUcode},
+            {"_Stoney_CE_UCODE", orgStnyCeUcode}, {"_Stoney_PFP_UCODE", orgStnyPfpUcode},
+            {"_Stoney_MEC1_UCODE", orgStnyMecUcode}, {"_Stoney_SDMA0_UCODE", orgStnySdmaUcode},
             //{"_Raven_SendMsgToSmc", orgRavenSendMsgToSmc},
             //{"_Renoir_SendMsgToSmc", orgRenoirSendMsgToSmc},
         };
@@ -209,19 +318,19 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN15AmdCailServicesC2EP11IOPCIDevice", wrapAmdTtlServicesConstructor, orgAmdTtlServicesConstructor},
             //{"__ZN35AMDRadeonX5000_AMDRadeonHWLibsX500025populateFirmwareDirectoryEv", wrapPopulateFirmwareDirectory,
-                //orgPopulateFirmwareDirectory},
+            // orgPopulateFirmwareDirectory},
             {"__ZN25AtiApplePowerTuneServices23createPowerTuneServicesEP11PP_InstanceP18PowerPlayCallbacks",
                 wrapCreatePowerTuneServices},
             //{"_SmuRaven_Initialize", wrapSmuRavenInitialize, orgSmuRavenInitialize},
             //{"_SmuRenoir_Initialize", wrapSmuRenoirInitialize, orgSmuRenoirInitialize},
-			{"__ZN15AmdCailServices23queryEngineRunningStateEP17CailHwEngineQueueP22CailEngineRunningState",
-							wrapQueryEngineRunningState, orgCAILQueryEngineRunningState},
-			{"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
-			{"_Cail_MCILTrace0", wrapCailMCILTrace0, orgCailMCILTrace0},
-			{"_Cail_MCILTrace1", wrapCailMCILTrace1, orgCailMCILTrace1},
-			{"_Cail_MCILTrace2", wrapCailMCILTrace0, orgCailMCILTrace0},
-			{"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
-			{"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
+            {"__ZN15AmdCailServices23queryEngineRunningStateEP17CailHwEngineQueueP22CailEngineRunningState",
+                wrapQueryEngineRunningState, orgCAILQueryEngineRunningState},
+            {"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
+            {"_Cail_MCILTrace0", wrapCailMCILTrace0, orgCailMCILTrace0},
+            {"_Cail_MCILTrace1", wrapCailMCILTrace1, orgCailMCILTrace1},
+            {"_Cail_MCILTrace2", wrapCailMCILTrace0, orgCailMCILTrace0},
+            {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
+            {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
             "Failed to route AMDRadeonX4000HWLibs symbols");
@@ -240,10 +349,10 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         injectGFXFirmware(filename, callbackLRed->orgCzPfpUcode);
         snprintf(filename, 128, "%s_mec.bin", asicName);
         injectGFXFirmware(filename, callbackLRed->orgCzMecUcode);
-		if (this->asicType == ASICType::Carrizo) {
-			snprintf(filename, 128, "%s_mec2.bin", asicName);
-			injectGFXFirmware(filename, callbackLRed->orgCzMec2Ucode);
-		}
+        if (this->chipType == ChipType::Carrizo) {
+            snprintf(filename, 128, "%s_mec2.bin", asicName);
+            injectGFXFirmware(filename, callbackLRed->orgCzMec2Ucode);
+        }
 
         snprintf(filename, 128, "%s_sdma.bin", asicName);
         auto &fwDesc = getFWDescByName(filename);
@@ -256,24 +365,26 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
 
     } else if (kextRadeonFramebuffer.loadIndex == index) {
-/*        KernelPatcher::SolveRequest solveRequests[] = {
-            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
-        };
-        PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size, true), "lred",
-            "Failed to resolve AMDFramebuffer symbols");
+        /*        KernelPatcher::SolveRequest solveRequests[] = {
+                    {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
+                };
+                PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size, true), "lred",
+                    "Failed to resolve AMDFramebuffer symbols");
 
-        KernelPatcher::RouteRequest requests[] = {
-            {"__ZNK15AmdAtomVramInfo16populateVramInfoER16AtomFirmwareInfo", wrapPopulateVramInfo},
-            {"__ZN30AMDRadeonX6000_AmdAsicInfoNavi18populateDeviceInfoEv", wrapPopulateDeviceInfo,
-                orgPopulateDeviceInfo},
-            {"__ZNK32AMDRadeonX6000_AmdAsicInfoNavi1027getEnumeratedRevisionNumberEv", wrapGetEnumeratedRevision},
-            {"__ZN32AMDRadeonX6000_AmdRegisterAccess11hwReadReg32Ej", wrapHwReadReg32, orgHwReadReg32},
-            {"__ZN24AMDRadeonX6000_AmdLogger15initWithPciInfoEP11IOPCIDevice", wrapInitWithPciInfo, orgInitWithPciInfo},
-            {"__ZN34AMDRadeonX6000_AmdRadeonController10doGPUPanicEPKcz", wrapDoGPUPanic},
-        };
-        PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
-            "Failed to route AMDRadeonX6000Framebuffer symbols");
-*/
+                KernelPatcher::RouteRequest requests[] = {
+                    {"__ZNK15AmdAtomVramInfo16populateVramInfoER16AtomFirmwareInfo", wrapPopulateVramInfo},
+                    {"__ZN30AMDRadeonX6000_AmdAsicInfoNavi18populateDeviceInfoEv", wrapPopulateDeviceInfo,
+                        orgPopulateDeviceInfo},
+                    {"__ZNK32AMDRadeonX6000_AmdAsicInfoNavi1027getEnumeratedRevisionNumberEv",
+           wrapGetEnumeratedRevision},
+                    {"__ZN32AMDRadeonX6000_AmdRegisterAccess11hwReadReg32Ej", wrapHwReadReg32, orgHwReadReg32},
+                    {"__ZN24AMDRadeonX6000_AmdLogger15initWithPciInfoEP11IOPCIDevice", wrapInitWithPciInfo,
+           orgInitWithPciInfo},
+                    {"__ZN34AMDRadeonX6000_AmdRadeonController10doGPUPanicEPKcz", wrapDoGPUPanic},
+                };
+                PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
+                    "Failed to route AMDRadeonX6000Framebuffer symbols");
+        */
         /** Neutralise VRAM Info creation null check to proceed with Controller Core Services initialisation. */
         const uint8_t find_null_check1[] = {0x48, 0x89, 0x83, 0x90, 0x00, 0x00, 0x00, 0x48, 0x85, 0xC0, 0x0F, 0x84,
             0x89, 0x00, 0x00, 0x00, 0x48, 0x8B, 0x7B, 0x18};
@@ -331,8 +442,8 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
             {"__ZN28AMDRadeonX4000_AMDCIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, orgSetupAndInitializeHWCapabilities},
-           //{"__ZN28AMDRadeonX5000_AMDRTHardware12getHWChannelE18_eAMD_CHANNEL_TYPE11SS_PRIORITYj", wrapRTGetHWChannel,
-                //orgRTGetHWChannel},
+            //{"__ZN28AMDRadeonX5000_AMDRTHardware12getHWChannelE18_eAMD_CHANNEL_TYPE11SS_PRIORITYj",
+            // wrapRTGetHWChannel, orgRTGetHWChannel},
             //{"__ZN30AMDRadeonX5000_AMDGFX9Hardware20initializeFamilyTypeEv", wrapInitializeFamilyType},
             //{"__ZN30AMDRadeonX5000_AMDGFX9Hardware20allocateAMDHWDisplayEv", wrapAllocateAMDHWDisplay},
             //{"__ZN41AMDRadeonX5000_AMDGFX9GraphicsAccelerator15newVideoContextEv", wrapNewVideoContext},
@@ -341,11 +452,13 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
             //{"__ZN37AMDRadeonX5000_AMDGraphicsAccelerator9newSharedEv", wrapNewShared},
             //{"__ZN37AMDRadeonX5000_AMDGraphicsAccelerator19newSharedUserClientEv", wrapNewSharedUserClient},
             //{"__ZN30AMDRadeonX5000_AMDGFX9Hardware25allocateAMDHWAlignManagerEv", wrapAllocateAMDHWAlignManager,
-                //orgAllocateAMDHWAlignManager},
-			{"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15configureDeviceEP11IOPCIDevice", wrapConfigureDevice, orgConfigureDevice},
-			{"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15createHWHandlerEv", wrapCreateHWHandler, orgCreateHWHandler},
-			{"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator17createHWInterfaceEP11IOPCIDevice", wrapCreateHWInterface, orgCreateHWInterface},
-			{"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
+            // orgAllocateAMDHWAlignManager},
+            {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15configureDeviceEP11IOPCIDevice", wrapConfigureDevice,
+                orgConfigureDevice},
+            {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15createHWHandlerEv", wrapCreateHWHandler, orgCreateHWHandler},
+            {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator17createHWInterfaceEP11IOPCIDevice", wrapCreateHWInterface,
+                orgCreateHWInterface},
+            {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
             "Failed to route AMDRadeonX4000 symbols");
@@ -354,26 +467,28 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
          * `AMDRadeonX4000_AMDHardware::startHWEngines`
          * Make for loop stop at 1 instead of 2 since we only have one SDMA engine.
          */
-		if (this->asicType == ASICType::Stoney) {
-			const uint8_t find[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74, 0x50}; // probably broken
-			const uint8_t repl[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
-			static_assert(arrsize(find) == arrsize(repl));
-			KernelPatcher::LookupPatch patch = {&kextRadeonX4000, find, repl, arrsize(find), 1};
-			patcher.applyLookupPatch(&patch);
-			patcher.clearError();
-			DBGLOG("lred", "-- Stoney Singular SDMA patch done, Let's hope we didn't break X4000 --");
-		}
-		
-	} else if (kextAMD8000Controller.loadIndex == index) {
-		KernelPatcher::RouteRequest requests[] = {
-			{"__ZN13ASIC_INFO__CIC2Ev", wrapASICINFO_CI, orgASICINFO_CI},
-			{"__ZN24DEVICE_COMPONENT_FACTORY14createAsicInfoEP13ATIController", wrapCreateAsicInfo, orgCreateAsicInfo},
-			{"__ZN17AMD8000Controller15powerUpHardwareEv", wrapPowerUpHardware, orgPowerUpHardware},
-			{"__ZN17AMD8000Controller35initializeProjectDependentResourcesEv", wrapInitializeProjectDependentResources, orgInitializeProjectDependentResources},
-		};
-		PANIC_COND(!patcher.routeMultipleLong(index, requests, address, size), "lred",
-			"Failed to route AMD8000Controller symbols");
-		DBGLOG("lred", "Successfully routed AMD8000Controller symbols");
+        if (this->chipType == ChipType::Stoney) {
+            const uint8_t find[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74,
+                0x50};    // probably broken
+            const uint8_t repl[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
+            static_assert(arrsize(find) == arrsize(repl));
+            KernelPatcher::LookupPatch patch = {&kextRadeonX4000, find, repl, arrsize(find), 1};
+            patcher.applyLookupPatch(&patch);
+            patcher.clearError();
+            DBGLOG("lred", "-- Stoney Singular SDMA patch done, Let's hope we didn't break X4000 --");
+        }
+
+    } else if (kextAMD8000Controller.loadIndex == index) {
+        KernelPatcher::RouteRequest requests[] = {
+            {"__ZN13ASIC_INFO__CIC2Ev", wrapASICINFO_CI, orgASICINFO_CI},
+            {"__ZN24DEVICE_COMPONENT_FACTORY14createAsicInfoEP13ATIController", wrapCreateAsicInfo, orgCreateAsicInfo},
+            {"__ZN17AMD8000Controller15powerUpHardwareEv", wrapPowerUpHardware, orgPowerUpHardware},
+            {"__ZN17AMD8000Controller35initializeProjectDependentResourcesEv", wrapInitializeProjectDependentResources,
+                orgInitializeProjectDependentResources},
+        };
+        PANIC_COND(!patcher.routeMultipleLong(index, requests, address, size), "lred",
+            "Failed to route AMD8000Controller symbols");
+        DBGLOG("lred", "Successfully routed AMD8000Controller symbols");
     }
 }
 
@@ -401,7 +516,7 @@ uint16_t LRed::wrapGetEnumeratedRevision() { return callbackLRed->enumeratedRevi
 IOReturn LRed::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callbackLRed->orgPopulateDeviceInfo)(that);
     auto deviceId = WIOKit::readPCIConfigValue(getMember<IOPCIDevice *>(that, 0x18), WIOKit::kIOPCIConfigDeviceID);
-	getMember<uint32_t>(that, 0x60) = AMDGPU_FAMILY_CZ;
+    getMember<uint32_t>(that, 0x60) = AMDGPU_FAMILY_CZ;
     auto revision = getMember<uint32_t>(that, 0x68);
     auto emulatedRevision = getMember<uint32_t>(that, 0x6c);
 
@@ -591,7 +706,7 @@ bool LRed::wrapAccelSharedUCStopX6000(void *that, void *provider) {
 /*
 void LRed::wrapInitDCNRegistersOffsets(void *that) {
     FunctionCast(wrapInitDCNRegistersOffsets, callbackLRed->orgInitDCNRegistersOffsets)(that);
-    if (callbackLRed->asicType < ASICType::Renoir) {
+    if (callbackLRed->chipType < ChipType::Renoir) {
         DBGLOG("lred", "initDCNRegistersOffsets !! PATCHING REGISTERS FOR DCN 1.0 !!");
         auto base = getMember<uint32_t>(that, 0x4830);
         getMember<uint32_t>(that, 0x4840) = base + mmHUBPREQ0_DCSURF_PRIMARY_SURFACE_ADDRESS;
@@ -719,62 +834,59 @@ void LRed::wrapDoGPUPanic() {
 }
 
 bool LRed::wrapAccelStart(void *that, IOService *provider) {
-	DBGLOG("rad", "accelStart: this = %p provider = %p", that, provider);
-	callbackLRed->callbackAccelerator = that;
-	auto ret = FunctionCast(wrapAccelStart, callbackLRed->orgAccelStart)(that, provider);
-	DBGLOG("rad", "accelStart returned %d", ret);
-	return ret;
+    DBGLOG("rad", "accelStart: this = %p provider = %p", that, provider);
+    callbackLRed->callbackAccelerator = that;
+    auto ret = FunctionCast(wrapAccelStart, callbackLRed->orgAccelStart)(that, provider);
+    DBGLOG("rad", "accelStart returned %d", ret);
+    return ret;
 }
 
-uint32_t LRed::wrapConfigureDevice(void * param1) {
-	DBGLOG("lred", "configureDevice: param1 = %p", param1);
-	auto ret = FunctionCast(wrapConfigureDevice, callbackLRed->orgConfigureDevice)(param1);
-	DBGLOG("lred", "configureDevice returned 0x%X", ret);
-	return ret;
+uint32_t LRed::wrapConfigureDevice(void *param1) {
+    DBGLOG("lred", "configureDevice: param1 = %p", param1);
+    auto ret = FunctionCast(wrapConfigureDevice, callbackLRed->orgConfigureDevice)(param1);
+    DBGLOG("lred", "configureDevice returned 0x%X", ret);
+    return ret;
 }
-
 
 void LRed::wrapASICINFO_CI(void) {
-	DBGLOG("lred", "ASIC_INFO__CI: Called.");
-	FunctionCast(wrapASICINFO_CI, callbackLRed->orgASICINFO_CI);
-	DBGLOG("lred", "ASIC_INFO__CI finished.");
+    DBGLOG("lred", "ASIC_INFO__CI: Called.");
+    FunctionCast(wrapASICINFO_CI, callbackLRed->orgASICINFO_CI);
+    DBGLOG("lred", "ASIC_INFO__CI finished.");
 }
 
-
-void * LRed::wrapCreateAsicInfo(void * param1) {
-	DBGLOG("lred", "createAsicInfo: param1 = %p", param1);
-	auto ret = FunctionCast(wrapCreateAsicInfo, callbackLRed->orgCreateAsicInfo)(param1);
-	DBGLOG("lred", "createAsicInfo returned %p", ret);
-	return ret;
+void *LRed::wrapCreateAsicInfo(void *param1) {
+    DBGLOG("lred", "createAsicInfo: param1 = %p", param1);
+    auto ret = FunctionCast(wrapCreateAsicInfo, callbackLRed->orgCreateAsicInfo)(param1);
+    DBGLOG("lred", "createAsicInfo returned %p", ret);
+    return ret;
 }
-
 
 uint32_t LRed::wrapPowerUpHardware(void) {
-	DBGLOG("lred", "AMD8000Controller::powerUpHardware: Called.");
-	auto ret = FunctionCast(wrapPowerUpHardware, callbackLRed->orgPowerUpHardware)();
-	DBGLOG("lred", "AMD8000Controller::powerUpHardware: We can't tell if it worked or not, theres no parameters, lets hope it did");
-	return ret;
+    DBGLOG("lred", "AMD8000Controller::powerUpHardware: Called.");
+    auto ret = FunctionCast(wrapPowerUpHardware, callbackLRed->orgPowerUpHardware)();
+    DBGLOG("lred", "AMD8000Controller::powerUpHardware: We can't tell if it worked or not, theres no parameters, lets "
+                   "hope it did");
+    return ret;
 }
-
 
 uint32_t LRed::wrapInitializeProjectDependentResources(void) {
-	DBGLOG("lred", "initializeProjectDependentResources: Called.");
-	auto ret = FunctionCast(wrapInitializeProjectDependentResources, callbackLRed->orgInitializeProjectDependentResources)();
-	DBGLOG("lred", "initializeProjectDependentResources returned 0x%X");
-	return ret;
+    DBGLOG("lred", "initializeProjectDependentResources: Called.");
+    auto ret =
+        FunctionCast(wrapInitializeProjectDependentResources, callbackLRed->orgInitializeProjectDependentResources)();
+    DBGLOG("lred", "initializeProjectDependentResources returned 0x%X");
+    return ret;
 }
 
-
-void * LRed::wrapCreateHWHandler(void) {
-	DBGLOG("lred", "createHWHandler: Called.");
-	auto ret = FunctionCast(wrapCreateHWHandler, callbackLRed->orgCreateHWHandler)();
-	DBGLOG("lred", "createHWHandler returned %p", ret);
-	return ret;
+void *LRed::wrapCreateHWHandler(void) {
+    DBGLOG("lred", "createHWHandler: Called.");
+    auto ret = FunctionCast(wrapCreateHWHandler, callbackLRed->orgCreateHWHandler)();
+    DBGLOG("lred", "createHWHandler returned %p", ret);
+    return ret;
 }
 
-void * LRed::wrapCreateHWInterface(void * param1) {
-	DBGLOG("lred", "createHWInterface: param1 = %p", param1);
-	auto ret = FunctionCast(wrapCreateHWInterface, callbackLRed->orgCreateHWInterface)(param1);
-	DBGLOG("lred", "createHWInterface returned %p", ret);
-	return ret;
+void *LRed::wrapCreateHWInterface(void *param1) {
+    DBGLOG("lred", "createHWInterface: param1 = %p", param1);
+    auto ret = FunctionCast(wrapCreateHWInterface, callbackLRed->orgCreateHWInterface)(param1);
+    DBGLOG("lred", "createHWInterface returned %p", ret);
+    return ret;
 }

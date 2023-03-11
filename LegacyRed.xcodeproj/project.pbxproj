@@ -13,6 +13,7 @@
 		CE8DA0832517C41A008C44E8 /* libkmod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = CE8DA0822517C41A008C44E8 /* libkmod.a */; };
 		CEA03B5E20EE825A00BA842F /* kern_lred.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CEA03B5C20EE825A00BA842F /* kern_lred.cpp */; };
 		CEA03B5F20EE825A00BA842F /* kern_lred.hpp in Headers */ = {isa = PBXBuildFile; fileRef = CEA03B5D20EE825A00BA842F /* kern_lred.hpp */; };
+		F0ED265129BC6B34001FE711 /* kern_model.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F0ED265029BC6B34001FE711 /* kern_model.hpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -78,6 +79,7 @@
 		F0ED264D29B5BDF9001FE711 /* carrizo_vce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_vce.bin; sourceTree = "<group>"; };
 		F0ED264E29B5BDF9001FE711 /* mullins_me.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_me.bin; sourceTree = "<group>"; };
 		F0ED264F29B5BDF9001FE711 /* mullins_mec.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_mec.bin; sourceTree = "<group>"; };
+		F0ED265029BC6B34001FE711 /* kern_model.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = kern_model.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -122,6 +124,7 @@
 				1C748C2C1C21952C0024EED2 /* kern_start.cpp */,
 				CEA03B5C20EE825A00BA842F /* kern_lred.cpp */,
 				CEA03B5D20EE825A00BA842F /* kern_lred.hpp */,
+				F0ED265029BC6B34001FE711 /* kern_model.hpp */,
 			);
 			path = LegacyRed;
 			sourceTree = "<group>";
@@ -213,6 +216,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F0ED265129BC6B34001FE711 /* kern_model.hpp in Headers */,
 				CEA03B5F20EE825A00BA842F /* kern_lred.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -8,12 +8,13 @@
 #include <IOKit/acpi/IOACPIPlatformExpert.h>
 #include <IOKit/pci/IOPCIDevice.h>
 
-enum struct ASICType {
+#define MODULE_SHORT "lred"
+
+enum struct ChipType {
     Unknown,
-	Carrizo,
-	Mullins,
-	Stoney,
-	CarrizoL,
+    Mullins,
+    Carrizo,
+    Stoney,
 };
 
 // Hack
@@ -26,29 +27,29 @@ static bool checkAtomBios(const uint8_t *bios, size_t size) {
     uint16_t tmp, bios_header_start;
 
     if (size < 0x49) {
-        DBGLOG("wred", "VBIOS size is invalid");
+        DBGLOG("lred", "VBIOS size is invalid");
         return false;
     }
 
     if (bios[0] != 0x55 || bios[1] != 0xAA) {
-        DBGLOG("wred", "VBIOS signature <%x %x> is invalid", bios[0], bios[1]);
+        DBGLOG("lred", "VBIOS signature <%x %x> is invalid", bios[0], bios[1]);
         return false;
     }
 
     bios_header_start = bios[0x48] | (bios[0x49] << 8);
     if (!bios_header_start) {
-        DBGLOG("wred", "Unable to locate VBIOS header");
+        DBGLOG("lred", "Unable to locate VBIOS header");
         return false;
     }
 
     tmp = bios_header_start + 4;
     if (size < tmp) {
-        DBGLOG("wred", "BIOS header is broken");
+        DBGLOG("lred", "BIOS header is broken");
         return false;
     }
 
     if (!memcmp(bios + tmp, "ATOM", 4) || !memcmp(bios + tmp, "MOTA", 4)) {
-        DBGLOG("wred", "ATOMBIOS detected");
+        DBGLOG("lred", "ATOMBIOS detected");
         return true;
     }
 
@@ -66,24 +67,24 @@ class LRed {
 
     private:
     static const char *getASICName() {
-        PANIC_COND(callbackLRed->asicType == ASICType::Unknown, "wred", "Unknown ASIC type");
+        PANIC_COND(callbackLRed->chipType == ChipType::Unknown, "lred", "Unknown ASIC type");
         static const char *asicNames[] = {"carrizo", "mullins", "stoney"};
-        return asicNames[static_cast<int>(callbackLRed->asicType) - 1];
+        return asicNames[static_cast<int>(callbackLRed->chipType) - 1];
     }
 
     bool getVBIOSFromVFCT(IOPCIDevice *obj) {
-        DBGLOG("wred", "Fetching VBIOS from VFCT table");
+        DBGLOG("lred", "Fetching VBIOS from VFCT table");
         auto *expert = reinterpret_cast<AppleACPIPlatformExpert *>(obj->getPlatform());
-        PANIC_COND(!expert, "wred", "Failed to get AppleACPIPlatformExpert");
+        PANIC_COND(!expert, "lred", "Failed to get AppleACPIPlatformExpert");
 
         auto *vfctData = expert->getACPITableData("VFCT", 0);
         if (!vfctData) {
-            DBGLOG("wred", "No VFCT from AppleACPIPlatformExpert");
+            DBGLOG("lred", "No VFCT from AppleACPIPlatformExpert");
             return false;
         }
 
         auto *vfct = static_cast<const VFCT *>(vfctData->getBytesNoCopy());
-        PANIC_COND(!vfct, "wred", "VFCT OSData::getBytesNoCopy returned null");
+        PANIC_COND(!vfct, "lred", "VFCT OSData::getBytesNoCopy returned null");
 
         auto offset = vfct->vbiosImageOffset;
 
@@ -91,14 +92,14 @@ class LRed {
             auto *vHdr =
                 static_cast<const GOPVideoBIOSHeader *>(vfctData->getBytesNoCopy(offset, sizeof(GOPVideoBIOSHeader)));
             if (!vHdr) {
-                DBGLOG("wred", "VFCT header out of bounds");
+                DBGLOG("lred", "VFCT header out of bounds");
                 return false;
             }
 
             auto *vContent = static_cast<const uint8_t *>(
                 vfctData->getBytesNoCopy(offset + sizeof(GOPVideoBIOSHeader), vHdr->imageLength));
             if (!vContent) {
-                DBGLOG("wred", "VFCT VBIOS image out of bounds");
+                DBGLOG("lred", "VFCT VBIOS image out of bounds");
                 return false;
             }
 
@@ -109,11 +110,11 @@ class LRed {
                 vHdr->vendorID == obj->configRead16(kIOPCIConfigVendorID) &&
                 vHdr->deviceID == obj->configRead16(kIOPCIConfigDeviceID)) {
                 if (!checkAtomBios(vContent, vHdr->imageLength)) {
-                    DBGLOG("wred", "VFCT VBIOS is not an ATOMBIOS");
+                    DBGLOG("lred", "VFCT VBIOS is not an ATOMBIOS");
                     return false;
                 }
                 this->vbiosData = OSData::withBytes(vContent, vHdr->imageLength);
-                PANIC_COND(!this->vbiosData, "wred", "VFCT OSData::withBytes failed");
+                PANIC_COND(!this->vbiosData, "lred", "VFCT OSData::withBytes failed");
                 obj->setProperty("ATY,bin_image", this->vbiosData);
                 return true;
             }
@@ -126,18 +127,18 @@ class LRed {
         uint32_t size = 256 * 1024;    // ???
         auto *bar0 = provider->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress0, kIOMemoryMapCacheModeWriteThrough);
         if (!bar0 || !bar0->getLength()) {
-            DBGLOG("wred", "FB BAR not enabled");
+            DBGLOG("lred", "FB BAR not enabled");
             if (bar0) { bar0->release(); }
             return false;
         }
         auto *fb = reinterpret_cast<const uint8_t *>(bar0->getVirtualAddress());
         if (!checkAtomBios(fb, size)) {
-            DBGLOG("wred", "VRAM VBIOS is not an ATOMBIOS");
+            DBGLOG("lred", "VRAM VBIOS is not an ATOMBIOS");
             bar0->release();
             return false;
         }
         this->vbiosData = OSData::withBytes(fb, size);
-        PANIC_COND(!this->vbiosData, "wred", "VRAM OSData::withBytes failed");
+        PANIC_COND(!this->vbiosData, "lred", "VRAM OSData::withBytes failed");
         provider->setProperty("ATY,bin_image", this->vbiosData);
         bar0->release();
         return true;
@@ -175,11 +176,11 @@ class LRed {
             return ret;
         };
 
-        PANIC_COND(smuWaitForResp() != 1, "wred", "Msg issuing pre-check failed; SMU may be in an improper state");
+        PANIC_COND(smuWaitForResp() != 1, "lred", "Msg issuing pre-check failed; SMU may be in an improper state");
         this->writeReg32(MP_BASE + mmMP1_SMN_C2PMSG_90, 0);                          // Status
         this->writeReg32(MP_BASE + mmMP1_SMN_C2PMSG_82, 0);                          // Param
         this->writeReg32(MP_BASE + mmMP1_SMN_C2PMSG_66, PPSMC_MSG_GetSmuVersion);    // Message
-        PANIC_COND(smuWaitForResp() != 1, "wred", "No response from SMU");
+        PANIC_COND(smuWaitForResp() != 1, "lred", "No response from SMU");
         return this->readReg32(MP_BASE + mmMP1_SMN_C2PMSG_82) >> 8;
     }
 
@@ -189,23 +190,25 @@ class LRed {
         fw->addr = 0x0;
         fw->size = fwHeader->ucodeSize;
         fw->data = fwDesc.data + fwHeader->ucodeOff;
-        DBGLOG("wred", "Injected %s!", filename);
+        DBGLOG("lred", "Injected %s!", filename);
 
         if (jt) {
             jt->addr = fwHeader->jtOff;
             jt->size = fwHeader->jtSize;
             jt->data = fwDesc.data + fwHeader->ucodeOff + fwHeader->jtOff;
-            DBGLOG("wred", "Injected %s <jt>!", filename);
+            DBGLOG("lred", "Injected %s <jt>!", filename);
         }
     }
 
     OSData *vbiosData = nullptr;
-    ASICType asicType = ASICType::Unknown;
+    ChipType chipType = ChipType::Unknown;
     uint64_t fbOffset {};
     IOMemoryMap *rmmio = nullptr;
     volatile uint32_t *rmmioPtr = nullptr;
     uint16_t enumeratedRevision {};
-    IOPCIDevice *videoBuiltin = nullptr;
+    IOPCIDevice *iGPU = nullptr;
+    uint32_t deviceId {};
+    uint16_t revision {};
 
     void *hwAlignMgr = nullptr;
     uint8_t *hwAlignMgrVtX5000 = nullptr;
@@ -242,31 +245,30 @@ class LRed {
     GcFwConstant *orgCzMec2Ucode = nullptr;
     SdmaFwConstant *orgCzSdma0Ucode = nullptr;
     SdmaFwConstant *orgCzSdma1Ucode = nullptr;
-	GcFwConstant *orgStnyRlcUcode = nullptr;
-	GcFwConstant *orgStnyMeUcode = nullptr;
-	GcFwConstant *orgStnyCeUcode = nullptr;
-	GcFwConstant *orgStnyPfpUcode = nullptr;
-	GcFwConstant *orgStnyMecUcode = nullptr;
-	SdmaFwConstant *orgStnySdmaUcode = nullptr;
+    GcFwConstant *orgStnyRlcUcode = nullptr;
+    GcFwConstant *orgStnyMeUcode = nullptr;
+    GcFwConstant *orgStnyCeUcode = nullptr;
+    GcFwConstant *orgStnyPfpUcode = nullptr;
+    GcFwConstant *orgStnyMecUcode = nullptr;
+    SdmaFwConstant *orgStnySdmaUcode = nullptr;
     t_sendMsgToSmc orgRavenSendMsgToSmc = nullptr;
     t_sendMsgToSmc orgRenoirSendMsgToSmc = nullptr;
     mach_vm_address_t orgSmuRavenInitialize {};
     mach_vm_address_t orgSmuRenoirInitialize {};
     mach_vm_address_t orgPspCmdKmSubmit {};
-	mach_vm_address_t orgCAILQueryEngineRunningState {};
-	mach_vm_address_t orgCailMonitorEngineInternalState {};
-	mach_vm_address_t orgCailMonitorPerformanceCounter {};
-	mach_vm_address_t orgSMUMInitialize {};
-	mach_vm_address_t orgCailMCILTrace0 {};
-	mach_vm_address_t orgCosDebugPrint {}, orgMCILDebugPrint {};
-	static void wrapCailMCILTrace0(void *that);
+    mach_vm_address_t orgCAILQueryEngineRunningState {};
+    mach_vm_address_t orgCailMonitorEngineInternalState {};
+    mach_vm_address_t orgCailMonitorPerformanceCounter {};
+    mach_vm_address_t orgSMUMInitialize {};
+    mach_vm_address_t orgCailMCILTrace0 {};
+    mach_vm_address_t orgCosDebugPrint {}, orgMCILDebugPrint {};
+    static void wrapCailMCILTrace0(void *that);
 
-	mach_vm_address_t orgCailMCILTrace1 {};
-	static void wrapCailMCILTrace1(void *that);
-	
-	mach_vm_address_t orgCailMCILTrace2 {};
-	static void wrapCailMCILTrace2(void *that);
+    mach_vm_address_t orgCailMCILTrace1 {};
+    static void wrapCailMCILTrace1(void *that);
 
+    mach_vm_address_t orgCailMCILTrace2 {};
+    static void wrapCailMCILTrace2(void *that);
 
     /** X6000 */
     t_HWEngineConstructor orgVCN2EngineConstructorX6000 = nullptr;
@@ -283,7 +285,7 @@ class LRed {
     mach_vm_address_t orgFillUBMSurface {};
     mach_vm_address_t orgConfigureDisplay {};
     mach_vm_address_t orgGetDisplayInfo {};
-	mach_vm_address_t orgAccelStart {};
+    mach_vm_address_t orgAccelStart {};
 
     /** X5000 */
     t_HWEngineConstructor orgGFX9PM4EngineConstructor = nullptr;
@@ -317,14 +319,14 @@ class LRed {
     static uint32_t wrapPspCmdKmSubmit(void *psp, void *ctx, void *param3, void *param4);
     static uint32_t hwLibsNoop();
     static uint32_t hwLibsUnsupported();
-	static uint64_t wrapMCILUpdateGfxCGPG(void *param1);
-	static IOReturn wrapQueryEngineRunningState(void *that, void *param1, void *param2);
-	static uint64_t wrapCAILQueryEngineRunningState(void *param1, uint32_t *param2, uint64_t param3);
-	static uint64_t wrapCailMonitorEngineInternalState(void *that, uint32_t param1, uint32_t *param2);
-	static uint64_t wrapCailMonitorPerformanceCounter(void *that, uint32_t *param1);
-	static uint64_t wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3);
-	static void wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
-		uint level);
+    static uint64_t wrapMCILUpdateGfxCGPG(void *param1);
+    static IOReturn wrapQueryEngineRunningState(void *that, void *param1, void *param2);
+    static uint64_t wrapCAILQueryEngineRunningState(void *param1, uint32_t *param2, uint64_t param3);
+    static uint64_t wrapCailMonitorEngineInternalState(void *that, uint32_t param1, uint32_t *param2);
+    static uint64_t wrapCailMonitorPerformanceCounter(void *that, uint32_t *param1);
+    static uint64_t wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3);
+    static void wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
+        uint level);
 
     /** X6000 */
     static bool wrapAccelStartX6000();
@@ -351,22 +353,22 @@ class LRed {
     static void *wrapNewShared();
     static void *wrapNewSharedUserClient();
     static void *wrapAllocateAMDHWAlignManager();
-	mach_vm_address_t orgConfigureDevice{};
-	static uint32_t wrapConfigureDevice(void * param1);
-	void *callbackAccelerator = nullptr;
-	static bool wrapAccelStart(void *that, IOService *provider);
-	mach_vm_address_t orgASICINFO_CI{};
-	static void wrapASICINFO_CI(void);
-	mach_vm_address_t orgCreateAsicInfo{};
-	static void * wrapCreateAsicInfo(void * param1);
-	mach_vm_address_t orgPowerUpHardware{};
-	static uint32_t wrapPowerUpHardware(void);
-	mach_vm_address_t orgInitializeProjectDependentResources{};
-	static uint32_t wrapInitializeProjectDependentResources(void);
-	mach_vm_address_t orgCreateHWHandler{};
-	static void * wrapCreateHWHandler(void);
-	mach_vm_address_t orgCreateHWInterface{};
-	static void * wrapCreateHWInterface(void * param1);
-	mach_vm_address_t orgStart{};
-	static uint64_t wrapStart(void * param1);
+    mach_vm_address_t orgConfigureDevice {};
+    static uint32_t wrapConfigureDevice(void *param1);
+    void *callbackAccelerator = nullptr;
+    static bool wrapAccelStart(void *that, IOService *provider);
+    mach_vm_address_t orgASICINFO_CI {};
+    static void wrapASICINFO_CI(void);
+    mach_vm_address_t orgCreateAsicInfo {};
+    static void *wrapCreateAsicInfo(void *param1);
+    mach_vm_address_t orgPowerUpHardware {};
+    static uint32_t wrapPowerUpHardware(void);
+    mach_vm_address_t orgInitializeProjectDependentResources {};
+    static uint32_t wrapInitializeProjectDependentResources(void);
+    mach_vm_address_t orgCreateHWHandler {};
+    static void *wrapCreateHWHandler(void);
+    mach_vm_address_t orgCreateHWInterface {};
+    static void *wrapCreateHWInterface(void *param1);
+    mach_vm_address_t orgStart {};
+    static uint64_t wrapStart(void *param1);
 };
