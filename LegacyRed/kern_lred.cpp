@@ -344,12 +344,7 @@ if (this->chipType == ChipType::Stoney) {
 }
 
 void LRed::wrapAmdTtlServicesConstructor(void *that, IOPCIDevice *provider) {
-    DBGLOG("lred", "Patching device type table");
-    PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "lred",
-        "Failed to enable kernel writing");
-    callbackLRed->orgDeviceTypeTable[0] = WIOKit::readPCIConfigValue(provider, WIOKit::kIOPCIConfigDeviceID);
-    callbackLRed->orgDeviceTypeTable[1] = 6;
-    MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
+    DBGLOG("lred", "AmdCailServices constructor called!");
 
     FunctionCast(wrapAmdTtlServicesConstructor, callbackLRed->orgAmdTtlServicesConstructor)(that, provider);
 }
