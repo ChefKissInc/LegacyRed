@@ -40,6 +40,9 @@ static KernelPatcher::KextInfo kextAMD9000Controller = {"com.apple.kext.AMD9000C
 static KernelPatcher::KextInfo kextRadeonX4000 {"com.apple.kext.AMDRadeonX4000", &pathRadeonX4000, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
 
+static KernelPatcher::KextInfo kextRadeonSupport {"com.apple.kext.AMDSupport", &pathRadeonSupport, 1, {}, {},
+    KernelPatcher::KextInfo::Unloaded};
+
 LRed *LRed::callbackLRed = nullptr;
 
 void LRed::init() {
@@ -48,7 +51,7 @@ void LRed::init() {
 
     lilu.onPatcherLoadForce(
         [](void *user, KernelPatcher &patcher) { static_cast<LRed *>(user)->processPatcher(patcher); }, this);
-    lilu.onKextLoadForce(&kextRadeonX4000HWLibs);
+    lilu.onKextLoad(&kextRadeonX4000HWLibs);
     lilu.onKextLoadForce(&kextRadeonFramebuffer);
     lilu.onKextLoad(&kextAMD8000Controller);
     lilu.onKextLoad(&kextAMD9000Controller);
@@ -80,29 +83,29 @@ void LRed::processPatcher(KernelPatcher &patcher) {
 
     devInfo->processSwitchOff();
 
-	auto *videoBuiltin = devInfo->videoBuiltin;
-	if (!videoBuiltin) {
-		SYSLOG(MODULE_SHORT, "videoBuiltin null");
-		for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
-			if (!OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video)) { continue; }
-			if (WIOKit::readPCIConfigValue(devInfo->videoExternal[i].video, WIOKit::kIOPCIConfigVendorID) ==
-				WIOKit::VendorID::ATIAMD) {
-				videoBuiltin = devInfo->videoExternal[i].video;
-				break;
-			}
-		}
-	}
+    auto *videoBuiltin = devInfo->videoBuiltin;
+    if (!videoBuiltin) {
+        SYSLOG(MODULE_SHORT, "videoBuiltin null");
+        for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
+            if (!OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video)) { continue; }
+            if (WIOKit::readPCIConfigValue(devInfo->videoExternal[i].video, WIOKit::kIOPCIConfigVendorID) ==
+                WIOKit::VendorID::ATIAMD) {
+                videoBuiltin = devInfo->videoExternal[i].video;
+                break;
+            }
+        }
+    }
 
-	PANIC_COND(!videoBuiltin, MODULE_SHORT, "videoBuiltin null");
-	auto *iGPU = OSDynamicCast(IOPCIDevice, videoBuiltin);
-	PANIC_COND(!iGPU, MODULE_SHORT, "videoBuiltin is not IOPCIDevice");
-	PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, MODULE_SHORT,
-		"videoBuiltin is not AMD");
+    PANIC_COND(!videoBuiltin, MODULE_SHORT, "videoBuiltin null");
+    auto *iGPU = OSDynamicCast(IOPCIDevice, videoBuiltin);
+    PANIC_COND(!iGPU, MODULE_SHORT, "videoBuiltin is not IOPCIDevice");
+    PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, MODULE_SHORT,
+        "videoBuiltin is not AMD");
 
-	callbackLRed->iGPU = iGPU;
+    callbackLRed->iGPU = iGPU;
 
-	WIOKit::renameDevice(iGPU, "IGPU");
-	WIOKit::awaitPublishing(iGPU);
+    WIOKit::renameDevice(iGPU, "IGPU");
+    WIOKit::awaitPublishing(iGPU);
 
     static uint8_t builtin[] = {0x01};
     iGPU->setProperty("built-in", builtin, sizeof(builtin));
@@ -239,30 +242,71 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
             "Failed to route AMDRadeonX4000HWLibs symbols");
 
+        if (this->chipType == ChipType::Mullins) {
+            DBGLOG(MODULE_SHORT, "- APPLYING _Carrizo_UcodeInfo PATCH -");
+            uint8_t find_cz_ucodeinfo_mec2skip[] = {0x5F, 0x43, 0x61, 0x72, 0x72, 0x69, 0x7A, 0x6F, 0x5F, 0x4D, 0x45,
+                0x43, 0x32, 0x5F, 0x55, 0x43, 0x4F, 0x44, 0x45};
+            uint8_t repl_cz_ucodeinfo_mec2skip[] = {0x5F, 0x53, 0x6B, 0x69, 0x70, 0x4C, 0x6F, 0x61, 0x64, 0x69, 0x6E,
+                0x67, 0x5F, 0x4D, 0x45, 0x43, 0x32, 0x5F, 0x55, 0x43, 0x4F, 0x44, 0x45};
+            static_assert(arrsize(find_cz_ucodeinfo_mec2skip) <
+                          arrsize(repl_cz_ucodeinfo_mec2skip));    // Crappy, but it gives me results
+            KernelPatcher::LookupPatch patches[] = {
+                {&kextRadeonSupport, find_cz_ucodeinfo_mec2skip, repl_cz_ucodeinfo_mec2skip,
+                    arrsize(find_cz_ucodeinfo_mec2skip), 1},
+            };
+            for (auto &patch : patches) {
+                patcher.applyLookupPatch(&patch);
+                patcher.clearError();
+            }
+            DBGLOG(MODULE_SHORT, "- APPLIED _Carrizo_UcodeInfo PATCH -");
+        }
+
         auto *asicName = callbackLRed->getASICName();
         // TODO: Inject all parts of RLC firmware
         // Disabled firmware injection due to bad code
     } else if (kextRadeonFramebuffer.loadIndex == index) {
         /*        KernelPatcher::SolveRequest solveRequests[] = {
-                    {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
-                };
-                PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size, true), "lred",
-                    "Failed to resolve AMDFramebuffer symbols");
+         {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
+         };
+         PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size, true), "lred",
+         "Failed to resolve AMDFramebuffer symbols");
 
-                KernelPatcher::RouteRequest requests[] = {
-                    {"__ZNK15AmdAtomVramInfo16populateVramInfoER16AtomFirmwareInfo", wrapPopulateVramInfo},
-                    {"__ZN30AMDRadeonX6000_AmdAsicInfoNavi18populateDeviceInfoEv", wrapPopulateDeviceInfo,
-                        orgPopulateDeviceInfo},
-                    {"__ZNK32AMDRadeonX6000_AmdAsicInfoNavi1027getEnumeratedRevisionNumberEv",
-           wrapGetEnumeratedRevision},
-                    {"__ZN32AMDRadeonX6000_AmdRegisterAccess11hwReadReg32Ej", wrapHwReadReg32, orgHwReadReg32},
-                    {"__ZN24AMDRadeonX6000_AmdLogger15initWithPciInfoEP11IOPCIDevice", wrapInitWithPciInfo,
-           orgInitWithPciInfo},
-                    {"__ZN34AMDRadeonX6000_AmdRadeonController10doGPUPanicEPKcz", wrapDoGPUPanic},
-                };
-                PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
-                    "Failed to route AMDRadeonX6000Framebuffer symbols");
-        */
+         KernelPatcher::RouteRequest requests[] = {
+         {"__ZNK15AmdAtomVramInfo16populateVramInfoER16AtomFirmwareInfo", wrapPopulateVramInfo},
+         {"__ZN30AMDRadeonX6000_AmdAsicInfoNavi18populateDeviceInfoEv", wrapPopulateDeviceInfo,
+         orgPopulateDeviceInfo},
+         {"__ZNK32AMDRadeonX6000_AmdAsicInfoNavi1027getEnumeratedRevisionNumberEv",
+         wrapGetEnumeratedRevision},
+         {"__ZN32AMDRadeonX6000_AmdRegisterAccess11hwReadReg32Ej", wrapHwReadReg32, orgHwReadReg32},
+         {"__ZN24AMDRadeonX6000_AmdLogger15initWithPciInfoEP11IOPCIDevice", wrapInitWithPciInfo,
+         orgInitWithPciInfo},
+         {"__ZN34AMDRadeonX6000_AmdRadeonController10doGPUPanicEPKcz", wrapDoGPUPanic},
+         };
+         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
+         "Failed to route AMDRadeonX6000Framebuffer symbols");
+         */
+    } else if (kextRadeonSupport.loadIndex == index) {
+        KernelPatcher::RouteRequest requests[] = {
+            {"__ZN13ATIController5startEP9IOService", wrapStartAtiController, orgStartAtiController},
+        };
+        PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
+            "Failed to route AMDSupport symbols");
+
+        /** Nuetralises VRAM Info Null check, taken from older builds of WhateverRed */
+        uint8_t find_null_vram_check[] = {0x48, 0x89, 0x83, 0x18, 0x01, 0x00, 0x00, 0x31, 0xc0, 0x48, 0x85, 0xc9, 0x75,
+            0x3e, 0x48, 0x8d, 0x3d, 0xa4, 0xe2, 0x01, 0x00};
+        uint8_t repl_null_vram_check[] = {0x48, 0x89, 0x83, 0x18, 0x01, 0x00, 0x00, 0x31, 0xc0, 0x48, 0x85, 0xc9, 0x74,
+            0x3e, 0x48, 0x8d, 0x3d, 0xa4, 0xe2, 0x01, 0x00};
+        DBGLOG(MODULE_SHORT, "- APPLYING VRAM INFO NULL CHECK PATCH -");
+        static_assert(arrsize(find_null_vram_check) == arrsize(repl_null_vram_check));
+        KernelPatcher::LookupPatch patches[] = {
+            {&kextRadeonSupport, find_null_vram_check, repl_null_vram_check, arrsize(find_null_vram_check), 1},
+        };
+        for (auto &patch : patches) {
+            patcher.applyLookupPatch(&patch);
+            patcher.clearError();
+        }
+        DBGLOG(MODULE_SHORT, "- APPLIED VRAM INFO NULL CHECK PATCH -");
     } else if (kextRadeonX4000.loadIndex == index) {
         uint32_t *orgChannelTypes = nullptr;
 
@@ -317,7 +361,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
          * Make for loop stop at 1 instead of 2 since we only have one SDMA engine.
          */
         /*
-if (this->chipType == ChipType::Stoney) {
+    if (this->chipType == ChipType::Stoney) {
     const uint8_t find[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74,
         0x50};    // probably broken
     const uint8_t repl[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
@@ -326,9 +370,8 @@ if (this->chipType == ChipType::Stoney) {
     patcher.applyLookupPatch(&patch);
     patcher.clearError();
     DBGLOG("lred", "-- Stoney Singular SDMA patch done, Let's hope we didn't break X4000 --");
-}
+    }
          */ // High chances are that this patch is broken, Will do eventually.
-
     } else if (kextAMD8000Controller.loadIndex == index) {
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN13ASIC_INFO__CIC2Ev", wrapASICINFO_CI, orgASICINFO_CI},
@@ -336,6 +379,8 @@ if (this->chipType == ChipType::Stoney) {
             {"__ZN17AMD8000Controller15powerUpHardwareEv", wrapPowerUpHardware, orgPowerUpHardware},
             {"__ZN17AMD8000Controller35initializeProjectDependentResourcesEv", wrapInitializeProjectDependentResources,
                 orgInitializeProjectDependentResources},
+            {"__ZNK18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId},
+            {"__ZN18CISharedController19initializeResourcesEv", wrapInitializeResources, orgInitializeResources},
         };
         PANIC_COND(!patcher.routeMultipleLong(index, requests, address, size), "lred",
             "Failed to route AMD8000Controller symbols");
@@ -549,75 +594,7 @@ bool LRed::wrapAccelSharedUCStartX6000(void *that, void *provider) {
 bool LRed::wrapAccelSharedUCStopX6000(void *that, void *provider) {
     return FunctionCast(wrapAccelSharedUCStopX6000, callbackLRed->orgAccelSharedUCStop)(that, provider);
 }
-/*
-void LRed::wrapInitDCNRegistersOffsets(void *that) {
-    FunctionCast(wrapInitDCNRegistersOffsets, callbackLRed->orgInitDCNRegistersOffsets)(that);
-    if (callbackLRed->chipType < ChipType::Renoir) {
-        DBGLOG("lred", "initDCNRegistersOffsets !! PATCHING REGISTERS FOR DCN 1.0 !!");
-        auto base = getMember<uint32_t>(that, 0x4830);
-        getMember<uint32_t>(that, 0x4840) = base + mmHUBPREQ0_DCSURF_PRIMARY_SURFACE_ADDRESS;
-        getMember<uint32_t>(that, 0x4878) = base + mmHUBPREQ1_DCSURF_PRIMARY_SURFACE_ADDRESS;
-        getMember<uint32_t>(that, 0x48B0) = base + mmHUBPREQ2_DCSURF_PRIMARY_SURFACE_ADDRESS;
-        getMember<uint32_t>(that, 0x48E8) = base + mmHUBPREQ3_DCSURF_PRIMARY_SURFACE_ADDRESS;
-        getMember<uint32_t>(that, 0x4844) = base + mmHUBPREQ0_DCSURF_PRIMARY_SURFACE_ADDRESS_HIGH;
-        getMember<uint32_t>(that, 0x487C) = base + mmHUBPREQ1_DCSURF_PRIMARY_SURFACE_ADDRESS_HIGH;
-        getMember<uint32_t>(that, 0x48B4) = base + mmHUBPREQ2_DCSURF_PRIMARY_SURFACE_ADDRESS_HIGH;
-        getMember<uint32_t>(that, 0x48EC) = base + mmHUBPREQ3_DCSURF_PRIMARY_SURFACE_ADDRESS_HIGH;
-        getMember<uint32_t>(that, 0x4848) = base + mmHUBP0_DCSURF_SURFACE_CONFIG;
-        getMember<uint32_t>(that, 0x4880) = base + mmHUBP1_DCSURF_SURFACE_CONFIG;
-        getMember<uint32_t>(that, 0x48B8) = base + mmHUBP2_DCSURF_SURFACE_CONFIG;
-        getMember<uint32_t>(that, 0x48F0) = base + mmHUBP3_DCSURF_SURFACE_CONFIG;
-        getMember<uint32_t>(that, 0x484C) = base + mmHUBPREQ0_DCSURF_SURFACE_PITCH;
-        getMember<uint32_t>(that, 0x4884) = base + mmHUBPREQ1_DCSURF_SURFACE_PITCH;
-        getMember<uint32_t>(that, 0x48BC) = base + mmHUBPREQ2_DCSURF_SURFACE_PITCH;
-        getMember<uint32_t>(that, 0x48F4) = base + mmHUBPREQ3_DCSURF_SURFACE_PITCH;
-        getMember<uint32_t>(that, 0x4850) = base + mmHUBP0_DCSURF_ADDR_CONFIG;
-        getMember<uint32_t>(that, 0x4888) = base + mmHUBP1_DCSURF_ADDR_CONFIG;
-        getMember<uint32_t>(that, 0x48C0) = base + mmHUBP2_DCSURF_ADDR_CONFIG;
-        getMember<uint32_t>(that, 0x48F8) = base + mmHUBP3_DCSURF_ADDR_CONFIG;
-        getMember<uint32_t>(that, 0x4854) = base + mmHUBP0_DCSURF_TILING_CONFIG;
-        getMember<uint32_t>(that, 0x488C) = base + mmHUBP1_DCSURF_TILING_CONFIG;
-        getMember<uint32_t>(that, 0x48C4) = base + mmHUBP2_DCSURF_TILING_CONFIG;
-        getMember<uint32_t>(that, 0x48FC) = base + mmHUBP3_DCSURF_TILING_CONFIG;
-        getMember<uint32_t>(that, 0x4858) = base + mmHUBP0_DCSURF_PRI_VIEWPORT_START;
-        getMember<uint32_t>(that, 0x4890) = base + mmHUBP1_DCSURF_PRI_VIEWPORT_START;
-        getMember<uint32_t>(that, 0x48C8) = base + mmHUBP2_DCSURF_PRI_VIEWPORT_START;
-        getMember<uint32_t>(that, 0x4900) = base + mmHUBP3_DCSURF_PRI_VIEWPORT_START;
-        getMember<uint32_t>(that, 0x485C) = base + mmHUBP0_DCSURF_PRI_VIEWPORT_DIMENSION;
-        getMember<uint32_t>(that, 0x4894) = base + mmHUBP1_DCSURF_PRI_VIEWPORT_DIMENSION;
-        getMember<uint32_t>(that, 0x48CC) = base + mmHUBP2_DCSURF_PRI_VIEWPORT_DIMENSION;
-        getMember<uint32_t>(that, 0x4904) = base + mmHUBP3_DCSURF_PRI_VIEWPORT_DIMENSION;
-        getMember<uint32_t>(that, 0x4860) = base + mmOTG0_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x4898) = base + mmOTG1_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x48D0) = base + mmOTG2_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x4908) = base + mmOTG3_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x4940) = base + mmOTG4_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x4978) = base + mmOTG5_OTG_CONTROL;
-        getMember<uint32_t>(that, 0x4864) = base + mmOTG0_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x489C) = base + mmOTG1_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x48D4) = base + mmOTG2_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x490C) = base + mmOTG3_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x4944) = base + mmOTG4_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x497C) = base + mmOTG5_OTG_INTERLACE_CONTROL;
-        getMember<uint32_t>(that, 0x4868) = base + mmHUBPREQ0_DCSURF_FLIP_CONTROL;
-        getMember<uint32_t>(that, 0x48A0) = base + mmHUBPREQ1_DCSURF_FLIP_CONTROL;
-        getMember<uint32_t>(that, 0x48D8) = base + mmHUBPREQ2_DCSURF_FLIP_CONTROL;
-        getMember<uint32_t>(that, 0x4910) = base + mmHUBPREQ3_DCSURF_FLIP_CONTROL;
-        getMember<uint32_t>(that, 0x486C) = base + mmHUBPRET0_HUBPRET_CONTROL;
-        getMember<uint32_t>(that, 0x48A4) = base + mmHUBPRET1_HUBPRET_CONTROL;
-        getMember<uint32_t>(that, 0x48DC) = base + mmHUBPRET2_HUBPRET_CONTROL;
-        getMember<uint32_t>(that, 0x4914) = base + mmHUBPRET3_HUBPRET_CONTROL;
-        getMember<uint32_t>(that, 0x4870) = base + mmHUBPREQ0_DCSURF_SURFACE_EARLIEST_INUSE;
-        getMember<uint32_t>(that, 0x48A8) = base + mmHUBPREQ1_DCSURF_SURFACE_EARLIEST_INUSE;
-        getMember<uint32_t>(that, 0x48E0) = base + mmHUBPREQ2_DCSURF_SURFACE_EARLIEST_INUSE;
-        getMember<uint32_t>(that, 0x4918) = base + mmHUBPREQ3_DCSURF_SURFACE_EARLIEST_INUSE;
-        getMember<uint32_t>(that, 0x4874) = base + mmHUBPREQ0_DCSURF_SURFACE_EARLIEST_INUSE_HIGH;
-        getMember<uint32_t>(that, 0x48AC) = base + mmHUBPREQ1_DCSURF_SURFACE_EARLIEST_INUSE_HIGH;
-        getMember<uint32_t>(that, 0x48E4) = base + mmHUBPREQ2_DCSURF_SURFACE_EARLIEST_INUSE_HIGH;
-        getMember<uint32_t>(that, 0x491C) = base + mmHUBPREQ3_DCSURF_SURFACE_EARLIEST_INUSE_HIGH;
-    }
-}
-*/
+
 void *LRed::wrapAllocateAMDHWAlignManager() {
     auto ret = FunctionCast(wrapAllocateAMDHWAlignManager, callbackLRed->orgAllocateAMDHWAlignManager)();
     callbackLRed->hwAlignMgr = ret;
@@ -696,8 +673,8 @@ uint32_t LRed::wrapConfigureDevice(void *param1) {
 
 void LRed::wrapASICINFO_CI(void) {
     DBGLOG("lred", "ASIC_INFO__CI: Called.");
-    FunctionCast(wrapASICINFO_CI, callbackLRed->orgASICINFO_CI);
-    DBGLOG("lred", "ASIC_INFO__CI finished.");
+    FunctionCast(wrapASICINFO_CI, callbackLRed->orgASICINFO_CI)();
+    DBGLOG("lred", "ASIC_INFO__CI: Finished.");
 }
 
 void *LRed::wrapCreateAsicInfo(void *param1) {
@@ -710,8 +687,7 @@ void *LRed::wrapCreateAsicInfo(void *param1) {
 uint32_t LRed::wrapPowerUpHardware(void) {
     DBGLOG("lred", "AMD8000Controller::powerUpHardware: Called.");
     auto ret = FunctionCast(wrapPowerUpHardware, callbackLRed->orgPowerUpHardware)();
-    DBGLOG("lred", "AMD8000Controller::powerUpHardware: We can't tell if it worked or not, theres no parameters, lets "
-                   "hope it did");
+    DBGLOG("lred", "AMD8000Controller::powerUpHardware: %p", ret);
     return ret;
 }
 
@@ -734,5 +710,25 @@ void *LRed::wrapCreateHWInterface(void *param1) {
     DBGLOG("lred", "createHWInterface: param1 = %p", param1);
     auto ret = FunctionCast(wrapCreateHWInterface, callbackLRed->orgCreateHWInterface)(param1);
     DBGLOG("lred", "createHWInterface returned %p", ret);
+    return ret;
+}
+
+uint64_t LRed::wrapStartAtiController(void *param1) {
+    DBGLOG("lred", "startAtiController << (param1: %p)", param1);
+    auto ret = FunctionCast(wrapStartAtiController, callbackLRed->orgStartAtiController)(param1);
+    DBGLOG("lred", "startAtiController >> 0x%llX", ret);
+    return ret;
+}
+
+uint16_t LRed::wrapGetFamilyId(void) {
+    FunctionCast(wrapGetFamilyId, callbackLRed->orgGetFamilyId)();
+    DBGLOG("wred", "getFamilyId >> 0x87");
+    return 0x87;
+}
+
+uint32_t LRed::wrapInitializeResources(void) {
+    DBGLOG("lred", "initializeResources called!");
+    auto ret = FunctionCast(wrapInitializeResources, callbackLRed->orgInitializeResources)();
+    DBGLOG("lred", "initializeResources >> 0x%X", ret);
     return ret;
 }

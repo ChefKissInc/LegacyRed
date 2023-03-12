@@ -355,4 +355,10 @@ class LRed {
     static void *wrapCreateHWInterface(void *param1);
     mach_vm_address_t orgStart {};
     static uint64_t wrapStart(void *param1);
+    mach_vm_address_t orgStartAtiController {};
+    static uint64_t wrapStartAtiController(void *param1);
+    mach_vm_address_t orgGetFamilyId {};
+    static uint16_t wrapGetFamilyId(void);
+    mach_vm_address_t orgInitializeResources {};
+    static uint32_t wrapInitializeResources(void);
 };
