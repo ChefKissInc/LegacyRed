@@ -242,25 +242,6 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "lred",
             "Failed to route AMDRadeonX4000HWLibs symbols");
 
-        if (this->chipType == ChipType::Mullins) {
-            DBGLOG(MODULE_SHORT, "- APPLYING _Carrizo_UcodeInfo PATCH -");
-            uint8_t find_cz_ucodeinfo_mec2skip[] = {0x5F, 0x43, 0x61, 0x72, 0x72, 0x69, 0x7A, 0x6F, 0x5F, 0x4D, 0x45,
-                0x43, 0x32, 0x5F, 0x55, 0x43, 0x4F, 0x44, 0x45};
-            uint8_t repl_cz_ucodeinfo_mec2skip[] = {0x5F, 0x53, 0x6B, 0x69, 0x70, 0x4C, 0x6F, 0x61, 0x64, 0x69, 0x6E,
-                0x67, 0x5F, 0x4D, 0x45, 0x43, 0x32, 0x5F, 0x55, 0x43, 0x4F, 0x44, 0x45};
-            static_assert(arrsize(find_cz_ucodeinfo_mec2skip) <
-                          arrsize(repl_cz_ucodeinfo_mec2skip));    // Crappy, but it gives me results
-            KernelPatcher::LookupPatch patches[] = {
-                {&kextRadeonSupport, find_cz_ucodeinfo_mec2skip, repl_cz_ucodeinfo_mec2skip,
-                    arrsize(find_cz_ucodeinfo_mec2skip), 1},
-            };
-            for (auto &patch : patches) {
-                patcher.applyLookupPatch(&patch);
-                patcher.clearError();
-            }
-            DBGLOG(MODULE_SHORT, "- APPLIED _Carrizo_UcodeInfo PATCH -");
-        }
-
         auto *asicName = callbackLRed->getASICName();
         // TODO: Inject all parts of RLC firmware
         // Disabled firmware injection due to bad code
