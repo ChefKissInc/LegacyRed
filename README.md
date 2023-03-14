@@ -1,4 +1,4 @@
-# LegacyRed ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Zorm-Industries/LegacyRed/main.yml?branch=staging-for-master&logo=github&style=for-the-badge)
+# LegacyRed ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Zorm-Industries/LegacyRed/main.yml?branch=master&logo=github&style=for-the-badge)
 
 An AMD Legacy iGPU support [Lilu](https://github.com/acidanthera/Lilu) plugin.
 
