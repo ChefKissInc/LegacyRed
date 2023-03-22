@@ -12,7 +12,7 @@ Since the kext isn't functioning yet: None.
 
 ### How functional is the kext?
 
-So far, we've gone from it failing at an IPI Timeout to it loading the AMDRadeonX4000 kexts, at the moment, we've reached AMD8000Controller initializing and failing at initializeResources
+So far, we've gone from it failing at an IPI Timeout to it loading the AMDRadeonX4000 kexts, at the moment, we've reached AMD8000Controller loading and failing at initializeResources
 
 ### On which macOS versions am I able to use this on?
 
