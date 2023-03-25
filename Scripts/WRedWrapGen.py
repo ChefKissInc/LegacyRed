@@ -118,11 +118,11 @@ function.append(
 
 if return_type == "void":
     function.append(
-        f"    FunctionCast(wrap{func_ident_pascal}, callbackWRed->org{func_ident_pascal})({arguments});\n")
+        f"    FunctionCast(wrap{func_ident_pascal}, callback->org{func_ident_pascal})({arguments});\n")
     function.append(f"    DBGLOG(\"lred\", \"{func_ident} >> void\");\n")
 else:
     function.append(
-        f"    auto ret = FunctionCast(wrap{func_ident_pascal}, callbackLRed->org{func_ident_pascal})({arguments});\n")
+        f"    auto ret = FunctionCast(wrap{func_ident_pascal}, callback->org{func_ident_pascal})({arguments});\n")
     function.append(
         f"    DBGLOG(\"lred\", \"{func_ident} >> {get_fmt_type(return_type)}\", ret);\n")
     function.append("    return ret;\n")

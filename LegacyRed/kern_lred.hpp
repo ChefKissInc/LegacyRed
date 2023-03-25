@@ -58,7 +58,7 @@ static bool checkAtomBios(const uint8_t *bios, size_t size) {
 
 class LRed {
     public:
-    static LRed *callbackLRed;
+    static LRed *callback;
 
     void init();
     void deinit();
@@ -67,9 +67,9 @@ class LRed {
 
     private:
     static const char *getASICName() {
-        PANIC_COND(callbackLRed->chipType == ChipType::Unknown, "lred", "Unknown ASIC type");
+        PANIC_COND(callback->chipType == ChipType::Unknown, "lred", "Unknown ASIC type");
         static const char *asicNames[] = {"carrizo", "mullins", "stoney"};
-        return asicNames[static_cast<int>(callbackLRed->chipType) - 1];
+        return asicNames[static_cast<int>(callback->chipType) - 1];
     }
 
     bool getVBIOSFromVFCT(IOPCIDevice *obj) {
@@ -215,7 +215,7 @@ class LRed {
     mach_vm_address_t orgPopulateFirmwareDirectory {};
     t_createFirmware orgCreateFirmware = nullptr;
     t_putFirmware orgPutFirmware = nullptr;
-    t_Vega10PowerTuneConstructor orgVega10PowerTuneConstructor = nullptr;
+    t_HawaiiPowerTuneConstructor orgHawaiiPowerTuneConstructor = nullptr;
     CailAsicCapEntry *orgCapsTableHWLibs = nullptr;
     CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
     // t_sendMsgToSmc orgRavenSendMsgToSmc = nullptr;
@@ -229,13 +229,6 @@ class LRed {
     mach_vm_address_t orgSMUMInitialize {};
     mach_vm_address_t orgCailMCILTrace0 {};
     mach_vm_address_t orgCosDebugPrint {}, orgMCILDebugPrint {};
-    static void wrapCailMCILTrace0(void *that);
-
-    mach_vm_address_t orgCailMCILTrace1 {};
-    static void wrapCailMCILTrace1(void *that);
-
-    mach_vm_address_t orgCailMCILTrace2 {};
-    static void wrapCailMCILTrace2(void *that);
 
     /** X6000 */
     t_HWEngineConstructor orgVCN2EngineConstructorX6000 = nullptr;
@@ -265,11 +258,11 @@ class LRed {
     mach_vm_address_t orgAllocateAMDHWAlignManager {};
 
     /** X6000Framebuffer */
-    static IOReturn wrapPopulateDeviceInfo(void *that);
-    static uint16_t wrapGetEnumeratedRevision();
-    static IOReturn wrapPopulateVramInfo(void *that, void *fwInfo);
-    static uint32_t wrapHwReadReg32(void *that, uint32_t param1);
-    static void wrapDoGPUPanic();
+    // static IOReturn wrapPopulateDeviceInfo(void *that);
+    // static uint16_t wrapGetEnumeratedRevision();
+    // static IOReturn wrapPopulateVramInfo(void *that, void *fwInfo);
+    // static uint32_t wrapHwReadReg32(void *that, uint32_t param1);
+    // static void wrapDoGPUPanic();
 
     /** X5000HWLibs */
     static void wrapAmdTtlServicesConstructor(void *that, IOPCIDevice *provider);
@@ -281,8 +274,8 @@ class LRed {
     static uint32_t wrapPspAsdLoad(void *pspData);
     static uint32_t wrapPspDtmLoad(void *pspData);
     static uint32_t wrapPspHdcpLoad(void *pspData);
-    static uint32_t wrapSmuRavenInitialize(void *smum, uint32_t param2);
-    static uint32_t wrapSmuRenoirInitialize(void *smum, uint32_t param2);
+    // static uint32_t wrapSmuRavenInitialize(void *smum, uint32_t param2);
+    // static uint32_t wrapSmuRenoirInitialize(void *smum, uint32_t param2);
     static uint32_t wrapPspCmdKmSubmit(void *psp, void *ctx, void *param3, void *param4);
     static uint32_t hwLibsNoop();
     static uint32_t hwLibsUnsupported();
@@ -294,21 +287,6 @@ class LRed {
     static uint64_t wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3);
     static void wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
         uint level);
-
-    /** X6000 */
-    static bool wrapAccelStartX6000();
-    static bool wrapInitWithPciInfo(void *that, void *param1);
-    static void *wrapNewVideoContext(void *that);
-    static void *wrapCreateSMLInterface(uint32_t configBit);
-    static bool wrapAccelSharedUCStartX6000(void *that, void *provider);
-    static bool wrapAccelSharedUCStopX6000(void *that, void *provider);
-    static void wrapInitDCNRegistersOffsets(void *that);
-    static uint64_t wrapAccelSharedSurfaceCopy(void *that, void *param1, uint64_t param2, void *param3);
-    static uint64_t wrapAllocateScanoutFB(void *that, uint32_t param1, void *param2, void *param3, void *param4);
-    static uint64_t wrapFillUBMSurface(void *that, uint32_t param1, void *param2, void *param3);
-    static bool wrapConfigureDisplay(void *that, uint32_t param1, uint32_t param2, void *param3, void *param4);
-    static uint64_t wrapGetDisplayInfo(void *that, uint32_t param1, bool param2, bool param3, void *param4,
-        void *param5);
 
     /** X5000 */
     static bool wrapAllocateHWEngines(void *that);
@@ -343,5 +321,5 @@ class LRed {
     mach_vm_address_t orgGetFamilyId {};
     static uint16_t wrapGetFamilyId(void);
     mach_vm_address_t orgInitializeResources {};
-    static uint32_t wrapInitializeResources(void);
+    static uint32_t wrapInitializeResources();
 };
