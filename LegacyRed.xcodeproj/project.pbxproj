@@ -52,33 +52,12 @@
 		CEA03B5C20EE825A00BA842F /* kern_lred.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = kern_lred.cpp; sourceTree = "<group>"; };
 		CEA03B5D20EE825A00BA842F /* kern_lred.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = kern_lred.hpp; sourceTree = "<group>"; };
 		CEB402A71F181D8300716912 /* kern_amd.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = kern_amd.hpp; sourceTree = "<group>"; };
-		F0ED263529B5BDF8001FE711 /* mullins_rlc.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_rlc.bin; sourceTree = "<group>"; };
-		F0ED263629B5BDF8001FE711 /* carrizo_pfp.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_pfp.bin; sourceTree = "<group>"; };
-		F0ED263729B5BDF8001FE711 /* mullins_pfp.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_pfp.bin; sourceTree = "<group>"; };
-		F0ED263829B5BDF8001FE711 /* carrizo_mec.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_mec.bin; sourceTree = "<group>"; };
-		F0ED263929B5BDF8001FE711 /* mullins_sdma1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_sdma1.bin; sourceTree = "<group>"; };
 		F0ED263A29B5BDF8001FE711 /* stoney_uvd.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_uvd.bin; sourceTree = "<group>"; };
-		F0ED263B29B5BDF8001FE711 /* carrizo_rlc.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_rlc.bin; sourceTree = "<group>"; };
 		F0ED263C29B5BDF8001FE711 /* carrizo_uvd.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_uvd.bin; sourceTree = "<group>"; };
-		F0ED263D29B5BDF8001FE711 /* mullins_sdma.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_sdma.bin; sourceTree = "<group>"; };
-		F0ED263E29B5BDF8001FE711 /* stoney_mec.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_mec.bin; sourceTree = "<group>"; };
-		F0ED263F29B5BDF8001FE711 /* stoney_sdma.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_sdma.bin; sourceTree = "<group>"; };
-		F0ED264029B5BDF8001FE711 /* stoney_pfp.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_pfp.bin; sourceTree = "<group>"; };
-		F0ED264129B5BDF8001FE711 /* stoney_rlc.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_rlc.bin; sourceTree = "<group>"; };
 		F0ED264229B5BDF8001FE711 /* stoney_vce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_vce.bin; sourceTree = "<group>"; };
-		F0ED264329B5BDF8001FE711 /* mullins_ce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_ce.bin; sourceTree = "<group>"; };
 		F0ED264429B5BDF8001FE711 /* mullins_uvd.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_uvd.bin; sourceTree = "<group>"; };
 		F0ED264529B5BDF8001FE711 /* mullins_vce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_vce.bin; sourceTree = "<group>"; };
-		F0ED264629B5BDF8001FE711 /* carrizo_sdma.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_sdma.bin; sourceTree = "<group>"; };
-		F0ED264729B5BDF8001FE711 /* carrizo_mec2.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_mec2.bin; sourceTree = "<group>"; };
-		F0ED264829B5BDF8001FE711 /* carrizo_sdma1.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_sdma1.bin; sourceTree = "<group>"; };
-		F0ED264929B5BDF8001FE711 /* carrizo_me.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_me.bin; sourceTree = "<group>"; };
-		F0ED264A29B5BDF8001FE711 /* stoney_ce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_ce.bin; sourceTree = "<group>"; };
-		F0ED264B29B5BDF9001FE711 /* stoney_me.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = stoney_me.bin; sourceTree = "<group>"; };
-		F0ED264C29B5BDF9001FE711 /* carrizo_ce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_ce.bin; sourceTree = "<group>"; };
 		F0ED264D29B5BDF9001FE711 /* carrizo_vce.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = carrizo_vce.bin; sourceTree = "<group>"; };
-		F0ED264E29B5BDF9001FE711 /* mullins_me.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_me.bin; sourceTree = "<group>"; };
-		F0ED264F29B5BDF9001FE711 /* mullins_mec.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = mullins_mec.bin; sourceTree = "<group>"; };
 		F0ED265029BC6B34001FE711 /* kern_model.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = kern_model.hpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -132,31 +111,10 @@
 		408F201A288AC068002EEC15 /* Firmware */ = {
 			isa = PBXGroup;
 			children = (
-				F0ED264C29B5BDF9001FE711 /* carrizo_ce.bin */,
-				F0ED264929B5BDF8001FE711 /* carrizo_me.bin */,
-				F0ED263829B5BDF8001FE711 /* carrizo_mec.bin */,
-				F0ED264729B5BDF8001FE711 /* carrizo_mec2.bin */,
-				F0ED263629B5BDF8001FE711 /* carrizo_pfp.bin */,
-				F0ED263B29B5BDF8001FE711 /* carrizo_rlc.bin */,
-				F0ED264629B5BDF8001FE711 /* carrizo_sdma.bin */,
-				F0ED264829B5BDF8001FE711 /* carrizo_sdma1.bin */,
 				F0ED263C29B5BDF8001FE711 /* carrizo_uvd.bin */,
 				F0ED264D29B5BDF9001FE711 /* carrizo_vce.bin */,
-				F0ED264329B5BDF8001FE711 /* mullins_ce.bin */,
-				F0ED264E29B5BDF9001FE711 /* mullins_me.bin */,
-				F0ED264F29B5BDF9001FE711 /* mullins_mec.bin */,
-				F0ED263729B5BDF8001FE711 /* mullins_pfp.bin */,
-				F0ED263529B5BDF8001FE711 /* mullins_rlc.bin */,
-				F0ED263D29B5BDF8001FE711 /* mullins_sdma.bin */,
-				F0ED263929B5BDF8001FE711 /* mullins_sdma1.bin */,
 				F0ED264429B5BDF8001FE711 /* mullins_uvd.bin */,
 				F0ED264529B5BDF8001FE711 /* mullins_vce.bin */,
-				F0ED264A29B5BDF8001FE711 /* stoney_ce.bin */,
-				F0ED264B29B5BDF9001FE711 /* stoney_me.bin */,
-				F0ED263E29B5BDF8001FE711 /* stoney_mec.bin */,
-				F0ED264029B5BDF8001FE711 /* stoney_pfp.bin */,
-				F0ED264129B5BDF8001FE711 /* stoney_rlc.bin */,
-				F0ED263F29B5BDF8001FE711 /* stoney_sdma.bin */,
 				F0ED263A29B5BDF8001FE711 /* stoney_uvd.bin */,
 				F0ED264229B5BDF8001FE711 /* stoney_vce.bin */,
 			);
