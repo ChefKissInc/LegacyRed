@@ -39,10 +39,10 @@ enum struct ChipVariant : uint32_t {
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
     Normal,
 };
-enum struct GFXVersion : uint32_t {
-	GFX7 = 0,
+enum struct GFXVersion {
+	GFX7,
 	GFX8,
-	Unknown
+	Unknown,
 };
 // Hack
 class AppleACPIPlatformExpert : IOACPIPlatformExpert {
