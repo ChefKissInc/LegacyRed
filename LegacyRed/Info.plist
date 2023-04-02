@@ -29,121 +29,6 @@
 	</array>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<key>AMD Radeon X4000 CI Services</key>
-		<dict>
-			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMDRadeonX4000HWServices</string>
-			<key>IOClass</key>
-			<string>AMDRadeonX4000_AMDRadeonHWServicesCI</string>
-			<key>IOMatchCategory</key>
-			<string>AMDRadeonX4000HWServices</string>
-			<key>IOPCIMatch</key>
-			<string>0x98501002 0x98511002 0x98521002 0x98531002 0x98541002 0x98551002 0x98561002</string>
-			<key>IOPCITunnelCompatible</key>
-			<true/>
-			<key>IOProbeScore</key>
-			<integer>65051</integer>
-			<key>IOPropertyMatch</key>
-			<dict>
-				<key>LoadHWServices</key>
-				<true/>
-			</dict>
-			<key>IOProviderClass</key>
-			<string>IOPCIDevice</string>
-		</dict>
-		<key>AMD Radeon X4000 VI Services</key>
-		<dict>
-			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMDRadeonX4000HWServices</string>
-			<key>IOClass</key>
-			<string>AMDRadeonX4000_AMDRadeonHWServicesVI</string>
-			<key>IOMatchCategory</key>
-			<string>AMDRadeonX4000HWServices</string>
-			<key>IOPCIMatch</key>
-			<string>0x98E41002 0x98741002</string>
-			<key>IOPCITunnelCompatible</key>
-			<true/>
-			<key>IOProbeScore</key>
-			<integer>65051</integer>
-			<key>IOPropertyMatch</key>
-			<dict>
-				<key>LoadHWServices</key>
-				<true/>
-			</dict>
-			<key>IOProviderClass</key>
-			<string>IOPCIDevice</string>
-		</dict>
-		<key>AMDBonaireGraphicsAccelerator</key>
-		<dict>
-			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMDRadeonX4000</string>
-			<key>GpuDebugPolicy</key>
-			<integer>0</integer>
-			<key>IOClass</key>
-			<string>AMDRadeonX4000_AMDBonaireGraphicsAccelerator</string>
-			<key>IODVDBundleName</key>
-			<string>AMDRadeonVADriver</string>
-			<key>IOKitDebug</key>
-			<integer>0</integer>
-			<key>IOMatchCategory</key>
-			<string>IOAccelerator</string>
-			<key>IOPCIMatch</key>
-			<string>0x98501002 0x98511002 0x98521002 0x98531002 0x98541002 0x98551002 0x98561002</string>
-			<key>IOPropertyMatch</key>
-			<dict>
-				<key>LoadAccelerator</key>
-				<true/>
-			</dict>
-			<key>IOProviderClass</key>
-			<string>IOPCIDevice</string>
-			<key>IOSourceVersion</key>
-			<string>0.0.0.0.0</string>
-			<key>IOVARendererID</key>
-			<integer>16908288</integer>
-		</dict>
-		<key>AMDTongaGraphicsAccelerator</key>
-		<dict>
-			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMDRadeonX4000</string>
-			<key>GpuDebugPolicy</key>
-			<integer>0</integer>
-			<key>IOClass</key>
-			<string>AMDRadeonX4000_AMDTongaGraphicsAccelerator</string>
-			<key>IODVDBundleName</key>
-			<string>AMDRadeonVADriver</string>
-			<key>IOKitDebug</key>
-			<integer>0</integer>
-			<key>IOMatchCategory</key>
-			<string>IOAccelerator</string>
-			<key>IOPCIMatch</key>
-			<string>0x98E41002 0x98741002</string>
-			<key>IOPropertyMatch</key>
-			<dict>
-				<key>LoadAccelerator</key>
-				<true/>
-			</dict>
-			<key>IOProviderClass</key>
-			<string>IOPCIDevice</string>
-			<key>IOSourceVersion</key>
-			<string>0.0.0.0.0</string>
-			<key>IOVARendererID</key>
-			<integer>16908288</integer>
-			<key>cail_properties</key>
-			<dict>
-				<key>CAIL_DisableAcpPowerGating</key>
-				<integer>0</integer>
-				<key>CAIL_DisableJpegEngine</key>
-				<integer>1</integer>
-				<key>CAIL_DisableSAMUPowerGating</key>
-				<integer>0</integer>
-				<key>CAIL_DisableSysClockGating</key>
-				<integer>1</integer>
-				<key>CAIL_DisableUVDPowerGating</key>
-				<integer>0</integer>
-				<key>CAIL_DisableVCEPowerGating</key>
-				<integer>0</integer>
-			</dict>
-		</dict>
 		<key>AtiGpuWrangler (GCN 2)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
@@ -454,6 +339,120 @@
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+			<key>Drivers</key>
+			<array>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000HWServices</string>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDRadeonHWServicesCI</string>
+					<key>IOMatchCategory</key>
+					<string>AMDRadeonX4000HWServices</string>
+					<key>IOPCIMatch</key>
+					<string>0x98501002 0x98511002 0x98521002 0x98531002 0x98541002 0x98551002 0x98561002</string>
+					<key>IOPCITunnelCompatible</key>
+					<true/>
+					<key>IOProbeScore</key>
+					<integer>65051</integer>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadHWServices</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+				</dict>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000HWServices</string>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDRadeonHWServicesVI</string>
+					<key>IOMatchCategory</key>
+					<string>AMDRadeonX4000HWServices</string>
+					<key>IOPCIMatch</key>
+					<string>0x98E41002 0x98741002</string>
+					<key>IOPCITunnelCompatible</key>
+					<true/>
+					<key>IOProbeScore</key>
+					<integer>65051</integer>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadHWServices</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+				</dict>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000</string>
+					<key>GpuDebugPolicy</key>
+					<integer>0</integer>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDBonaireGraphicsAccelerator</string>
+					<key>IODVDBundleName</key>
+					<string>AMDRadeonVADriver</string>
+					<key>IOKitDebug</key>
+					<integer>0</integer>
+					<key>IOMatchCategory</key>
+					<string>IOAccelerator</string>
+					<key>IOPCIMatch</key>
+					<string>0x98501002 0x98511002 0x98521002 0x98531002 0x98541002 0x98551002 0x98561002</string>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadAccelerator</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+					<key>IOSourceVersion</key>
+					<string>0.0.0.0.0</string>
+					<key>IOVARendererID</key>
+					<integer>16908288</integer>
+				</dict>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000</string>
+					<key>GpuDebugPolicy</key>
+					<integer>0</integer>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDTongaGraphicsAccelerator</string>
+					<key>IODVDBundleName</key>
+					<string>AMDRadeonVADriver</string>
+					<key>IOKitDebug</key>
+					<integer>0</integer>
+					<key>IOMatchCategory</key>
+					<string>IOAccelerator</string>
+					<key>IOPCIMatch</key>
+					<string>0x98E41002 0x98741002</string>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadAccelerator</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+					<key>IOSourceVersion</key>
+					<string>0.0.0.0.0</string>
+					<key>IOVARendererID</key>
+					<integer>16908288</integer>
+					<key>cail_properties</key>
+					<dict>
+						<key>CAIL_DisableAcpPowerGating</key>
+						<integer>0</integer>
+						<key>CAIL_DisableJpegEngine</key>
+						<integer>1</integer>
+						<key>CAIL_DisableSAMUPowerGating</key>
+						<integer>0</integer>
+						<key>CAIL_DisableSysClockGating</key>
+						<integer>1</integer>
+						<key>CAIL_DisableUVDPowerGating</key>
+						<integer>0</integer>
+						<key>CAIL_DisableVCEPowerGating</key>
+						<integer>0</integer>
+					</dict>
+				</dict>
+			</array>
 			<key>IOClass</key>
 			<string>$(PRODUCT_NAME:rfc1034identifier)</string>
 			<key>IOMatchCategory</key>
