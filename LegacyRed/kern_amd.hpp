@@ -1,18 +1,20 @@
 //  Copyright © 2022 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#pragma once
+//  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  details.
+
+#ifndef kern_amd_hpp
+#define kern_amd_hpp
 #include <Headers/kern_util.hpp>
 
-using t_createFirmware = void *(*)(const void *data, uint32_t size, uint32_t param3, const char *filename);
-using t_putFirmware = bool (*)(void *that, uint32_t deviceType, void *fw);
-using t_HawaiiPowerTuneConstructor = void (*)(void *that, void *param1, void *param2);
-using t_HWEngineConstructor = void (*)(void *that);
+using t_GenericConstructor = void (*)(void *that);
 using t_HWEngineNew = void *(*)(size_t size);
 using t_sendMsgToSmc = uint32_t (*)(void *smum, uint32_t msgId);
 using t_pspLoadExtended = uint32_t (*)(void *, uint64_t, uint64_t, const void *, size_t);
 
 constexpr uint32_t AMDGPU_FAMILY_CZ = 0x87;
+constexpr uint32_t AMDGPU_FAMILY_KV = 0x7D;
 
 constexpr uint32_t PPSMC_MSG_GetSmuVersion = 0x2;
 constexpr uint32_t PPSMC_MSG_PowerUpSdma = 0xE;
@@ -93,27 +95,6 @@ constexpr uint32_t mmMP1_SMN_C2PMSG_66 = 0x282;
 constexpr uint32_t mmPCIE_INDEX2 = 0xE;
 constexpr uint32_t mmPCIE_DATA2 = 0xF;
 
-struct VFCT {
-    char signature[4];
-    uint32_t length;
-    uint8_t revision, checksum;
-    char oemId[6];
-    char oemTableId[8];
-    uint32_t oemRevision;
-    char creatorId[4];
-    uint32_t creatorRevision;
-    char tableUUID[16];
-    uint32_t vbiosImageOffset, lib1ImageOffset;
-    uint32_t reserved[4];
-} PACKED;
-
-struct GOPVideoBIOSHeader {
-    uint32_t pciBus, pciDevice, pciFunction;
-    uint16_t vendorID, deviceID;
-    uint16_t ssvId, ssId;
-    uint32_t revision, imageLength;
-} PACKED;
-
 struct CommonFirmwareHeader {
     uint32_t size;
     uint32_t headerSize;
@@ -184,23 +165,6 @@ struct PspTaFwHeaderV1 : public CommonFirmwareHeader {
     PspFwLegacyBinDesc xgmi, ras, hdcp, dtm, securedisplay;
 } PACKED;
 
-struct CailAsicCapEntry {
-    uint32_t familyId, deviceId;
-    uint32_t revision, emulatedRev;
-    uint32_t pciRev;
-    uint32_t _reserved;
-    uint32_t *caps;
-    uint32_t *skeleton;
-} PACKED;
-
-struct CailInitAsicCapEntry {
-    uint64_t familyId, deviceId;
-    uint64_t revision, emulatedRev;
-    uint64_t pciRev;
-    uint32_t *caps;
-    void *goldenCaps;
-} PACKED;
-
 struct GcFwConstant {
     const char *firmwareVer;
     uint32_t featureVer, size;
@@ -215,49 +179,58 @@ struct SdmaFwConstant {
     const uint8_t *data;
 } PACKED;
 
-struct AtomCommonTableHeader {
-    uint16_t structureSize;
-    uint8_t formatRev;
-    uint8_t contentRev;
+struct GPUInfoFirmware {
+    uint32_t gcNumSe;
+    uint32_t gcNumCuPerSh;
+    uint32_t gcNumShPerSe;
+    uint32_t gcNumRbPerSe;
+    uint32_t gcNumTccs;
+    uint32_t gcNumGprs;
+    uint32_t gcNumMaxGsThds;
+    uint32_t gcGsTableDepth;
+    uint32_t gcGsPrimBuffDepth;
+    uint32_t gcParameterCacheDepth;
+    uint32_t gcDoubleOffchipLdsBuffer;
+    uint32_t gcWaveSize;
+    uint32_t gcMaxWavesPerSimd;
+    uint32_t gcMaxScratchSlotsPerCu;
+    uint32_t gcLdsSize;
 } PACKED;
 
-constexpr uint32_t ATOM_ROM_TABLE_PTR = 0x48;
-constexpr uint32_t ATOM_ROM_DATA_PTR = 0x20;
-
-struct IgpSystemInfoV11 : public AtomCommonTableHeader {
-    uint32_t vbiosMisc;
-    uint32_t gpuCapInfo;
-    uint32_t systemConfig;
-    uint32_t cpuCapInfo;
-    uint16_t gpuclkSsPercentage;
-    uint16_t gpuclkSsType;
-    uint16_t lvdsSsPercentage;
-    uint16_t lvdsSsRate10hz;
-    uint16_t hdmiSsPercentage;
-    uint16_t hdmiSsRate10hz;
-    uint16_t dviSsPercentage;
-    uint16_t dviSsRate10hz;
-    uint16_t dpPhyOverride;
-    uint16_t lvdsMisc;
-    uint16_t backlightPwmHz;
-    uint8_t memoryType;
-    uint8_t umaChannelCount;
+struct CailAsicCapEntry {
+    uint32_t familyId, deviceId;
+    uint32_t revision, emulatedRev;
+    uint32_t pciRev;
+    uint32_t _reserved;
+    const uint32_t *caps;
+    const uint32_t *skeleton;
 } PACKED;
 
-struct IgpSystemInfoV2 : public AtomCommonTableHeader {
-    uint32_t vbiosMisc;
-    uint32_t gpuCapInfo;
-    uint32_t systemConfig;
-    uint32_t cpuCapInfo;
-    uint16_t gpuclkSsPercentage;
-    uint16_t gpuclkSsType;
-    uint16_t dpPhyOverride;
-    uint8_t memoryType;
-    uint8_t umaChannelCount;
+struct CailInitAsicCapEntry {
+    uint64_t familyId, deviceId;
+    uint64_t revision, emulatedRev;
+    uint64_t pciRev;
+    const uint32_t *caps;
+    const void *goldenCaps;
 } PACKED;
-
-union IgpSystemInfo {
-    AtomCommonTableHeader header;
-    IgpSystemInfoV11 infoV11;
-    IgpSystemInfoV2 infoV2;
+/** TODO: Port */
+/*
+static const uint32_t ddiCapsRaven[16] = {0x800005U, 0x500011FEU, 0x80000U, 0x11001000U, 0x200U, 0x68000001U,
+        0x20000000, 0x4002U, 0x22420001U, 0x9E20E10U, 0x2000120U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U};
+static const uint32_t ddiCapsRenoir[16] = {0x800005U, 0x500011FEU, 0x80000U, 0x11001000U, 0x200U, 0x68000001U,
+        0x20000000, 0x4002U, 0x22420001U, 0x9E20E18U, 0x2000120U, 0x0U, 0x0U, 0x0U, 0x0U, 0x0U};
+*/
+enum AMDReturn : uint32_t {
+    kAMDReturnSuccess = 0,
+    kAMDReturnInvalidArgument,
+    kAMDReturnGeneralFailure,
+    kAMDReturnResourcesExhausted,
+    kAMDReturnUnsupported,
 };
+
+struct CailDeviceTypeEntry {
+    uint32_t deviceId;
+    uint32_t deviceType;
+} PACKED;
+
+#endif /* kern_amd.hpp */
