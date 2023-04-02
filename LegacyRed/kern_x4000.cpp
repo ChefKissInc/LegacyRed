@@ -42,6 +42,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "x5000", "Failed to resolve symbols");
 
         KernelPatcher::RouteRequest requests[] = {
+			{"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
             {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
 			{"__ZN28AMDRadeonX4000_AMDCIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv", wrapSetupAndInitializeHWCapabilities},
@@ -57,7 +58,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         // orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
         // orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
         // MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-        // DBGLOG("x5000", "Applied SDMA1 patches");
+        // DBGLOG("x4000", "Applied SDMA1 patches");
 
         // KernelPatcher::LookupPatch patch = {&kextRadeonX5000, kStartHWEnginesOriginal, kStartHWEnginesPatched,
         // arrsize(kStartHWEnginesOriginal), 1};
@@ -80,6 +81,7 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
 /** TODO: Port and workout IOMallocZero Values aswell as values for the constructors */
 bool X4000::wrapAllocateHWEngines(void *that) {
 	if (LRed::callback->gfxVer == GFXVersion::GFX7) {
+		DBGLOG("x4000", "Using GFX7 Constructors");
 		callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x1E8));
 		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x128));
 		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x128));
@@ -87,6 +89,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
 		callback->orgGFX7SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x128));
 		callback->orgGFX7VCEEngineConstructor(getMember<void *>(that, 1000) = IOMallocZero(0x128));
 	} else if (LRed::callback->gfxVer == GFXVersion::GFX8) {
+		DBGLOG("x4000", "Using GFX8 Constructors");
 		callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x1E8));
 		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x128));
 		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x128));

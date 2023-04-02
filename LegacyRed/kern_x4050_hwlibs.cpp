@@ -28,7 +28,6 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-        CailDeviceTypeEntry *orgDeviceTypeTable = nullptr;
 
         if (LRed::callback->chipVariant == ChipVariant::KLE) {
             KernelPatcher::SolveRequest solveRequests[] = {
@@ -88,7 +87,6 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
 
         PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
             "Failed to enable kernel writing");
-        *orgDeviceTypeTable = {.deviceId = LRed::callback->deviceId, .deviceType = 0};
         orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = AMDGPU_FAMILY_KV;
         orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
         orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;

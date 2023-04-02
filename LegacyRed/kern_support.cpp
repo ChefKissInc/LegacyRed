@@ -42,11 +42,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
 
     return false;
 }
-
-uint32_t Support::wrapHwReadReg32(void *that, uint32_t reg) {
-    return FunctionCast(wrapHwReadReg32, callback->orgHwReadReg32)(that, reg == 0xD31 ? 0xD2F : reg);
-}
-
+/** Wrap is likely broken, don't be surprised if it is */
 bool Support::wrapPopulateDeviceMemory(IOService *that, uint32_t param_1) {
 	DBGLOG("support", " populateDeviceMemeory >> returning true");
 	return true;

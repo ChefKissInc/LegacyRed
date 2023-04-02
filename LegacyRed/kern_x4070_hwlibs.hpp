@@ -7,9 +7,9 @@
 #ifndef kern_x4070_hwlibs_hpp
 #define kern_x4070_hwlibs_hpp
 #include "kern_amd.hpp"
+#include "kern_lred.hpp"
 #include <Headers/kern_patcher.hpp>
 #include <Headers/kern_util.hpp>
-#include <IOKit/pci/IOPCIDevice.h>
 
 using t_XPowerTuneConstructor = void (*)(void *that, void *ppInstance, void *ppCallbacks);
 using t_sendMsgToSmc = uint32_t (*)(void *smum, uint32_t msgId);

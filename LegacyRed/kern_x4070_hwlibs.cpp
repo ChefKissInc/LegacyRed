@@ -28,7 +28,6 @@ bool X4070HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-        CailDeviceTypeEntry *orgDeviceTypeTable = nullptr;
 
         /** The Bristol Ridge else if is a complete shot in the dark, it is not guaranteed it will work */
         if (LRed::callback->chipVariant == ChipVariant::s3CU) {
@@ -81,7 +80,6 @@ bool X4070HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
 
         PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
             "Failed to enable kernel writing");
-        *orgDeviceTypeTable = {.deviceId = LRed::callback->deviceId, .deviceType = 0};
         orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = AMDGPU_FAMILY_CZ;
         orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
         orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;

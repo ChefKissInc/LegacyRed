@@ -368,6 +368,8 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 		DBGLOG("lred", "Processed support");
 	} else if (x4050hwlibs.processKext(patcher, index, address, size)) {
 		DBGLOG("lred", "Processed x4050hwlibs");
+	} else if (x4070hwlibs.processKext(patcher, index, address, size)) {
+		DBGLOG("lred", "Processed x4070hwlibs");
 	} else if (gfx7con.processKext(patcher, index, address, size)) {
 		DBGLOG("lred", "Processed gfx7con");
 	} else if (gfx8con.processKext(patcher, index, address, size)) {
