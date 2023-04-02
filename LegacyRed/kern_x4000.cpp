@@ -33,6 +33,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 			{"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
 			{"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor},
 			{"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor},
+			{"__ZN32AMDRadeonX4000_AMDUVD6v3HWEngineC1Ev", this->orgUVD6v3EngineConstructor},
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities},
@@ -78,24 +79,30 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
     DBGLOG("x4000", "accelStart returned %d", ret);
     return ret;
 }
-/** TODO: Port and workout IOMallocZero Values aswell as values for the constructors */
+
+/** Rough calculations based on AMDRadeonX4000's Assembly  */
 bool X4000::wrapAllocateHWEngines(void *that) {
 	if (LRed::callback->gfxVer == GFXVersion::GFX7) {
 		DBGLOG("x4000", "Using GFX7 Constructors");
-		callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x1E8));
-		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x128));
-		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x128));
-		callback->orgGFX7UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x1E8));
-		callback->orgGFX7SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x128));
-		callback->orgGFX7VCEEngineConstructor(getMember<void *>(that, 1000) = IOMallocZero(0x128));
+		callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x118));
+		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x118));
+		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x118));
+		callback->orgGFX7UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
+		callback->orgGFX7SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1C8));
+		callback->orgGFX7VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
 	} else if (LRed::callback->gfxVer == GFXVersion::GFX8) {
 		DBGLOG("x4000", "Using GFX8 Constructors");
 		callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x1E8));
-		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x128));
-		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x128));
-		callback->orgGFX8UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x1E8));
-		callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x128));
-		callback->orgGFX8VCEEngineConstructor(getMember<void *>(that, 1000) = IOMallocZero(0x128));
+		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x100));
+		/** According to Wikipedia, Stoney uses UVD 6.3, unconfirmed however, we also only have one SDMA channel on Stoney */
+		if (LRed::callback->chipType == ChipType::Stoney) {
+			callback->orgUVD6v3EngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
+		} else {
+			callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x100));
+			callback->orgGFX8UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
+		}
+		callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1D0));
+		callback->orgGFX8VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
 	} else if (LRed::callback->gfxVer == GFXVersion::Unknown) {
 		PANIC("lred", "GFX Version is Unknown!");
 	}

@@ -25,6 +25,7 @@ class X4000 {
     t_GenericConstructor orgGFX8VCEEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8SAMUEngineConstructor {nullptr};
+	t_GenericConstructor orgUVD6v3EngineConstructor {nullptr};
     mach_vm_address_t orgSetupAndInitializeHWCapabilities {0};
     mach_vm_address_t orgAccelStart {};
 
