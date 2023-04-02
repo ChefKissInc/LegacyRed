@@ -114,6 +114,21 @@ void *X4050HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
     callback->orgHawaiiPowerTuneConstructor(ret, that, param2);
     return ret;
 }
+
+uint64_t X4050HWLibs::wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3) {
+	DBGLOG("hwlibs", "_SMUM_Initialize: param1 = 0x%llX param2 = %p param3 = 0x%llX", param1, param2, param3);
+	auto ret = FunctionCast(wrapSMUMInitialize, callback->orgSMUMInitialize)(param1, param2, param3);
+	DBGLOG("hwlibs", "_SMUM_Initialize returned 0x%llX", ret);
+	return ret;
+}
+/** Modifications made, highly unlikely to work, will change later on */
+void X4050HWLibs::wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
+	uint level) {
+	printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
+	printf(fmt, param3, param4, param5, level);
+	FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
+}
+
 /** For future reference */
 /*
 AMDReturn X5000HWLibs::wrapSmuRavenInitialize(void *smum, uint32_t param2) {

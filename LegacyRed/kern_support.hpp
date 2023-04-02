@@ -20,7 +20,7 @@ class Support {
     private:
 	mach_vm_address_t orgPopulateDeviceMemory {};
 
-	static bool wrapPopulateDeviceMemory(IOService *that, uint32_t param_1);
+	static IOReturn wrapPopulateDeviceMemory(void *that, uint32_t reg);
 };
 
 #endif /* kern_support_hpp */
