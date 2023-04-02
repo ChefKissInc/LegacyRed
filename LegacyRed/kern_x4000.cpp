@@ -84,7 +84,7 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
 bool X4000::wrapAllocateHWEngines(void *that) {
 	if (LRed::callback->gfxVer == GFXVersion::GFX7) {
 		DBGLOG("x4000", "Using GFX7 Constructors");
-		callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x118));
+		callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x198));
 		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x118));
 		callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x118));
 		callback->orgGFX7UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
@@ -92,7 +92,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
 		callback->orgGFX7VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
 	} else if (LRed::callback->gfxVer == GFXVersion::GFX8) {
 		DBGLOG("x4000", "Using GFX8 Constructors");
-		callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x1E8));
+		callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x198));
 		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x100));
 		/** According to Wikipedia, Stoney uses UVD 6.3, unconfirmed however, we also only have one SDMA channel on Stoney */
 		if (LRed::callback->chipType == ChipType::Stoney) {
