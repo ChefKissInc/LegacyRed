@@ -9,21 +9,21 @@
 #include "kern_patches.hpp"
 #include <Headers/kern_api.hpp>
 
-static const char *pathRadeonX5000HWLibs = "/System/Library/Extensions/AMDRadeonX5000HWServices.kext/Contents/PlugIns/"
-                                           "AMDRadeonX5000HWLibs.kext/Contents/MacOS/AMDRadeonX5000HWLibs";
+static const char *pathRadeonX4050HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
+                                           "AMDRadeonX4050HWLibs.kext/Contents/MacOS/AMDRadeonX4050HWLibs";
 
-static KernelPatcher::KextInfo kextRadeonX5000HWLibs {"com.apple.kext.AMDRadeonX5000HWLibs", &pathRadeonX5000HWLibs, 1,
+static KernelPatcher::KextInfo kextRadeonX4050HWLibs {"com.apple.kext.AMDRadeonX4050HWLibs", &pathRadeonX4050HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 X4050HWLibs *X4050HWLibs::callback = nullptr;
 
 void X4050HWLibs::init() {
     callback = this;
-    lilu.onKextLoadForce(&kextRadeonX5000HWLibs);
+    lilu.onKextLoadForce(&kextRadeonX4050HWLibs);
 }
 
 bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
-    if (kextRadeonX5000HWLibs.loadIndex == index) {
+    if (kextRadeonX4050HWLibs.loadIndex == index) {
         CailAsicCapEntry *orgAsicCapsTable = nullptr;
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
