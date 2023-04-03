@@ -19,7 +19,9 @@ class GFX8Con {
     private:
     mach_vm_address_t orgGetFamilyId {};
     mach_vm_address_t orgHwReadReg32 {0};
+	mach_vm_address_t orgPopulateDeviceInfo {0};
 
+	static IOReturn wrapPopulateDeviceInfo(void *that);
     static uint16_t wrapGetFamilyId(void);
     static uint32_t wrapHwReadReg32(void *that, uint32_t param1);
 };
