@@ -8,7 +8,7 @@ The Source Code of this Derivative Work is licensed under the `Thou Shalt Not Pr
 
 ### Can I have an AMD dGPU installed on the system?
 
-Since the kext isn't functioning yet: None.
+Since the kext isn't functioning yet: None, but in the future, due to how we only use the kexts for GCN 1 through 4, you can install a Vega or Navi card
 
 ### How functional is the kext?
 
