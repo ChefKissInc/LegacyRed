@@ -197,7 +197,17 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 			case 0x1313:
 				[[fallthrough]];
 			case 0x1315:
-				[[fallthrough]];
+				this->chipType = ChipType::Kaveri;
+				this->gfxVer = GFXVersion::GFX7;
+				DBGLOG("", "Chip type is Kaveri");
+				break;
+			case 0x1316:
+				this->chipType = ChipType::Kaveri
+				this->gfxVer = GFX7Con;
+				DBGLOG("lred", "Chip type is Kaveri");
+				this->chipVariant = ChipVariant::Spooky;
+				/** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
+				DBGLOG("lred", "Chip variant is Spooky")
 			case 0x1318:
 				[[fallthrough]];
 			case 0x131B:
