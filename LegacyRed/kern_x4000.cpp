@@ -95,7 +95,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
 		callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x100));
 		/** Only one SDMA channel is present on Stoney APUs  */
 		if (LRed::callback->chipType == ChipType::Stoney) {
-			DBGLOG("hwlibs", "Using only 1 SDMA Engine for Stoney");
+			DBGLOG("x4000", "Using only 1 SDMA Engine for Stoney");
 		} else {
 			callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x100));
 		}
@@ -108,7 +108,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
 
     return true;
 }
-
+// Likely to be unused, here for incase we need to use it for X4000::setupAndInitializeHWCapabilities
 enum HWCapability : uint64_t {
     DisplayPipeCount = 0x04,    // uint32_t
     SECount = 0x34,             // uint32_t

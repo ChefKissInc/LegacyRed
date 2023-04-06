@@ -105,7 +105,7 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
 }
 
 void X4050HWLibs::wrapAmdCailServicesConstructor(void *that, IOPCIDevice *provider) {
-    DBGLOG("lred", "AmdCailServices constructor called!");
+    DBGLOG("hwlibs", "AmdCailServices constructor called!");
     FunctionCast(wrapAmdCailServicesConstructor, callback->orgAmdCailServicesConstructor)(that, provider);
 }
 
