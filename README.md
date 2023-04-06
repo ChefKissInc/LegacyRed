@@ -12,7 +12,7 @@ Since the kext isn't functioning yet: None.
 
 ### How functional is the kext?
 
-So far, we've gone from it failing at an IPI Timeout to it loading the AMDRadeonX4000 kexts, at the moment, we've reached AMD8000Controller loading and failing at initializeResources
+As of recent, AMDRadeonX4000 was kernel panicing on createHWInterface, and as of recent we now have AMD8000Controller failing on CIBandwidthManager::init
 
 ### On which macOS versions am I able to use this on?
 
