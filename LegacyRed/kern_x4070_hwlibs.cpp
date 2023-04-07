@@ -24,8 +24,8 @@ void X4070HWLibs::init() {
 
 bool X4070HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4070HWLibs.loadIndex == index) {
-		LRed::callback->setRMMIOIfNecessary();
-		
+        LRed::callback->setRMMIOIfNecessary();
+
         CailAsicCapEntry *orgAsicCapsTable = nullptr;
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};

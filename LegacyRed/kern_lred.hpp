@@ -96,7 +96,7 @@ class LRed {
     void init();
     void processPatcher(KernelPatcher &patcher);
     void processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
-	void setRMMIOIfNecessary();
+    void setRMMIOIfNecessary();
 
     private:
     static const char *getChipName() {

@@ -180,7 +180,7 @@ void LRed::setRMMIOIfNecessary() {
         this->fbOffset = static_cast<uint64_t>(this->readReg32(0x296B)) << 24;
         this->revision = (this->readReg32(0xD2F) & 0xF000000) >> 0x18;
         switch (this->deviceId) {
-            // Who thought it would be a good idea to use this many Device IDs and Revisions?
+                // Who thought it would be a good idea to use this many Device IDs and Revisions?
             case 0x1309:
                 [[fallthrough]];
             case 0x130A:
@@ -325,6 +325,9 @@ void LRed::setRMMIOIfNecessary() {
     } else {
         DBGLOG("lred", "GFX version is 8");
     }
+}
+
+void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextBacklight.loadIndex == index) {
         KernelPatcher::RouteRequest request {"__ZN15AppleIntelPanel10setDisplayEP9IODisplay", wrapApplePanelSetDisplay,
             orgApplePanelSetDisplay};
