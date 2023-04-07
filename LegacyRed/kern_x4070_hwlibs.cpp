@@ -34,31 +34,31 @@ bool X4070HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
             KernelPatcher::SolveRequest solveRequests[] = {
                 {"_STONEY_GoldenSettings_A0_3CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
             };
-			PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
+            PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
+                "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using 3CU Stoney Golden Settings");
         } else if (LRed::callback->chipVariant == ChipVariant::s2CU) {
             KernelPatcher::SolveRequest solveRequests[] = {
                 {"_STONEY_GoldenSettings_A0_2CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
             };
-			PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
+            PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
+                "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using 2CU Stoney Golden Settings");
         } else if (LRed::callback->chipVariant == ChipVariant::Bristol) {
             KernelPatcher::SolveRequest solveRequests[] = {
                 {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
                 {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
             };
-			PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
+            PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
+                "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using A1 Carrizo Golden Settings and DDI Caps");
         } else {
             KernelPatcher::SolveRequest solveRequests[] = {
                 {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
                 {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
             };
-			PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
+            PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
+                "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using A0 Carrizo Golden Settings and DDI Caps");
         }
 
@@ -98,8 +98,8 @@ bool X4070HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
 }
 
 void X4070HWLibs::wrapAmdCailServicesConstructor(void *that, IOPCIDevice *provider) {
-	DBGLOG("lred", "AmdCailServices constructor called!");
-	FunctionCast(wrapAmdCailServicesConstructor, callback->orgAmdCailServicesConstructor)(that, provider);
+    DBGLOG("lred", "AmdCailServices constructor called!");
+    FunctionCast(wrapAmdCailServicesConstructor, callback->orgAmdCailServicesConstructor)(that, provider);
 }
 
 void *X4070HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
@@ -109,17 +109,17 @@ void *X4070HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
 }
 
 uint64_t X4070HWLibs::wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3) {
-	DBGLOG("hwlibs", "_SMUM_Initialize: param1 = 0x%llX param2 = %p param3 = 0x%llX", param1, param2, param3);
-	auto ret = FunctionCast(wrapSMUMInitialize, callback->orgSMUMInitialize)(param1, param2, param3);
-	DBGLOG("hwlibs", "_SMUM_Initialize returned 0x%llX", ret);
-	return ret;
+    DBGLOG("hwlibs", "_SMUM_Initialize: param1 = 0x%llX param2 = %p param3 = 0x%llX", param1, param2, param3);
+    auto ret = FunctionCast(wrapSMUMInitialize, callback->orgSMUMInitialize)(param1, param2, param3);
+    DBGLOG("hwlibs", "_SMUM_Initialize returned 0x%llX", ret);
+    return ret;
 }
 /** Modifications made, highly unlikely to work, will change later on */
 void X4070HWLibs::wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
-	uint level) {
-	printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
-	printf(fmt, param3, param4, param5, level);
-	FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
+    uint level) {
+    printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
+    printf(fmt, param3, param4, param5, level);
+    FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
 }
 
 /** For future reference */

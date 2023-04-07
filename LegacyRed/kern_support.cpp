@@ -24,7 +24,8 @@ void Support::init() {
 bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonSupport.loadIndex == index) {
         KernelPatcher::RouteRequest requests[] = {
-            {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory, orgPopulateDeviceMemory},
+            {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
+                orgPopulateDeviceMemory},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "support", "Failed to route symbols");
 
@@ -44,8 +45,8 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
 }
 /** Wrap is likely broken, don't be surprised if it is */
 IOReturn Support::wrapPopulateDeviceMemory(void *that, uint32_t reg) {
-	DBGLOG("support", "populateDeviceMemory: this = %p reg = 0x%X", that, reg);
-	auto ret = FunctionCast(wrapPopulateDeviceMemory, callback->orgPopulateDeviceMemory)(that, reg);
-	DBGLOG("support", "populateDeviceMemory returned 0x%X", ret);
-	return kIOReturnSuccess;
+    DBGLOG("support", "populateDeviceMemory: this = %p reg = 0x%X", that, reg);
+    auto ret = FunctionCast(wrapPopulateDeviceMemory, callback->orgPopulateDeviceMemory)(that, reg);
+    DBGLOG("support", "populateDeviceMemory returned 0x%X", ret);
+    return kIOReturnSuccess;
 }

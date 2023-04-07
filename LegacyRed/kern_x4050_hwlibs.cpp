@@ -32,30 +32,30 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
         if (LRed::callback->chipVariant == ChipVariant::KLE) {
             KernelPatcher::SolveRequest solveRequests[] = {
                 {"_CAIL_DDI_CAPS_KALINDI_A0_E", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-				{"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-				{"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-				{"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
+                {"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
             };
             PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
                 "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using 'E' Kalindi Golden Settings");
-		} else if (LRed::callback->chipVariant == ChipVariant::KVE) {
-			KernelPatcher::SolveRequest solveRequests[] = {
-				{"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-				{"_SPECTRE_GoldenSettings_A0_8812_E", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
-			};
-			PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
-			DBGLOG("hwlibs", "Using 'E' Kaveri Golden Settings and DDI Caps");
+        } else if (LRed::callback->chipVariant == ChipVariant::KVE) {
+            KernelPatcher::SolveRequest solveRequests[] = {
+                {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
+                {"_SPECTRE_GoldenSettings_A0_8812_E", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
+            };
+            PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
+                "Failed to resolve symbols");
+            DBGLOG("hwlibs", "Using 'E' Kaveri Golden Settings and DDI Caps");
         } else {
             KernelPatcher::SolveRequest solveRequests[] = {
-				{"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
-				{"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-				{"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-				{"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
-				{"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-				{"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
-				/** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
+                {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
+                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
+                {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
+                {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
+                /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
             };
             PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs",
                 "Failed to resolve symbols");
@@ -69,7 +69,7 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
             //{"_Raven_SendMsgToSmc", this->orgRavenSendMsgToSmc},
             //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
             //{"_RAVEN1_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Raven)]},
-		};
+        };
         PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "hwlibs", "Failed to resolve symbols");
 
         KernelPatcher::RouteRequest requests[] = {
@@ -116,17 +116,17 @@ void *X4050HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
 }
 
 uint64_t X4050HWLibs::wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3) {
-	DBGLOG("hwlibs", "_SMUM_Initialize: param1 = 0x%llX param2 = %p param3 = 0x%llX", param1, param2, param3);
-	auto ret = FunctionCast(wrapSMUMInitialize, callback->orgSMUMInitialize)(param1, param2, param3);
-	DBGLOG("hwlibs", "_SMUM_Initialize returned 0x%llX", ret);
-	return ret;
+    DBGLOG("hwlibs", "_SMUM_Initialize: param1 = 0x%llX param2 = %p param3 = 0x%llX", param1, param2, param3);
+    auto ret = FunctionCast(wrapSMUMInitialize, callback->orgSMUMInitialize)(param1, param2, param3);
+    DBGLOG("hwlibs", "_SMUM_Initialize returned 0x%llX", ret);
+    return ret;
 }
 /** Modifications made, highly unlikely to work, will change later on */
 void X4050HWLibs::wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
-	uint level) {
-	printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
-	printf(fmt, param3, param4, param5, level);
-	FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
+    uint level) {
+    printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
+    printf(fmt, param3, param4, param5, level);
+    FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
 }
 
 /** For future reference */

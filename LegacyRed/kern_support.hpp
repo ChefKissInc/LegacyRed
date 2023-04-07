@@ -18,9 +18,9 @@ class Support {
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
 
     private:
-	mach_vm_address_t orgPopulateDeviceMemory {};
+    mach_vm_address_t orgPopulateDeviceMemory {};
 
-	static IOReturn wrapPopulateDeviceMemory(void *that, uint32_t reg);
+    static IOReturn wrapPopulateDeviceMemory(void *that, uint32_t reg);
 };
 
 #endif /* kern_support_hpp */

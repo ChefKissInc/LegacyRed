@@ -27,23 +27,21 @@ enum struct ChipType : uint32_t {
     Stoney,
     Unknown,
 };
-/** TODO: Fully implement this system */
-/** Some APUs have 'E' variants, IE: Radeon R1E, Stoney 'E' APUs don't have seperate DDI Caps & Golden Settings, however
- */
+
 enum struct ChipVariant : uint32_t {
     KVE = 0,
-    Spooky, // A revision of APU? More research needed
-    KLE, // Unsure about the three above
-    s2CU,    // s2CU && s3CU have different Golden Settings
+    Spooky,    // A revision of APU? More research needed
+    KLE,       // Unsure about the three above
+    s2CU,      // s2CU && s3CU have different Golden Settings
     s3CU,
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
     Normal,
 };
 // Primarily designed for X4000 where we have to use both GFX versions
 enum struct GFXVersion {
-	GFX7,
-	GFX8,
-	Unknown,
+    GFX7,
+    GFX8,
+    Unknown,
 };
 // Hack
 class AppleACPIPlatformExpert : IOACPIPlatformExpert {
@@ -215,7 +213,7 @@ class LRed {
     OSData *vbiosData {nullptr};
     ChipType chipType = ChipType::Unknown;
     ChipVariant chipVariant = ChipVariant::Normal;
-	GFXVersion gfxVer = GFXVersion::Unknown;
+    GFXVersion gfxVer = GFXVersion::Unknown;
     uint64_t fbOffset {0};
     IOMemoryMap *rmmio {nullptr};
     volatile uint32_t *rmmioPtr {nullptr};

@@ -28,9 +28,9 @@ class X4000 {
     mach_vm_address_t orgSetupAndInitializeHWCapabilities {0};
     mach_vm_address_t orgAccelStart {};
 
-	static bool wrapAllocateHWEngines(void *that);
-	static void wrapSetupAndInitializeHWCapabilities(void *that);
-	static void wrapInitializeFamilyType(void *that);
+    static bool wrapAllocateHWEngines(void *that);
+    static void wrapSetupAndInitializeHWCapabilities(void *that);
+    static void wrapInitializeFamilyType(void *that);
     void *callbackAccelerator = nullptr;
     static bool wrapAccelStart(void *that, IOService *provider);
 };

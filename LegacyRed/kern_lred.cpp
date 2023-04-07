@@ -92,7 +92,8 @@ void LRed::processPatcher(KernelPatcher &patcher) {
             auto len = static_cast<uint32_t>(strlen(model) + 1);
             this->iGPU->setProperty("model", const_cast<char *>(model), len);
             this->iGPU->setProperty("ATY,FamilyName", const_cast<char *>("Radeon"), 7);
-            this->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11, len - 11);    /** TODO: Figure out if this works on LRed or not */
+            this->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11,
+                len - 11); /** TODO: Figure out if this works on LRed or not */
         }
 
         if (UNLIKELY(this->iGPU->getProperty("ATY,bin_image"))) {
@@ -171,185 +172,188 @@ void LRed::csValidatePage(vnode *vp, memory_object_t pager, memory_object_offset
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
-	if (UNLIKELY(!this->rmmio || !this->rmmio->getLength())) {
-		this->rmmio = this->iGPU->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
-		PANIC_COND(!this->rmmio || !this->rmmio->getLength(), "lred", "Failed to map RMMIO");
-		this->rmmioPtr = reinterpret_cast<uint32_t *>(this->rmmio->getVirtualAddress());
-		
-		this->fbOffset = static_cast<uint64_t>(this->readReg32(0x296B)) << 24;
-		this->revision = (this->readReg32(0xD2F) & 0xF000000) >> 0x18;
-		switch (this->deviceId) {
-			// Who thought it would be a good idea to use this many Device IDs and Revisions?
-			case 0x1309:
-				[[fallthrough]];
-			case 0x130A:
-				[[fallthrough]];
-			case 0x130B:
-				[[fallthrough]];
-			case 0x130C:
-				[[fallthrough]];
-			case 0x130D:
-				[[fallthrough]];
-			case 0x130E:
-				[[fallthrough]];
-			case 0x130F:
-				[[fallthrough]];
-			case 0x1313:
-				[[fallthrough]];
-			case 0x1315:
-				this->chipType = ChipType::Kaveri;
-				this->gfxVer = GFXVersion::GFX7;
-				DBGLOG("", "Chip type is Kaveri");
-				break;
-			case 0x1316:
-				this->chipType = ChipType::Kaveri;
-				this->gfxVer = GFXVersion::GFX7;
-				DBGLOG("lred", "Chip type is Kaveri");
-				this->chipVariant = ChipVariant::Spooky;
-				/** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
-				DBGLOG("lred", "Chip variant is Spooky");
-			case 0x1318:
-				[[fallthrough]];
-			case 0x131B:
-				[[fallthrough]];
-			case 0x131C:
-				[[fallthrough]];
-			case 0x131D:
-				this->chipType = ChipType::Kaveri;
-				this->gfxVer = GFXVersion::GFX7;
-				DBGLOG("lred", "Chip type is Kaveri");
-				break;
-			case 0x9830:
-				[[fallthrough]];
-			case 0x9831:
-				[[fallthrough]];
-			case 0x9832:
-				[[fallthrough]];
-			case 0x9833:
-				[[fallthrough]];
-			case 0x9834:
-				[[fallthrough]];
-			case 0x9835:
-				[[fallthrough]];
-			case 0x9836:
-				[[fallthrough]];
-			case 0x9837:
-				[[fallthrough]];
-			case 0x9838:
-				[[fallthrough]];
-			case 0x9839:
-				[[fallthrough]];
-			case 0x983D:
-				this->chipType = ChipType::Kabini;
-				this->gfxVer = GFXVersion::GFX7;
-				DBGLOG("lred", "Chip type is Kabini");
-				if (this->deviceId == 0x9831 || this->deviceId == 0x9833 || this->deviceId == 0x9835 || this->deviceId == 0x9837) {
-					DBGLOG("lred", "Chip variant is Kabini 'E'");
-					this->chipVariant = ChipVariant::KLE;
-				}
-				break;
-			case 0x9850:
-				[[fallthrough]];
-			case 0x9851:
-				[[fallthrough]];
-			case 0x9852:
-				[[fallthrough]];
-			case 0x9853:
-				[[fallthrough]];
-			case 0x9854:
-				[[fallthrough]];
-			case 0x9855:
-				[[fallthrough]];
-			case 0x9856:
-				this->chipType = ChipType::Mullins;
-				this->gfxVer = GFXVersion::GFX7;
-				DBGLOG("lred", "Chip type is Mullins");
-				switch (this->deviceId) {
-					case 0x9851:
-						if (this->revision == 0x01 || this->revision == 0x06) {
-							this->chipVariant = ChipVariant::KLE;
-							DBGLOG("lred", "Chip variant is Mullins 'E'");
-						}
-						break;
-					case 0x9853:
-						if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
-							this->chipVariant = ChipVariant::KLE;
-							DBGLOG("lred", "Chip variant is Mullins 'E'");
-						}
-						break;
-					case 0x9854:
-						if (this->revision == 0x01) {
-							this->chipVariant = ChipVariant::KLE;
-							DBGLOG("lred", "Chip variant is Mullins 'E'");
-						}
-						break;
-					case 0x9856:
-						if (this->revision >= 0x01 && this->revision != 0x02 && this->revision != 0x06) {
-							this->chipVariant = ChipVariant::KLE;
-							DBGLOG("lred", "Chip variant is Mullins 'E'");
-						}
-					default:
-						break;
-				}
-				break;
-			case 0x9874:
-				this->chipType = ChipType::Carrizo;
-				DBGLOG("lred", "Chip type is Carrizo");
-				this->gfxVer = GFXVersion::GFX8;
-				if (this->revision >= 0xC8) {
-					this->chipVariant = ChipVariant::Bristol;
-					DBGLOG("lred", "Chip variant is Bristol");
-				}
-				break;
-			case 0x98E4:
-				this->chipType = ChipType::Stoney;
-				this->gfxVer = GFXVersion::GFX8;
-				DBGLOG("lred", "Chip type is Stoney");
-				if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) || (this->revision >= 0xD9 && this->revision < 0xDB) || this->revision >= 0xE9) {
-					this->chipVariant = ChipVariant::s3CU;
-					DBGLOG("lred", "Chip variant is Stoney 3CU");
-				} else {
-					this->chipVariant = ChipVariant::s2CU;
-					DBGLOG("lred", "Chip variant is Stoney 2CU");
-				}
-			default:
-				PANIC("lred", "Unknown device ID");
-		}
-	}
-	if (this->gfxVer == GFXVersion::GFX7) {
-		DBGLOG("lred", "GFX version is 7");
-	} else {
-		DBGLOG("lred", "GFX version is 8");
-	}
-	if (kextBacklight.loadIndex == index) {
-		KernelPatcher::RouteRequest request {"__ZN15AppleIntelPanel10setDisplayEP9IODisplay", wrapApplePanelSetDisplay,
-			orgApplePanelSetDisplay};
-		if (patcher.routeMultiple(kextBacklight.loadIndex, &request, 1, address, size)) {
-			const uint8_t find[] = {"F%uT%04x"};
-			const uint8_t replace[] = {"F%uTxxxx"};
-			KernelPatcher::LookupPatch patch = {&kextBacklight, find, replace, sizeof(find), 1};
-			DBGLOG("lred", "applying backlight patch");
-			patcher.applyLookupPatch(&patch);
-		}
-	} else if (kextMCCSControl.loadIndex == index) {
-		KernelPatcher::RouteRequest request[] = {
-			{"__ZN25AppleMCCSControlGibraltar5probeEP9IOServicePi", wrapFunctionReturnZero},
-			{"__ZN21AppleMCCSControlCello5probeEP9IOServicePi", wrapFunctionReturnZero},
-		};
-		patcher.routeMultiple(index, request, address, size);
-	} else if (support.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed support");
-	} else if (x4050hwlibs.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed x4050hwlibs");
-	} else if (x4070hwlibs.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed x4070hwlibs");
-	} else if (gfx7con.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed gfx7con");
-	} else if (gfx8con.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed gfx8con");
-	} else if (x4000.processKext(patcher, index, address, size)) {
-		DBGLOG("lred", "Processed x4000");
-	}
+    if (UNLIKELY(!this->rmmio || !this->rmmio->getLength())) {
+        this->rmmio = this->iGPU->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
+        PANIC_COND(!this->rmmio || !this->rmmio->getLength(), "lred", "Failed to map RMMIO");
+        this->rmmioPtr = reinterpret_cast<uint32_t *>(this->rmmio->getVirtualAddress());
+
+        this->fbOffset = static_cast<uint64_t>(this->readReg32(0x296B)) << 24;
+        this->revision = (this->readReg32(0xD2F) & 0xF000000) >> 0x18;
+        switch (this->deviceId) {
+            // Who thought it would be a good idea to use this many Device IDs and Revisions?
+            case 0x1309:
+                [[fallthrough]];
+            case 0x130A:
+                [[fallthrough]];
+            case 0x130B:
+                [[fallthrough]];
+            case 0x130C:
+                [[fallthrough]];
+            case 0x130D:
+                [[fallthrough]];
+            case 0x130E:
+                [[fallthrough]];
+            case 0x130F:
+                [[fallthrough]];
+            case 0x1313:
+                [[fallthrough]];
+            case 0x1315:
+                this->chipType = ChipType::Kaveri;
+                this->gfxVer = GFXVersion::GFX7;
+                DBGLOG("", "Chip type is Kaveri");
+                break;
+            case 0x1316:
+                this->chipType = ChipType::Kaveri;
+                this->gfxVer = GFXVersion::GFX7;
+                DBGLOG("lred", "Chip type is Kaveri");
+                this->chipVariant = ChipVariant::Spooky;
+                /** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
+                DBGLOG("lred", "Chip variant is Spooky");
+            case 0x1318:
+                [[fallthrough]];
+            case 0x131B:
+                [[fallthrough]];
+            case 0x131C:
+                [[fallthrough]];
+            case 0x131D:
+                this->chipType = ChipType::Kaveri;
+                this->gfxVer = GFXVersion::GFX7;
+                DBGLOG("lred", "Chip type is Kaveri");
+                break;
+            case 0x9830:
+                [[fallthrough]];
+            case 0x9831:
+                [[fallthrough]];
+            case 0x9832:
+                [[fallthrough]];
+            case 0x9833:
+                [[fallthrough]];
+            case 0x9834:
+                [[fallthrough]];
+            case 0x9835:
+                [[fallthrough]];
+            case 0x9836:
+                [[fallthrough]];
+            case 0x9837:
+                [[fallthrough]];
+            case 0x9838:
+                [[fallthrough]];
+            case 0x9839:
+                [[fallthrough]];
+            case 0x983D:
+                this->chipType = ChipType::Kabini;
+                this->gfxVer = GFXVersion::GFX7;
+                DBGLOG("lred", "Chip type is Kabini");
+                if (this->deviceId == 0x9831 || this->deviceId == 0x9833 || this->deviceId == 0x9835 ||
+                    this->deviceId == 0x9837) {
+                    DBGLOG("lred", "Chip variant is Kabini 'E'");
+                    this->chipVariant = ChipVariant::KLE;
+                }
+                break;
+            case 0x9850:
+                [[fallthrough]];
+            case 0x9851:
+                [[fallthrough]];
+            case 0x9852:
+                [[fallthrough]];
+            case 0x9853:
+                [[fallthrough]];
+            case 0x9854:
+                [[fallthrough]];
+            case 0x9855:
+                [[fallthrough]];
+            case 0x9856:
+                this->chipType = ChipType::Mullins;
+                this->gfxVer = GFXVersion::GFX7;
+                DBGLOG("lred", "Chip type is Mullins");
+                switch (this->deviceId) {
+                    case 0x9851:
+                        if (this->revision == 0x01 || this->revision == 0x06) {
+                            this->chipVariant = ChipVariant::KLE;
+                            DBGLOG("lred", "Chip variant is Mullins 'E'");
+                        }
+                        break;
+                    case 0x9853:
+                        if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
+                            this->chipVariant = ChipVariant::KLE;
+                            DBGLOG("lred", "Chip variant is Mullins 'E'");
+                        }
+                        break;
+                    case 0x9854:
+                        if (this->revision == 0x01) {
+                            this->chipVariant = ChipVariant::KLE;
+                            DBGLOG("lred", "Chip variant is Mullins 'E'");
+                        }
+                        break;
+                    case 0x9856:
+                        if (this->revision >= 0x01 && this->revision != 0x02 && this->revision != 0x06) {
+                            this->chipVariant = ChipVariant::KLE;
+                            DBGLOG("lred", "Chip variant is Mullins 'E'");
+                        }
+                    default:
+                        break;
+                }
+                break;
+            case 0x9874:
+                this->chipType = ChipType::Carrizo;
+                DBGLOG("lred", "Chip type is Carrizo");
+                this->gfxVer = GFXVersion::GFX8;
+                if (this->revision >= 0xC8) {
+                    this->chipVariant = ChipVariant::Bristol;
+                    DBGLOG("lred", "Chip variant is Bristol");
+                }
+                break;
+            case 0x98E4:
+                this->chipType = ChipType::Stoney;
+                this->gfxVer = GFXVersion::GFX8;
+                DBGLOG("lred", "Chip type is Stoney");
+                /** R4 and up iGPUs have 3 compute units while the others have 2 CUs, hence the chip variations */
+                if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) ||
+                    (this->revision >= 0xD9 && this->revision < 0xDB) || this->revision >= 0xE9) {
+                    this->chipVariant = ChipVariant::s3CU;
+                    DBGLOG("lred", "Chip variant is Stoney 3CU");
+                } else {
+                    this->chipVariant = ChipVariant::s2CU;
+                    DBGLOG("lred", "Chip variant is Stoney 2CU");
+                }
+            default:
+                PANIC("lred", "Unknown device ID");
+        }
+    }
+    if (this->gfxVer == GFXVersion::GFX7) {
+        DBGLOG("lred", "GFX version is 7");
+    } else {
+        DBGLOG("lred", "GFX version is 8");
+    }
+    if (kextBacklight.loadIndex == index) {
+        KernelPatcher::RouteRequest request {"__ZN15AppleIntelPanel10setDisplayEP9IODisplay", wrapApplePanelSetDisplay,
+            orgApplePanelSetDisplay};
+        if (patcher.routeMultiple(kextBacklight.loadIndex, &request, 1, address, size)) {
+            const uint8_t find[] = {"F%uT%04x"};
+            const uint8_t replace[] = {"F%uTxxxx"};
+            KernelPatcher::LookupPatch patch = {&kextBacklight, find, replace, sizeof(find), 1};
+            DBGLOG("lred", "applying backlight patch");
+            patcher.applyLookupPatch(&patch);
+        }
+    } else if (kextMCCSControl.loadIndex == index) {
+        KernelPatcher::RouteRequest request[] = {
+            {"__ZN25AppleMCCSControlGibraltar5probeEP9IOServicePi", wrapFunctionReturnZero},
+            {"__ZN21AppleMCCSControlCello5probeEP9IOServicePi", wrapFunctionReturnZero},
+        };
+        patcher.routeMultiple(index, request, address, size);
+    } else if (support.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed support");
+    } else if (x4050hwlibs.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed x4050hwlibs");
+    } else if (x4070hwlibs.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed x4070hwlibs");
+    } else if (gfx7con.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed gfx7con");
+    } else if (gfx8con.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed gfx8con");
+    } else if (x4000.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed x4000");
+    }
 }
 
 struct ApplePanelData {

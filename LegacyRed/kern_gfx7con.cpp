@@ -27,7 +27,7 @@ bool GFX7Con::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
         KernelPatcher::RouteRequest requests[] = {
             {"__ZNK18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId},
             {"__ZN17CIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
-			{"__ZN13ASIC_INFO__CI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo},
+            {"__ZN13ASIC_INFO__CI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "gfx7con", "Failed to route symbols");
 
@@ -48,7 +48,7 @@ uint16_t GFX7Con::wrapGetFamilyId(void) {
 }
 
 IOReturn GFX7Con::wrapPopulateDeviceInfo(void *that) {
-	auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
-	getMember<uint32_t>(that, 0x60) = AMDGPU_FAMILY_KV;
-	return ret;
+    auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
+    getMember<uint32_t>(that, 0x60) = AMDGPU_FAMILY_KV;
+    return ret;
 }
