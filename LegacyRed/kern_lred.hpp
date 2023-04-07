@@ -27,19 +27,19 @@ enum struct ChipType : uint32_t {
     Stoney,
     Unknown,
 };
-/** TODO: Implement this system */
+/** TODO: Fully implement this system */
 /** Some APUs have 'E' variants, IE: Radeon R1E, Stoney 'E' APUs don't have seperate DDI Caps & Golden Settings, however
  */
 enum struct ChipVariant : uint32_t {
     KVE = 0,
     Spooky, // A revision of APU? More research needed
-    KLE,
-    MLE,     // Unsure about the four above
+    KLE, // Unsure about the three above
     s2CU,    // s2CU && s3CU have different Golden Settings
     s3CU,
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
     Normal,
 };
+// Primarily designed for X4000 where we have to use both GFX versions
 enum struct GFXVersion {
 	GFX7,
 	GFX8,

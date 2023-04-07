@@ -243,6 +243,10 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Kabini;
 				this->gfxVer = GFXVersion::GFX7;
 				DBGLOG("lred", "Chip type is Kabini");
+				if (this>deviceId == 0x9831 || 0x9833 || 0x9835 || 0x9837) {
+					DBGLOG("lred", "Chip variant is Kabini 'E'");
+					this->chipVariant = ChipVariant::KLE;
+				}
 				break;
 			case 0x9850:
 				[[fallthrough]];
@@ -260,18 +264,19 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Mullins;
 				this->gfxVer = GFXVersion::GFX7;
 				DBGLOG("lred", "Chip type is Mullins");
-				switch (this->revision) {
-					case 0x01:
-						[[fallthrough]];
-					case 0x05:
-						[[fallthrough]];
-					case 0x07:
-						[[fallthrough]];
-					case 0x08:
-						[[fallthrough]];
-					case 0x13:
-						this->chipVariant = ChipVariant::MLE;
-						DBGLOG("lred", "Mullins APU is E Variant"); /** TODO: Make this work without being broken on a majority of Device IDs */
+				switch (this->deviceId) {
+					case 0x9851:
+						if (this->revision == 0x01 || 0x06) {
+							this->chipVariant = ChipVariant::KLE;
+							DBGLOG("lred", "Chip variant is Mullins 'E'");
+						}
+						break;
+					case 0x9853:
+						if (this->revision == 0x01 || >= 0x05 && < 0x40) {
+							this->chipVariant = ChipVariant::KLE;
+							DBGLOG("lred", "Chip variant is Mullins 'E'");
+						}
+					default:
 						break;
 				}
 				break;
@@ -279,38 +284,9 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Carrizo;
 				DBGLOG("lred", "Chip type is Carrizo");
 				this->gfxVer = GFXVersion::GFX8;
-				switch (this->revision) {
-					case 0xC8:
-						[[fallthrough]];
-					case 0xC9:
-						[[fallthrough]];
-					case 0xCA:
-						[[fallthrough]];
-					case 0xCB:
-						[[fallthrough]];
-					case 0xCC:
-						[[fallthrough]];
-					case 0xCD:
-						[[fallthrough]];
-					case 0xCE:
-						[[fallthrough]];
-					case 0xE1:
-						[[fallthrough]];
-					case 0xE2:
-						[[fallthrough]];
-					case 0xE3:
-						[[fallthrough]];
-					case 0xE4:
-						[[fallthrough]];
-					case 0xE5:
-						[[fallthrough]];
-					case 0xE6:
-						this->chipVariant = ChipVariant::Bristol;
-						DBGLOG("lred", "Carrizo APU is Bristol Variant");
-						break;
-					default:
-						this->chipVariant = ChipVariant::Normal;
-						break;
+				if (this->revision >= 0xC8) {
+					this->chipVariant = ChipVariant::Bristol;
+					DBGLOG("lred", "Chip variant is Bristol");
 				}
 				break;
 			case 0x98E4:
@@ -346,11 +322,11 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 						[[fallthrough]];
 					case 0xEB:
 						this->chipVariant = ChipVariant::s3CU;
-						DBGLOG("lred", "Stoney APU is 3CU Variant");
+						DBGLOG("lred", "Chip variant is Stoney 3CU");
 						break;
 					default:
 						this->chipVariant = ChipVariant::s2CU;
-						DBGLOG("lred", "Stoney APU is 2CU Variant");
+						DBGLOG("lred", "Chip variant is Stoney 2CU");
 						break;
 				}
 				break;
@@ -358,7 +334,11 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				PANIC("lred", "Unknown device ID");
 		}
 	}
-	DBGLOG("lred", "GFX Version is %d", gfxVer);
+	if (this->gfxVer == GFXVersion::GFX7) {
+		DBGLOG("lred", "GFX version is 7");
+	} else {
+		DBGLOG("lred", "GFX version is 8");
+	}
 	if (kextBacklight.loadIndex == index) {
 		KernelPatcher::RouteRequest request {"__ZN15AppleIntelPanel10setDisplayEP9IODisplay", wrapApplePanelSetDisplay,
 			orgApplePanelSetDisplay};
