@@ -276,6 +276,18 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 							this->chipVariant = ChipVariant::KLE;
 							DBGLOG("lred", "Chip variant is Mullins 'E'");
 						}
+						break;
+					case 0x9854:
+						if (this->revision == 0x01) {
+							this->chipVariant = ChipVariant::KLE;
+							DBGLOG("lred", "Chip variant is Mullins 'E'");
+						}
+						break;
+					case 0x9856:
+						if (this->revision >= 0x01 && this->revision != 0x02 && this->revision != 0x06) {
+							this->chipVariant = ChipVariant::KLE;
+							DBGLOG("lred", "Chip variant is Mullins 'E'");
+						}
 					default:
 						break;
 				}
@@ -293,43 +305,13 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Stoney;
 				this->gfxVer = GFXVersion::GFX8;
 				DBGLOG("lred", "Chip type is Stoney");
-				switch (this->revision) {
-					case 0x80:
-						[[fallthrough]];
-					case 0x81:
-						[[fallthrough]];
-					case 0xC0:
-						[[fallthrough]];
-					case 0xC1:
-						[[fallthrough]];
-					case 0xC2:
-						[[fallthrough]];
-					case 0xC4:
-						[[fallthrough]];
-					case 0xC6:
-						[[fallthrough]];
-					case 0xC8:
-						[[fallthrough]];
-					case 0xC9:
-						[[fallthrough]];
-					case 0xCA:
-						[[fallthrough]];
-					case 0xD9:
-						[[fallthrough]];
-					case 0xDA:
-						[[fallthrough]];
-					case 0xE9:
-						[[fallthrough]];
-					case 0xEB:
-						this->chipVariant = ChipVariant::s3CU;
-						DBGLOG("lred", "Chip variant is Stoney 3CU");
-						break;
-					default:
-						this->chipVariant = ChipVariant::s2CU;
-						DBGLOG("lred", "Chip variant is Stoney 2CU");
-						break;
+				if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) || (this->revision >= 0xD9 && this->revision < 0xDB) || this->revision >= 0xE9) {
+					this->chipVariant = ChipVariant::s3CU;
+					DBGLOG("lred", "Chip variant is Stoney 3CU");
+				} else {
+					this->chipVariant = ChipVariant::s2CU;
+					DBGLOG("lred", "Chip variant is Stoney 2CU");
 				}
-				break;
 			default:
 				PANIC("lred", "Unknown device ID");
 		}
