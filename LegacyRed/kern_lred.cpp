@@ -207,7 +207,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				DBGLOG("lred", "Chip type is Kaveri");
 				this->chipVariant = ChipVariant::Spooky;
 				/** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
-				DBGLOG("lred", "Chip variant is Spooky")
+				DBGLOG("lred", "Chip variant is Spooky");
 			case 0x1318:
 				[[fallthrough]];
 			case 0x131B:
@@ -243,7 +243,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Kabini;
 				this->gfxVer = GFXVersion::GFX7;
 				DBGLOG("lred", "Chip type is Kabini");
-				if (this>deviceId == 0x9831 || 0x9833 || 0x9835 || 0x9837) {
+				if (this->deviceId == 0x9831 || 0x9833 || 0x9835 || 0x9837) {
 					DBGLOG("lred", "Chip variant is Kabini 'E'");
 					this->chipVariant = ChipVariant::KLE;
 				}
