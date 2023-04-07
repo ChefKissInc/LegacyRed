@@ -31,7 +31,7 @@ static constexpr Model dev130A[] = {
 
 static constexpr Model dev130B[] = {
     {0x00, "AMD Radeon R4 Graphics"},
-}
+};
 
 static constexpr Model dev130C[] = {
     {0x00, "AMD Radeon R7 Graphics"},

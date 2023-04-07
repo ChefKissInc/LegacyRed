@@ -203,7 +203,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				break;
 			case 0x1316:
 				this->chipType = ChipType::Kaveri;
-				this->gfxVer = GFX7Con;
+				this->gfxVer = GFX7;
 				DBGLOG("lred", "Chip type is Kaveri");
 				this->chipVariant = ChipVariant::Spooky;
 				/** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
