@@ -187,7 +187,7 @@ static constexpr Model dev9856[] = {
 
 // Carrizo
 
-static constexpr Model dev9874 = {
+static constexpr Model dev9874[] = {
     {0x81, "AMD Radeon R6 Graphics"},
     {0x84, "AMD Radeon R7 Graphics"},
     {0x85, "AMD Radeon R6 Graphics"},

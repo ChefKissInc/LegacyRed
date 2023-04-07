@@ -243,7 +243,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				this->chipType = ChipType::Kabini;
 				this->gfxVer = GFXVersion::GFX7;
 				DBGLOG("lred", "Chip type is Kabini");
-				if (this->deviceId == 0x9831 || 0x9833 || 0x9835 || 0x9837) {
+				if (this->deviceId == 0x9831 || this->deviceId == 0x9833 || this->deviceId == 0x9835 || this->deviceId == 0x9837) {
 					DBGLOG("lred", "Chip variant is Kabini 'E'");
 					this->chipVariant = ChipVariant::KLE;
 				}
@@ -272,7 +272,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 						}
 						break;
 					case 0x9853:
-						if (this->revision == 0x01 || this->revision >= 0x05 && this->revision < 0x40) {
+						if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
 							this->chipVariant = ChipVariant::KLE;
 							DBGLOG("lred", "Chip variant is Mullins 'E'");
 						}
