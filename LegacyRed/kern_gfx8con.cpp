@@ -24,6 +24,8 @@ void GFX8Con::init() {
 
 bool GFX8Con::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonGFX8Con.loadIndex == index) {
+		LRed::callback->setRMMIOIfNecessary();
+		
         KernelPatcher::RouteRequest requests[] = {
             {"__ZNK18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId},
             {"__ZN17VIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},

@@ -96,6 +96,7 @@ class LRed {
     void init();
     void processPatcher(KernelPatcher &patcher);
     void processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
+	void setRMMIOIfNecessary();
 
     private:
     static const char *getChipName() {
@@ -221,10 +222,6 @@ class LRed {
     uint16_t enumeratedRevision {0};
     uint16_t revision {0};
     IOPCIDevice *iGPU {nullptr};
-
-    void *hwAlignMgr {nullptr};
-    uint8_t *hwAlignMgrVtX5000 {nullptr};
-    uint8_t *hwAlignMgrVtX6000 {nullptr};
 
     OSMetaClass *metaClassMap[4][2] = {{nullptr}};
 

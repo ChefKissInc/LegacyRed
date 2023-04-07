@@ -171,7 +171,7 @@ void LRed::csValidatePage(vnode *vp, memory_object_t pager, memory_object_offset
     }
 }
 
-void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
+void LRed::setRMMIOIfNecessary() {
     if (UNLIKELY(!this->rmmio || !this->rmmio->getLength())) {
         this->rmmio = this->iGPU->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
         PANIC_COND(!this->rmmio || !this->rmmio->getLength(), "lred", "Failed to map RMMIO");

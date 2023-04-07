@@ -23,6 +23,8 @@ void Support::init() {
 
 bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonSupport.loadIndex == index) {
+		LRed::callback->setRMMIOIfNecessary();
+		
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
                 orgPopulateDeviceMemory},

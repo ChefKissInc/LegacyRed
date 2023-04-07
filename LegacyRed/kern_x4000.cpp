@@ -20,6 +20,8 @@ void X4000::init() {
 
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4000.loadIndex == index) {
+		LRed::callback->setRMMIOIfNecessary();
+		
         uint32_t *orgChannelTypes = nullptr;
 
         KernelPatcher::SolveRequest solveRequests[] = {
