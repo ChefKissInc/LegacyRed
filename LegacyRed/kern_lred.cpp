@@ -203,7 +203,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				break;
 			case 0x1316:
 				this->chipType = ChipType::Kaveri;
-				this->gfxVer = GFX7;
+				this->gfxVer = GFXVersion::GFX7;
 				DBGLOG("lred", "Chip type is Kaveri");
 				this->chipVariant = ChipVariant::Spooky;
 				/** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
@@ -266,13 +266,13 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				DBGLOG("lred", "Chip type is Mullins");
 				switch (this->deviceId) {
 					case 0x9851:
-						if (this->revision == 0x01 || 0x06) {
+						if (this->revision == 0x01 || this->revision == 0x06) {
 							this->chipVariant = ChipVariant::KLE;
 							DBGLOG("lred", "Chip variant is Mullins 'E'");
 						}
 						break;
 					case 0x9853:
-						if (this->revision == 0x01 || >= 0x05 && < 0x40) {
+						if (this->revision == 0x01 || this->revision >= 0x05 && this->revision < 0x40) {
 							this->chipVariant = ChipVariant::KLE;
 							DBGLOG("lred", "Chip variant is Mullins 'E'");
 						}
