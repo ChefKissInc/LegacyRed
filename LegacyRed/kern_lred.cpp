@@ -202,7 +202,7 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
 				DBGLOG("", "Chip type is Kaveri");
 				break;
 			case 0x1316:
-				this->chipType = ChipType::Kaveri
+				this->chipType = ChipType::Kaveri;
 				this->gfxVer = GFX7Con;
 				DBGLOG("lred", "Chip type is Kaveri");
 				this->chipVariant = ChipVariant::Spooky;
