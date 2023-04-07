@@ -200,15 +200,10 @@ void LRed::setRMMIOIfNecessary() {
             case 0x1315:
                 this->chipType = ChipType::Kaveri;
                 this->gfxVer = GFXVersion::GFX7;
-                DBGLOG("", "Chip type is Kaveri");
+                DBGLOG("lred", "Chip type is Kaveri");
                 break;
             case 0x1316:
-                this->chipType = ChipType::Kaveri;
-                this->gfxVer = GFXVersion::GFX7;
-                DBGLOG("lred", "Chip type is Kaveri");
-                this->chipVariant = ChipVariant::Spooky;
-                /** Unusure about this one, found through GPUOpen's DeviceInfo, will research */
-                DBGLOG("lred", "Chip variant is Spooky");
+                [[fallthrough]];
             case 0x1318:
                 [[fallthrough]];
             case 0x131B:
@@ -219,6 +214,10 @@ void LRed::setRMMIOIfNecessary() {
                 this->chipType = ChipType::Kaveri;
                 this->gfxVer = GFXVersion::GFX7;
                 DBGLOG("lred", "Chip type is Kaveri");
+                if (this->deviceId == 0x1316) {
+                    this->chipVariant = ChipVariant::Spooky;
+                    DBGLOG("lred", "Chip variant is Spooky");
+                }
                 break;
             case 0x9830:
                 [[fallthrough]];

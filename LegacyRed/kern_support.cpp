@@ -45,7 +45,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
 
     return false;
 }
-/** Wrap is likely broken, don't be surprised if it is */
+
 IOReturn Support::wrapPopulateDeviceMemory(void *that, uint32_t reg) {
     DBGLOG("support", "populateDeviceMemory: this = %p reg = 0x%X", that, reg);
     auto ret = FunctionCast(wrapPopulateDeviceMemory, callback->orgPopulateDeviceMemory)(that, reg);

@@ -62,13 +62,14 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         // orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
         // orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
         // MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-        // DBGLOG("x4000", "Applied SDMA1 patches");
 
-        // KernelPatcher::LookupPatch patch = {&kextRadeonX5000, kStartHWEnginesOriginal, kStartHWEnginesPatched,
-        // arrsize(kStartHWEnginesOriginal), 1};
-        // patcher.applyLookupPatch(&patch);
-        // patcher.clearError();
-
+        if (LRed::callback->chipType == ChipType::Stoney) {
+            KernelPatcher::LookupPatch patch = {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesPatched,
+                arrsize(kStartHWEnginesOriginal), 1};
+            patcher.applyLookupPatch(&patch);
+            patcher.clearError();
+            DBGLOG("x4000", "Applied Singular SDMA lookup patch");
+        }
         return true;
     }
 

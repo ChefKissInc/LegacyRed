@@ -29,6 +29,15 @@ static const uint8_t kAGDPFBCountCheckPatched[] = {0x02, 0x00, 0x00, 0x83, 0xF8,
 static const char kAGDPBoardIDKeyOriginal[] = "board-id";
 static const char kAGDPBoardIDKeyPatched[] = "applehax";
 
+/**
+ * `AMDRadeonX4000_AMDHardware::startHWEngines`
+ * Make for loop run only once as we only have one SDMA engine.
+ * Patch originally came from NootedRed, since the code for startHWEngines is nearly identical on X4000, this patch, in
+ * theory, should work
+ */
+static const uint8_t kStartHWEnginesOriginal[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74, 0x50};
+static const uint8_t kStartHWEnginesPatched[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
+
 /** VideoToolbox DRM model check */
 static const char kVideoToolboxDRMModelOriginal[] = "MacPro5,1\0MacPro6,1\0IOService";
 
@@ -45,6 +54,7 @@ static const uint8_t kCoreLSKDPatched[] = {0xC7, 0xC0, 0xC3, 0x06, 0x03, 0x00, 0
 static_assert(arrsize(kVRAMInfoNullCheckOriginal) == arrsize(kVRAMInfoNullCheckPatched));
 static_assert(arrsize(kAGDPFBCountCheckOriginal) == arrsize(kAGDPFBCountCheckPatched));
 static_assert(arrsize(kAGDPBoardIDKeyOriginal) == arrsize(kAGDPBoardIDKeyPatched));
+static_assert(arrsize(kStartHWEnginesOriginal) == arrsize(kStartHWEnginesPatched));
 static_assert(arrsize(kCoreLSKDOriginal) == arrsize(kCoreLSKDPatched));
 
 #endif /* kern_patches_hpp */
