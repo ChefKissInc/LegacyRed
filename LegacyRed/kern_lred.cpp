@@ -1,9 +1,6 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-//  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
-//  details.
-
 #include "kern_lred.hpp"
 #include "kern_gfx7con.hpp"
 #include "kern_gfx8con.hpp"
@@ -39,7 +36,7 @@ static X4070HWLibs x4070hwlibs;
 static X4000 x4000;
 
 void LRed::init() {
-    SYSLOG("lred", "Please don't support tonymacx86.com!");
+    SYSLOG("lred", "Copyright © 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
     callback = this;
 
     lilu.onPatcherLoadForce(

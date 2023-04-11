@@ -1,9 +1,6 @@
 //  Copyright © 2022-2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-//  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
-//  details.
-
 #ifndef kern_model_hpp
 #define kern_model_hpp
 #include <Headers/kern_util.hpp>

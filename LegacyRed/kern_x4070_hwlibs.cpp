@@ -1,9 +1,6 @@
 //  Copyright © 2022-2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-//  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
-//  details.
-
 #include "kern_x4070_hwlibs.hpp"
 #include "kern_lred.hpp"
 #include "kern_patches.hpp"
