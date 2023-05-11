@@ -12,7 +12,7 @@ Since the kext isn't functioning yet: None, but in the future, due to how we onl
 
 ### How functional is the kext?
 
-As of recent, AMDRadeonX4000 was kernel panicing on createHWInterface, and as of recent we now have AMD8000Controller failing on CIBandwidthManager::init
+As of recent, AMDRadeonX4000 is kernel panicing on createHWInterface on both Volcanic Islands and Caribbean Islands accelerators
 
 ### On which macOS versions am I able to use this on?
 
