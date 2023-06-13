@@ -196,7 +196,6 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x1315:
                 this->chipType = ChipType::Kaveri;
-                this->gfxVer = GFXVersion::GFX7;
                 DBGLOG("lred", "Chip type is Kaveri");
                 break;
             case 0x1316:
@@ -209,7 +208,6 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x131D:
                 this->chipType = ChipType::Kaveri;
-                this->gfxVer = GFXVersion::GFX7;
                 DBGLOG("lred", "Chip type is Kaveri");
                 if (this->deviceId == 0x1316) {
                     this->chipVariant = ChipVariant::Spooky;
@@ -238,7 +236,6 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x983D:
                 this->chipType = ChipType::Kabini;
-                this->gfxVer = GFXVersion::GFX7;
                 DBGLOG("lred", "Chip type is Kabini");
                 if (this->deviceId == 0x9831 || this->deviceId == 0x9833 || this->deviceId == 0x9835 ||
                     this->deviceId == 0x9837) {
@@ -260,7 +257,6 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x9856:
                 this->chipType = ChipType::Mullins;
-                this->gfxVer = GFXVersion::GFX7;
                 DBGLOG("lred", "Chip type is Mullins");
                 switch (this->deviceId) {
                     case 0x9851:
@@ -293,7 +289,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x9874:
                 this->chipType = ChipType::Carrizo;
                 DBGLOG("lred", "Chip type is Carrizo");
-                this->gfxVer = GFXVersion::GFX8;
+				this->isGcn3Derivative = true;
                 if (this->revision >= 0xC8) {
                     this->chipVariant = ChipVariant::Bristol;
                     DBGLOG("lred", "Chip variant is Bristol");
@@ -301,7 +297,7 @@ void LRed::setRMMIOIfNecessary() {
                 break;
             case 0x98E4:
                 this->chipType = ChipType::Stoney;
-                this->gfxVer = GFXVersion::GFX8;
+                this->isGcn3Derivative = true;
                 DBGLOG("lred", "Chip type is Stoney");
                 /** R4 and up iGPUs have 3 compute units while the others have 2 CUs, hence the chip variations */
                 if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) ||
@@ -316,11 +312,7 @@ void LRed::setRMMIOIfNecessary() {
                 PANIC("lred", "Unknown device ID");
         }
     }
-    if (this->gfxVer == GFXVersion::GFX7) {
-        DBGLOG("lred", "GFX version is 7");
-    } else {
-        DBGLOG("lred", "GFX version is 8");
-    }
+	DBGLOG_COND(this->isGcn3Derivative == true, "lred", "iGPU is GCN 3 derivative");
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {

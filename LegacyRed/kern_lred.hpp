@@ -39,12 +39,7 @@ enum struct ChipVariant : uint32_t {
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
     Normal,
 };
-// Primarily designed for X4000 where we have to use both GFX versions
-enum struct GFXVersion {
-    GFX7,
-    GFX8,
-    Unknown,
-};
+
 // Hack
 class AppleACPIPlatformExpert : IOACPIPlatformExpert {
     friend class LRed;
@@ -216,7 +211,7 @@ class LRed {
     OSData *vbiosData {nullptr};
     ChipType chipType = ChipType::Unknown;
     ChipVariant chipVariant = ChipVariant::Normal;
-    GFXVersion gfxVer = GFXVersion::Unknown;
+	bool isGcn3Derivative = false;
     uint64_t fbOffset {0};
     IOMemoryMap *rmmio {nullptr};
     volatile uint32_t *rmmioPtr {nullptr};

@@ -35,7 +35,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             //{"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
             //{"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor},
             //{"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor},
-            //{"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
+            {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
@@ -47,10 +47,10 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
             //{"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             //{"__ZN28AMDRadeonX4000_AMDCIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
-            //{"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
-              //  wrapSetupAndInitializeHWCapabilities},
-            //{"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
-              //  wrapSetupAndInitializeHWCapabilities},
+            {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
+                wrapSetupAndInitializeHWCapabilities},
+            {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
+                wrapSetupAndInitializeHWCapabilities},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType},
         };
@@ -84,6 +84,28 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
     return ret;
 }
 
+// Likely to be unused, here for incase we need to use it for X4000::setupAndInitializeHWCapabilities
+enum HWCapability : uint64_t {
+	DisplayPipeCount = 0x04,    // uint32_t
+	SECount = 0x34,             // uint32_t
+	SHPerSE = 0x3C,             // uint32_t
+	CUPerSH = 0x70,             // uint32_t
+	HasUVD0 = 0x84,             // bool
+	HasUVD1 = 0x85,             // bool
+	HasVCE = 0x86,              // bool
+	HasVCN0 = 0x87,             // bool
+	HasVCN1 = 0x88,             // bool
+	HasHDCP = 0x8D,             // bool
+	HasSDMAPageQueue = 0x98,    // bool
+};
+
+void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
+	DBGLOG("x4000", "setupAndInitializeHWCapabilities: this = %p", that);
+	FunctionCast(wrapSetupAndInitializeHWCapabilities, callback->orgSetupAndInitializeHWCapabilities)(that);
+}
+
+void X4000::wrapInitializeFamilyType(void *that) { getMember<uint32_t>(that, 0x308) = LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV; }
+
 /** Rough calculations based on AMDRadeonX4000's Assembly  */
 /*
 bool X4000::wrapAllocateHWEngines(void *that) {
@@ -115,17 +137,3 @@ bool X4000::wrapAllocateHWEngines(void *that) {
     return true;
 }
 */
-// Likely to be unused, here for incase we need to use it for X4000::setupAndInitializeHWCapabilities
-enum HWCapability : uint64_t {
-    DisplayPipeCount = 0x04,    // uint32_t
-    SECount = 0x34,             // uint32_t
-    SHPerSE = 0x3C,             // uint32_t
-    CUPerSH = 0x70,             // uint32_t
-    HasUVD0 = 0x84,             // bool
-    HasUVD1 = 0x85,             // bool
-    HasVCE = 0x86,              // bool
-    HasVCN0 = 0x87,             // bool
-    HasVCN1 = 0x88,             // bool
-    HasHDCP = 0x8D,             // bool
-    HasSDMAPageQueue = 0x98,    // bool
-};
