@@ -15,20 +15,20 @@ class X4000 {
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
 
     private:
-    t_GenericConstructor orgGFX7PM4EngineConstructor {nullptr};
-    t_GenericConstructor orgGFX7SDMAEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX7VCEEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX7UVDEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX7SAMUEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX8PM4EngineConstructor {nullptr};
-    t_GenericConstructor orgGFX8SDMAEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX8VCEEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};
-    t_GenericConstructor orgGFX8SAMUEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX7PM4EngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX7SDMAEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX7VCEEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX7UVDEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX7SAMUEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX8PM4EngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX8SDMAEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX8VCEEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};
+    //t_GenericConstructor orgGFX8SAMUEngineConstructor {nullptr};
     mach_vm_address_t orgSetupAndInitializeHWCapabilities {0};
     mach_vm_address_t orgAccelStart {};
 
-    static bool wrapAllocateHWEngines(void *that);
+    //static bool wrapAllocateHWEngines(void *that);
     static void wrapSetupAndInitializeHWCapabilities(void *that);
     static void wrapInitializeFamilyType(void *that);
     void *callbackAccelerator = nullptr;
