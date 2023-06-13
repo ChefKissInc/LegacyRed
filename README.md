@@ -1,8 +1,10 @@
-# LegacyRed ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/Zorm-Industries/LegacyRed/main.yml?branch=master&logo=github&style=for-the-badge)
+# LegacyRed ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/NootInc/LegacyRed/main.yml?branch=master&logo=github&style=for-the-badge)
 
 An AMD Legacy iGPU support [Lilu](https://github.com/acidanthera/Lilu) plugin.
 
 The Source Code of this Derivative Work is licensed under the `Thou Shalt Not Profit License version 1.0`. See `LICENSE`
+
+Please do not use the artifacts from the dbg branch unless you know what you are doing.
 
 ## FAQ
 
