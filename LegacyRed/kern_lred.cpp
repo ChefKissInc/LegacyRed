@@ -63,11 +63,25 @@ void LRed::processPatcher(KernelPatcher &patcher) {
     if (devInfo) {
         devInfo->processSwitchOff();
 
-        PANIC_COND(!devInfo->videoBuiltin, "lred", "videoBuiltin null");
-        this->iGPU = OSDynamicCast(IOPCIDevice, devInfo->videoBuiltin);
-        PANIC_COND(!this->iGPU, "lred", "videoBuiltin is not IOPCIDevice");
-        PANIC_COND(WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD, "lred",
-            "videoBuiltin is not AMD");
+        if (!devInfo->videoBuiltin) {
+            for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
+                auto *device = OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video);
+                if (!device) { continue; }
+                auto devid = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigDeviceID) & 0xFF00;
+                if (WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID) == WIOKit::VendorID::ATIAMD &&
+                    (devid == 0x1300 || devid == 0x9800)) {
+                    this->iGPU = device;
+                    break;
+                }
+            }
+            PANIC_COND(!this->iGPU, "lred", "No iGPU found");
+        } else {
+            PANIC_COND(!devInfo->videoBuiltin, "lred", "videoBuiltin null");
+            this->iGPU = OSDynamicCast(IOPCIDevice, devInfo->videoBuiltin);
+            PANIC_COND(!this->iGPU, "lred", "videoBuiltin is not IOPCIDevice");
+            PANIC_COND(WIOKit::readPCIConfigValue(this->iGPU, WIOKit::kIOPCIConfigVendorID) != WIOKit::VendorID::ATIAMD,
+                "lred", "videoBuiltin is not AMD");
+        }
 
         WIOKit::renameDevice(this->iGPU, "IGPU");
         WIOKit::awaitPublishing(this->iGPU);
@@ -309,7 +323,7 @@ void LRed::setRMMIOIfNecessary() {
                 PANIC("lred", "Unknown device ID: %x", deviceId);
         }
     }
-    DBGLOG_COND(this->isGcn3Derivative == true, "lred", "iGPU is GCN 3 derivative");
+    DBGLOG_COND(this->isGcn3Derivative, "lred", "iGPU is GCN 3 derivative");
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
