@@ -86,25 +86,27 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
 
 // Likely to be unused, here for incase we need to use it for X4000::setupAndInitializeHWCapabilities
 enum HWCapability : uint64_t {
-	DisplayPipeCount = 0x04,    // uint32_t
-	SECount = 0x34,             // uint32_t
-	SHPerSE = 0x3C,             // uint32_t
-	CUPerSH = 0x70,             // uint32_t
-	HasUVD0 = 0x84,             // bool
-	HasUVD1 = 0x85,             // bool
-	HasVCE = 0x86,              // bool
-	HasVCN0 = 0x87,             // bool
-	HasVCN1 = 0x88,             // bool
-	HasHDCP = 0x8D,             // bool
-	HasSDMAPageQueue = 0x98,    // bool
+    DisplayPipeCount = 0x04,    // uint32_t
+    SECount = 0x34,             // uint32_t
+    SHPerSE = 0x3C,             // uint32_t
+    CUPerSH = 0x70,             // uint32_t
+    HasUVD0 = 0x84,             // bool
+    HasUVD1 = 0x85,             // bool
+    HasVCE = 0x86,              // bool
+    HasVCN0 = 0x87,             // bool
+    HasVCN1 = 0x88,             // bool
+    HasHDCP = 0x8D,             // bool
+    HasSDMAPageQueue = 0x98,    // bool
 };
 
 void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
-	DBGLOG("x4000", "setupAndInitializeHWCapabilities: this = %p", that);
-	FunctionCast(wrapSetupAndInitializeHWCapabilities, callback->orgSetupAndInitializeHWCapabilities)(that);
+    DBGLOG("x4000", "setupAndInitializeHWCapabilities: this = %p", that);
+    FunctionCast(wrapSetupAndInitializeHWCapabilities, callback->orgSetupAndInitializeHWCapabilities)(that);
 }
 
-void X4000::wrapInitializeFamilyType(void *that) { getMember<uint32_t>(that, 0x308) = LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV; }
+void X4000::wrapInitializeFamilyType(void *that) {
+    getMember<uint32_t>(that, 0x308) = LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+}
 
 /** Rough calculations based on AMDRadeonX4000's Assembly  */
 /*

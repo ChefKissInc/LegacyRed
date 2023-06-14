@@ -244,52 +244,47 @@ void LRed::setRMMIOIfNecessary() {
                 }
                 break;
             case 0x9850:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                DBGLOG("lred", "Chip type is Mullins");
+                break;
             case 0x9851:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                DBGLOG("lred", "Chip type is Mullins");
+                if (this->revision == 0x01 || this->revision == 0x06) {
+                    this->chipVariant = ChipVariant::KLE;
+                    DBGLOG("lred", "Chip variant is Mullins 'E'");
+                }
+                break;
             case 0x9852:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                DBGLOG("lred", "Chip type is Mullins");
+                break;
             case 0x9853:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
+                    this->chipVariant = ChipVariant::KLE;
+                    DBGLOG("lred", "Chip variant is Mullins 'E'");
+                }
+                break;
             case 0x9854:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                if (this->revision == 0x01) {
+                    this->chipVariant = ChipVariant::KLE;
+                    DBGLOG("lred", "Chip variant is Mullins 'E'");
+                }
+                break;
             case 0x9855:
-                [[fallthrough]];
+                this->chipType = ChipType::Mullins;
+                DBGLOG("lred", "Chip type is Mullins");
+                break;
             case 0x9856:
                 this->chipType = ChipType::Mullins;
                 DBGLOG("lred", "Chip type is Mullins");
-                switch (this->deviceId) {
-                    case 0x9851:
-                        if (this->revision == 0x01 || this->revision == 0x06) {
-                            this->chipVariant = ChipVariant::KLE;
-                            DBGLOG("lred", "Chip variant is Mullins 'E'");
-                        }
-                        break;
-                    case 0x9853:
-                        if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
-                            this->chipVariant = ChipVariant::KLE;
-                            DBGLOG("lred", "Chip variant is Mullins 'E'");
-                        }
-                        break;
-                    case 0x9854:
-                        if (this->revision == 0x01) {
-                            this->chipVariant = ChipVariant::KLE;
-                            DBGLOG("lred", "Chip variant is Mullins 'E'");
-                        }
-                        break;
-                    case 0x9856:
-                        if (this->revision >= 0x01 && this->revision != 0x02 && this->revision != 0x06) {
-                            this->chipVariant = ChipVariant::KLE;
-                            DBGLOG("lred", "Chip variant is Mullins 'E'");
-                        }
-                    default:
-                        break;
-                }
                 break;
             case 0x9874:
                 this->chipType = ChipType::Carrizo;
                 DBGLOG("lred", "Chip type is Carrizo");
-				this->isGcn3Derivative = true;
+                this->isGcn3Derivative = true;
                 if (this->revision >= 0xC8) {
                     this->chipVariant = ChipVariant::Bristol;
                     DBGLOG("lred", "Chip variant is Bristol");
@@ -304,15 +299,17 @@ void LRed::setRMMIOIfNecessary() {
                     (this->revision >= 0xD9 && this->revision < 0xDB) || this->revision >= 0xE9) {
                     this->chipVariant = ChipVariant::s3CU;
                     DBGLOG("lred", "Chip variant is Stoney 3CU");
+                    break;
                 } else {
                     this->chipVariant = ChipVariant::s2CU;
                     DBGLOG("lred", "Chip variant is Stoney 2CU");
+                    break;
                 }
             default:
-                PANIC("lred", "Unknown device ID");
+                PANIC("lred", "Unknown device ID: %x", deviceId);
         }
     }
-	DBGLOG_COND(this->isGcn3Derivative == true, "lred", "iGPU is GCN 3 derivative");
+    DBGLOG_COND(this->isGcn3Derivative == true, "lred", "iGPU is GCN 3 derivative");
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {

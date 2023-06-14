@@ -47,6 +47,6 @@ IOReturn Support::wrapPopulateDeviceMemory(void *that, uint32_t reg) {
     DBGLOG("support", "populateDeviceMemory: this = %p reg = 0x%X", that, reg);
     auto ret = FunctionCast(wrapPopulateDeviceMemory, callback->orgPopulateDeviceMemory)(that, reg);
     DBGLOG("support", "populateDeviceMemory returned 0x%X", ret);
-	(void)ret;
+    (void)ret;
     return kIOReturnSuccess;
 }
