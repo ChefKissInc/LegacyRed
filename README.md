@@ -4,6 +4,8 @@ An AMD Legacy iGPU support [Lilu](https://github.com/acidanthera/Lilu) plugin.
 
 The Source Code of this Derivative Work is licensed under the `Thou Shalt Not Profit License version 1.0`. See `LICENSE`
 
+Thanks to [Acidanthera](https://github.com/acidanthera) for the [WhateverGreen](https://github.com/acidanthera/WhateverGreen) kern_agdc code used in kern_support
+
 Please do not use the artifacts from the dbg branch unless you know what you are doing.
 
 ## FAQ
