@@ -25,11 +25,11 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
                 orgPopulateDeviceMemory},
-			{"__ZN16AtiDeviceControl16notifyLinkChangeE31kAGDCRegisterLinkControlEvent_tmj", wrapNotifyLinkChange,
-				orgNotifyLinkChange},
-			{"__ZN13AtomBiosProxy19createAtomBiosProxyER16AtomBiosInitData", wrapCreateAtomBiosProxy,
-				orgCreateAtomBiosProxy},
-			{"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
+            {"__ZN16AtiDeviceControl16notifyLinkChangeE31kAGDCRegisterLinkControlEvent_tmj", wrapNotifyLinkChange,
+                orgNotifyLinkChange},
+            {"__ZN13AtomBiosProxy19createAtomBiosProxyER16AtomBiosInitData", wrapCreateAtomBiosProxy,
+                orgCreateAtomBiosProxy},
+            {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "support", "Failed to route symbols");
 
@@ -57,31 +57,31 @@ IOReturn Support::wrapPopulateDeviceMemory(void *that, uint32_t reg) {
 }
 
 bool Support::wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkControlEvent_t event, void *eventData,
-	uint32_t eventFlags) {
-	auto ret = FunctionCast(wrapNotifyLinkChange, callback->orgNotifyLinkChange)(atiDeviceControl, event, eventData,
-		eventFlags);
+    uint32_t eventFlags) {
+    auto ret = FunctionCast(wrapNotifyLinkChange, callback->orgNotifyLinkChange)(atiDeviceControl, event, eventData,
+        eventFlags);
 
-	if (event == kAGDCValidateDetailedTiming) {
-		auto cmd = static_cast<AGDCValidateDetailedTiming_t *>(eventData);
-		DBGLOG("support", "AGDCValidateDetailedTiming %u -> %d (%u)", cmd->framebufferIndex, ret, cmd->modeStatus);
-		if (ret == false || cmd->modeStatus < 1 || cmd->modeStatus > 3) {
-			cmd->modeStatus = 2;
-			ret = true;
-		}
-	}
+    if (event == kAGDCValidateDetailedTiming) {
+        auto cmd = static_cast<AGDCValidateDetailedTiming_t *>(eventData);
+        DBGLOG("support", "AGDCValidateDetailedTiming %u -> %d (%u)", cmd->framebufferIndex, ret, cmd->modeStatus);
+        if (ret == false || cmd->modeStatus < 1 || cmd->modeStatus > 3) {
+            cmd->modeStatus = 2;
+            ret = true;
+        }
+    }
 
-	return ret;
+    return ret;
 }
 
 bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] uint32_t reg,
-	[[maybe_unused]] bool retryOnFail) {
-	DBGLOG("support", "TestVRAM called! Returning true");
-	return true;
+    [[maybe_unused]] bool retryOnFail) {
+    DBGLOG("support", "TestVRAM called! Returning true");
+    return true;
 }
 
 void *Support::wrapCreateAtomBiosProxy(void *param1) {
-	DBGLOG("support", "createAtomBiosProxy: param1 = %p", param1);
-	auto ret = FunctionCast(wrapCreateAtomBiosProxy, callback->orgCreateAtomBiosProxy)(param1);
-	DBGLOG("support", "createAtomBiosProxy returned %p", ret);
-	return ret;
+    DBGLOG("support", "createAtomBiosProxy: param1 = %p", param1);
+    auto ret = FunctionCast(wrapCreateAtomBiosProxy, callback->orgCreateAtomBiosProxy)(param1);
+    DBGLOG("support", "createAtomBiosProxy returned %p", ret);
+    return ret;
 }
