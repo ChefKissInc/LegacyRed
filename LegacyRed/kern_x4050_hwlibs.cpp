@@ -51,7 +51,7 @@ bool X4050HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_addr
                 {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
                 {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
                 {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
                 {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
                 {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
                 /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
