@@ -25,11 +25,6 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         uint32_t *orgChannelTypes = nullptr;
 
         KernelPatcher::SolveRequest solveRequests[] = {
-            //{"__ZN29AMDRadeonX4000_AMDCIPM4EngineC1Ev", this->orgGFX7PM4EngineConstructor},
-            //{"__ZN30AMDRadeonX4000_AMDCIsDMAEngineC1Ev", this->orgGFX7SDMAEngineConstructor},
-            //{"__ZN31AMDRadeonX4000_AMDCIUVDHWEngineC1Ev", this->orgGFX7UVDEngineConstructor},
-            //{"__ZN30AMDRadeonX4000_AMDCISAMUEngineC1Ev", this->orgGFX7SAMUEngineConstructor},
-            //{"__ZN31AMDRadeonX4000_AMDCIVCEHWEngineC1Ev", this->orgGFX7VCEEngineConstructor},
             //{"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor},
             //{"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor},
             //{"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
@@ -46,7 +41,6 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
             //{"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
-            //{"__ZN28AMDRadeonX4000_AMDCIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
@@ -111,16 +105,7 @@ void X4000::wrapInitializeFamilyType(void *that) {
 /** Rough calculations based on AMDRadeonX4000's Assembly  */
 /*
 bool X4000::wrapAllocateHWEngines(void *that) {
-    if (LRed::callback->gfxVer == GFXVersion::GFX7) {
-        DBGLOG("x4000", "Using GFX7 Constructors");
-        callback->orgGFX7PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x198));
-        callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x118));
-        callback->orgGFX7SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x118));
-        callback->orgGFX7UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
-        callback->orgGFX7SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1C8));
-        callback->orgGFX7VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
-    } else if (LRed::callback->gfxVer == GFXVersion::GFX8) {
-        DBGLOG("x4000", "Using GFX8 Constructors");
+        DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
         callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x198));
         callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x100));
         // Only one SDMA channel is present on Stoney APUs
@@ -132,9 +117,6 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         callback->orgGFX8UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
         callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1D0));
         callback->orgGFX8VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
-    } else if (LRed::callback->gfxVer == GFXVersion::Unknown) {
-        PANIC("lred", "GFX Version is Unknown!");
-    }
 
     return true;
 }
