@@ -117,7 +117,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         }
         callback->orgGFX8UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
         // I swear to god, this one infuriates me to no end, I love ghidra.
-        callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x3D0) = IOMallocZero(0x1D0));
+        callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1D0));
         callback->orgGFX8VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
     } else {
         PANIC("x4000", "Using VI logic on unsupported ASIC!");
