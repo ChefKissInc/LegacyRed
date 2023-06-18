@@ -209,7 +209,7 @@ class LRed {
     OSData *vbiosData {nullptr};
     ChipType chipType = ChipType::Unknown;
     ChipVariant chipVariant = ChipVariant::Normal;
-    bool isGcn3Derivative = false;
+    bool isGCN3 = false;
     uint64_t fbOffset {0};
     IOMemoryMap *rmmio {nullptr};
     volatile uint32_t *rmmioPtr {nullptr};

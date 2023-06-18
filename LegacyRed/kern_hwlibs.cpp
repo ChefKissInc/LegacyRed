@@ -189,8 +189,8 @@ void HWLibs::wrapAmdCailServicesConstructor(void *that, IOPCIDevice *provider) {
 
 void *HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
     auto *ret = operator new(0x18);
-    LRed::callback->isGcn3Derivative ? callback->orgTongaPowerTuneConstructor(ret, that, param2) :
-                                       callback->orgHawaiiPowerTuneConstructor(ret, that, param2);
+    (LRed::callback->isGCN3 ? callback->orgTongaPowerTuneConstructor : callback->orgHawaiiPowerTuneConstructor)(ret,
+        that, param2);
     return ret;
 }
 

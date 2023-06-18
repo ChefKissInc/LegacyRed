@@ -292,7 +292,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x9874:
                 this->chipType = ChipType::Carrizo;
                 DBGLOG("lred", "Chip type is Carrizo");
-                this->isGcn3Derivative = true;
+                this->isGCN3 = true;
                 if (this->revision >= 0xC8) {
                     this->chipVariant = ChipVariant::Bristol;
                     DBGLOG("lred", "Chip variant is Bristol");
@@ -300,7 +300,7 @@ void LRed::setRMMIOIfNecessary() {
                 break;
             case 0x98E4:
                 this->chipType = ChipType::Stoney;
-                this->isGcn3Derivative = true;
+                this->isGCN3 = true;
                 DBGLOG("lred", "Chip type is Stoney");
                 /** R4 and up iGPUs have 3 compute units while the others have 2 CUs, hence the chip variations */
                 if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) ||
@@ -317,7 +317,7 @@ void LRed::setRMMIOIfNecessary() {
                 PANIC("lred", "Unknown device ID: %x", deviceId);
         }
     }
-    DBGLOG_COND(this->isGcn3Derivative, "lred", "iGPU is GCN 3 derivative");
+    DBGLOG_COND(this->isGCN3, "lred", "iGPU is GCN 3 derivative");
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {

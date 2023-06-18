@@ -61,12 +61,12 @@ uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
 
 uint16_t GFXCon::wrapGetFamilyId(void) {
     FunctionCast(wrapGetFamilyId, callback->orgGetFamilyId)();
-    DBGLOG("gfxcon", "getFamilyId >> %x", LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV);
-    return LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    DBGLOG("gfxcon", "getFamilyId >> %x", LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV);
+    return LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
 }
 
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
-    getMember<uint32_t>(that, 0x60) = LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    getMember<uint32_t>(that, 0x60) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
     return ret;
 }

@@ -21,7 +21,7 @@ void X4000::init() {
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4000.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
-        bool useGcn3Logic = LRed::callback->isGcn3Derivative;
+        bool useGcn3Logic = LRed::callback->isGCN3;
 
         uint32_t *orgChannelTypes = nullptr;
 
@@ -107,14 +107,14 @@ void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
 }
 
 void X4000::wrapInitializeFamilyType(void *that) {
-    getMember<uint32_t>(that, 0x308) = LRed::callback->isGcn3Derivative ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    getMember<uint32_t>(that, 0x308) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
 }
 
 /** Rough calculations based on AMDRadeonX4000's Assembly  */
 
 bool X4000::wrapAllocateHWEngines(void *that) {
     DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
-    if (LRed::callback->isGcn3Derivative) {
+    if (LRed::callback->isGCN3) {
         // since the AMDRadeonXY000 code sucks, older versions use a wrap around OSObject::operator new, and since we
         // want to maximise compatibility, we use OSObject here rather than an IOMallocZero([engine value]).
 
