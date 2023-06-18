@@ -25,11 +25,11 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         uint32_t *orgChannelTypes = nullptr;
 
         KernelPatcher::SolveRequest solveRequests[] = {
-            //{"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor},
-            //{"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor},
-            //{"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
-            //{"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor},
-            //{"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor},
+            {"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor},
+            {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor},
+            {"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
+            {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor},
+            {"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor},
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities},
@@ -40,7 +40,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            //{"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
+            {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
@@ -50,7 +50,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "x4000", "Failed to route symbols");
 
-        // PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x5000",
+        // PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
         //  "Failed to enable kernel writing");
         /** TODO: Port this */
         // orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
@@ -103,21 +103,25 @@ void X4000::wrapInitializeFamilyType(void *that) {
 }
 
 /** Rough calculations based on AMDRadeonX4000's Assembly  */
-/*
+
 bool X4000::wrapAllocateHWEngines(void *that) {
-        DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
+    DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
+    if (LRed::callback->isGcn3Derivative) {
         callback->orgGFX8PM4EngineConstructor(getMember<void *>(that, 0x3B0) = IOMallocZero(0x198));
         callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3B8) = IOMallocZero(0x100));
         // Only one SDMA channel is present on Stoney APUs
         if (LRed::callback->chipType == ChipType::Stoney) {
-            DBGLOG("x4000", "Using only 1 SDMA Engine for Stoney");
+            DBGLOG("x4000", "Using only 1 SDMA Engine for Stoney.");
         } else {
             callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = IOMallocZero(0x100));
         }
         callback->orgGFX8UVDEngineConstructor(getMember<void *>(that, 0x3D8) = IOMallocZero(0x2F0));
-        callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x400) = IOMallocZero(0x1D0));
+        // I swear to god, this one infuriates me to no end, I love ghidra.
+        callback->orgGFX8SAMUEngineConstructor(getMember<void *>(that, 0x3D0) = IOMallocZero(0x1D0));
         callback->orgGFX8VCEEngineConstructor(getMember<void *>(that, 0x3E8) = IOMallocZero(0x258));
-
+    } else {
+        PANIC("x4000", "Using VI logic on unsupported ASIC!");
+    }
+    DBGLOG("x4000", "Finished AllocateHWEngines wrap.");
     return true;
 }
-*/
