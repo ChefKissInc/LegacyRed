@@ -37,6 +37,8 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
                 this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
+            {"__ZN26AMDRadeonX5000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
+                orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };
         PANIC_COND(SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
             "Failed to resolve symbols");
@@ -50,7 +52,8 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
                 wrapSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
-            {"", wrapInitializeFamilyType, LRed::callback->chipType == ChipType::Stoney},
+            {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
+                wrapGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
             "Failed to route symbols");
