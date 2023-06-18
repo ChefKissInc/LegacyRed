@@ -107,41 +107,41 @@ void X4000::wrapInitializeFamilyType(void *that) {
 bool X4000::wrapAllocateHWEngines(void *that) {
     DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
     if (LRed::callback->isGcn3Derivative) {
-		
-		// since the AMDRadeonXY000 code sucks, older versions use a wrap around OSObject::operator new, and since we want to maximise compatibility, we use OSObject here rather than an IOMallocZero([engine value]).
-		
-		auto *pm4 = OSObject::operator new (0x198);
+        // since the AMDRadeonXY000 code sucks, older versions use a wrap around OSObject::operator new, and since we
+        // want to maximise compatibility, we use OSObject here rather than an IOMallocZero([engine value]).
+
+        auto *pm4 = OSObject::operator new(0x198);
         callback->orgGFX8PM4EngineConstructor(pm4);
-		getMember<void *>(that, 0x3B0) = pm4;
-		
-		auto *sdma0 = OSObject::operator new (0x100);
+        getMember<void *>(that, 0x3B0) = pm4;
+
+        auto *sdma0 = OSObject::operator new(0x100);
         callback->orgGFX8SDMAEngineConstructor(sdma0);
-		getMember<void *>(that, 0x3B8) = sdma0;
-		
+        getMember<void *>(that, 0x3B8) = sdma0;
+
         // Only one SDMA channel is present on Stoney APUs
-		
+
         if (LRed::callback->chipType == ChipType::Stoney) {
             DBGLOG("x4000", "Using only 1 SDMA Engine for Stoney.");
         } else {
-			auto *sdma1 = OSObject::operator new (0x100);
+            auto *sdma1 = OSObject::operator new(0x100);
             callback->orgGFX8SDMAEngineConstructor(getMember<void *>(that, 0x3C0) = sdma1);
-			getMember<void *>(that, 0x3C0) = sdma1;
+            getMember<void *>(that, 0x3C0) = sdma1;
         }
-		
-		auto *uvd = OSObject::operator new(0x2F0);
+
+        auto *uvd = OSObject::operator new(0x2F0);
         callback->orgGFX8UVDEngineConstructor(uvd);
-		getMember<void *>(that, 0x3D8) = uvd;
-		
+        getMember<void *>(that, 0x3D8) = uvd;
+
         // I swear to god, this one infuriates me to no end, I love ghidra.
-		auto *samu = OSObject::operator new (0x1D0);
+        auto *samu = OSObject::operator new(0x1D0);
         callback->orgGFX8SAMUEngineConstructor(samu);
-		getMember<void *>(that, 0x400) = samu;
-		
-		auto *vce = OSObject::operator new (0x258);
+        getMember<void *>(that, 0x400) = samu;
+
+        auto *vce = OSObject::operator new(0x258);
         callback->orgGFX8VCEEngineConstructor(vce);
-		getMember<void *>(that, 0x3E8) = vce;
-		
-		// is it even worth it to have these just for pre-Catalina support? lol
+        getMember<void *>(that, 0x3E8) = vce;
+
+        // is it even worth it to have these just for pre-Catalina support? lol
     } else {
         PANIC("x4000", "Using VI logic on unsupported ASIC!");
     }
