@@ -4,12 +4,12 @@
 #ifndef kern_gfx7con_hpp
 #define kern_gfx7con_hpp
 #include "kern_amd.hpp"
-#include <Headers/kern_patcher.hpp>
+#include "kern_patcherplus.hpp"
 #include <Headers/kern_util.hpp>
 
-class GFX7Con {
+class GFXCon {
     public:
-    static GFX7Con *callback;
+    static GFXCon *callback;
     void init();
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
 

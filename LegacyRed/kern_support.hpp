@@ -4,7 +4,7 @@
 #ifndef kern_support_hpp
 #define kern_support_hpp
 #include "kern_amd.hpp"
-#include <Headers/kern_patcher.hpp>
+#include "kern_patcherplus.hpp"
 #include <Headers/kern_util.hpp>
 #include <IOKit/IOService.h>
 

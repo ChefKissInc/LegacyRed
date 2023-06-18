@@ -22,7 +22,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
     if (kextRadeonSupport.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
 
-        KernelPatcher::RouteRequest requests[] = {
+        RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
                 orgPopulateDeviceMemory},
             {"__ZN16AtiDeviceControl16notifyLinkChangeE31kAGDCRegisterLinkControlEvent_tmj", wrapNotifyLinkChange,
@@ -31,16 +31,15 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
                 orgCreateAtomBiosProxy},
             {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
         };
-        PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "support", "Failed to route symbols");
+        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
+            "Failed to route symbols");
 
-        KernelPatcher::LookupPatch patches[] = {
+        LookupPatchPlus const patches[] = {
             {&kextRadeonSupport, kVRAMInfoNullCheckOriginal, kVRAMInfoNullCheckPatched,
                 arrsize(kVRAMInfoNullCheckOriginal), 1},
         };
-        for (auto &patch : patches) {
-            patcher.applyLookupPatch(&patch);
-            patcher.clearError();
-        }
+        PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
+            "Failed to apply patches: %d", patcher.getError());
 
         return true;
     }

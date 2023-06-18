@@ -21,34 +21,39 @@ void X4000::init() {
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4000.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
+        bool useGcn3Logic = LRed::callback->isGcn3Derivative;
 
         uint32_t *orgChannelTypes = nullptr;
 
-        KernelPatcher::SolveRequest solveRequests[] = {
-            {"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor},
-            {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor},
-            {"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor},
-            {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor},
-            {"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor},
-            {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes},
+        SolveRequestPlus solveRequests[] = {
+            {"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor, useGcn3Logic},
+            {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor, useGcn3Logic},
+            {"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor, useGcn3Logic},
+            {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor, useGcn3Logic},
+            {"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor, useGcn3Logic},
+            {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes,
+                LRed::callback->chipType == ChipType::Stoney},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
-                this->orgSetupAndInitializeHWCapabilities},
+                this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
-                this->orgSetupAndInitializeHWCapabilities},
+                this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
         };
-        PANIC_COND(!patcher.solveMultiple(index, solveRequests, address, size), "x5000", "Failed to resolve symbols");
+        PANIC_COND(SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
+            "Failed to resolve symbols");
 
-        KernelPatcher::RouteRequest requests[] = {
+        RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines},
+            {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities},
+                wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities},
-            {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType},
+                wrapSetupAndInitializeHWCapabilities, useGcn3Logic},
+            {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
+            {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
+            {"", wrapInitializeFamilyType, LRed::callback->chipType == ChipType::Stoney},
         };
-        PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "x4000", "Failed to route symbols");
+        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
+            "Failed to route symbols");
 
         // PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
         //  "Failed to enable kernel writing");
@@ -147,4 +152,9 @@ bool X4000::wrapAllocateHWEngines(void *that) {
     }
     DBGLOG("x4000", "Finished AllocateHWEngines wrap.");
     return true;
+}
+
+void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) {
+    /** Redirect SDMA1 engine type to SDMA0 */
+    return FunctionCast(wrapGetHWChannel, callback->orgGetHWChannel)(that, (engineType == 2) ? 1 : engineType, ringId);
 }

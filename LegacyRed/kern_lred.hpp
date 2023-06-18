@@ -80,10 +80,8 @@ static bool checkAtomBios(const uint8_t *bios, size_t size) {
 }
 
 class LRed {
-    friend class GFX7Con;
-    friend class GFX8Con;
-    friend class X4050HWLibs;
-    friend class X4070HWLibs;
+    friend class GFXCon;
+    friend class HWLibs;
     friend class X4000;
     friend class Support;
 

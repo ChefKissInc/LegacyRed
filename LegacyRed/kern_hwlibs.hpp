@@ -5,20 +5,21 @@
 #define kern_x4050_hwlibs_hpp
 #include "kern_amd.hpp"
 #include "kern_lred.hpp"
-#include <Headers/kern_patcher.hpp>
+#include "kern_patcherplus.hpp"
 #include <Headers/kern_util.hpp>
 
 using t_XPowerTuneConstructor = void (*)(void *that, void *ppInstance, void *ppCallbacks);
 using t_sendMsgToSmc = uint32_t (*)(void *smum, uint32_t msgId);
 
-class X4050HWLibs {
+class HWLibs {
     public:
-    static X4050HWLibs *callback;
+    static HWLibs *callback;
     void init();
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
-
+	
     private:
     t_XPowerTuneConstructor orgHawaiiPowerTuneConstructor {nullptr};
+	t_XPowerTuneConstructor orgTongaPowerTuneConstructor {nullptr};
     t_sendMsgToSmc orgRavenSendMsgToSmc {nullptr};
     mach_vm_address_t orgAmdCailServicesConstructor {};
     mach_vm_address_t orgCAILQueryEngineRunningState {};

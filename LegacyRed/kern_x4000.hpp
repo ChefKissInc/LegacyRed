@@ -5,7 +5,7 @@
 #define kern_x4000_hpp
 #include "kern_amd.hpp"
 #include "kern_lred.hpp"
-#include <Headers/kern_patcher.hpp>
+#include "kern_patcherplus.hpp"
 #include <Headers/kern_util.hpp>
 #include <IOKit/IOService.h>
 
@@ -21,14 +21,17 @@ class X4000 {
     t_GenericConstructor orgGFX8VCEEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8SAMUEngineConstructor {nullptr};
+    mach_vm_address_t orgAccelStart {0};
+    mach_vm_address_t orgGetHWChannel {0};
     mach_vm_address_t orgSetupAndInitializeHWCapabilities {0};
-    mach_vm_address_t orgAccelStart {};
 
-    static bool wrapAllocateHWEngines(void *that);
-    static void wrapSetupAndInitializeHWCapabilities(void *that);
-    static void wrapInitializeFamilyType(void *that);
     void *callbackAccelerator = nullptr;
+
     static bool wrapAccelStart(void *that, IOService *provider);
+    static bool wrapAllocateHWEngines(void *that);
+    static void *wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId);
+    static void wrapInitializeFamilyType(void *that);
+    static void wrapSetupAndInitializeHWCapabilities(void *that);
 };
 
 #endif /* kern_x4000_hpp */

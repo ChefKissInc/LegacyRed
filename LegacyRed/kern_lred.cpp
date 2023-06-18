@@ -2,14 +2,12 @@
 //  details.
 
 #include "kern_lred.hpp"
-#include "kern_gfx7con.hpp"
-#include "kern_gfx8con.hpp"
+#include "kern_gfxcon.hpp"
+#include "kern_hwlibs.hpp"
 #include "kern_model.hpp"
 #include "kern_patches.hpp"
 #include "kern_support.hpp"
 #include "kern_x4000.hpp"
-#include "kern_x4050_hwlibs.hpp"
-#include "kern_x4070_hwlibs.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_devinfo.hpp>
 #include <IOKit/IODeviceTreeSupport.h>
@@ -28,11 +26,9 @@ static KernelPatcher::KextInfo kextMCCSControl {"com.apple.driver.AppleMCCSContr
 
 LRed *LRed::callback = nullptr;
 
-static GFX7Con gfx7con;
-static GFX8Con gfx8con;
+static GFXCon gfxcon;
 static Support support;
-static X4050HWLibs x4050hwlibs;
-static X4070HWLibs x4070hwlibs;
+static HWLibs hwlibs;
 static X4000 x4000;
 
 void LRed::init() {
@@ -50,10 +46,8 @@ void LRed::init() {
     lilu.onKextLoadForce(&kextAGDP);
     lilu.onKextLoadForce(&kextBacklight);
     lilu.onKextLoadForce(&kextMCCSControl);
-    x4050hwlibs.init();
-    x4070hwlibs.init();
-    gfx7con.init();
-    gfx8con.init();
+    hwlibs.init();
+    gfxcon.init();
     x4000.init();
     support.init();
 }
@@ -345,14 +339,10 @@ void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t a
         patcher.routeMultiple(index, request, address, size);
     } else if (support.processKext(patcher, index, address, size)) {
         DBGLOG("lred", "Processed support");
-    } else if (x4050hwlibs.processKext(patcher, index, address, size)) {
-        DBGLOG("lred", "Processed x4050hwlibs");
-    } else if (x4070hwlibs.processKext(patcher, index, address, size)) {
-        DBGLOG("lred", "Processed x4070hwlibs");
-    } else if (gfx7con.processKext(patcher, index, address, size)) {
-        DBGLOG("lred", "Processed gfx7con");
-    } else if (gfx8con.processKext(patcher, index, address, size)) {
-        DBGLOG("lred", "Processed gfx8con");
+    } else if (hwlibs.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed hwlibs");
+    } else if (gfxcon.processKext(patcher, index, address, size)) {
+        DBGLOG("lred", "Processed gfxcon");
     } else if (x4000.processKext(patcher, index, address, size)) {
         DBGLOG("lred", "Processed x4000");
     }

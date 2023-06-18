@@ -9,7 +9,6 @@
 #include <Headers/kern_util.hpp>
 
 using t_GenericConstructor = void (*)(void *that);
-using t_HWEngineNew = void *(*)(size_t size);
 using t_sendMsgToSmc = uint32_t (*)(void *smum, uint32_t msgId);
 using t_pspLoadExtended = uint32_t (*)(void *, uint64_t, uint64_t, const void *, size_t);
 
