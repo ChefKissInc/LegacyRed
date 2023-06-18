@@ -8,6 +8,10 @@ Thanks to [Acidanthera](https://github.com/acidanthera) for the [WhateverGreen](
 
 ## FAQ
 
+### What iGPUs does this kext support?
+
+It supports Kaveri, Kabini, Mullins, Carrizo and Stoney based iGPUs, aka, GCN 2 and GCN 3.
+
 ### Can I have an AMD dGPU installed on the system?
 
 Since the kext isn't functioning yet: None, but in the future, due to how we only use the kexts for GCN 1 through 4, you can install a Vega or Navi card
