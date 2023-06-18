@@ -8,7 +8,7 @@ Thanks to [Acidanthera](https://github.com/acidanthera) for the [WhateverGreen](
 
 ## FAQ
 
-### What iGPUs does this kext support?
+### Which iGPUs does this kext support?
 
 It supports Kaveri, Kabini, Mullins, Carrizo and Stoney based iGPUs, aka, GCN 2 and GCN 3.
 
