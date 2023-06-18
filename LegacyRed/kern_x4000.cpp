@@ -135,7 +135,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         // I swear to god, this one infuriates me to no end, I love ghidra.
 		auto *samu = OSObject::operator new (0x1D0);
         callback->orgGFX8SAMUEngineConstructor(samu);
-		getMember<void *>(that, 0x400);
+		getMember<void *>(that, 0x400) = samu;
 		
 		auto *vce = OSObject::operator new (0x258);
         callback->orgGFX8VCEEngineConstructor(vce);
