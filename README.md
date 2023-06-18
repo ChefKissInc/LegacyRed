@@ -21,11 +21,3 @@ As of recent, AMDRadeonX4000 is kernel panicing on createHWInterface on both Vol
 ### On which macOS versions am I able to use this on?
 
 Big Sur.
-
-## Project Members
-- [@Zormeister](https://github.com/Zormeister) | LegacyRed lead, kext developer.
-
-## Credits:
-
-- [@ChefKissInc](https://github.com/ChefKissInc) | NootedRed lead, Linux shitcode analyser and kernel extension developer. Extensive knowledge of OS inner workings
-- [@NyanCatTW1](https://github.com/NyanCatTW1) | Reverse Engineering and Python automation magician. His Ghidra RedMetaClassAnalyzer script has made the entire process way painless by automagically discovering C++ v-tables for classes.
