@@ -16,10 +16,10 @@ class HWLibs {
     static HWLibs *callback;
     void init();
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
-	
+
     private:
     t_XPowerTuneConstructor orgHawaiiPowerTuneConstructor {nullptr};
-	t_XPowerTuneConstructor orgTongaPowerTuneConstructor {nullptr};
+    t_XPowerTuneConstructor orgTongaPowerTuneConstructor {nullptr};
     t_sendMsgToSmc orgRavenSendMsgToSmc {nullptr};
     mach_vm_address_t orgAmdCailServicesConstructor {};
     mach_vm_address_t orgCAILQueryEngineRunningState {};

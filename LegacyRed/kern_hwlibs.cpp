@@ -10,15 +10,13 @@ static const char *pathRadeonX4050HWLibs = "/System/Library/Extensions/AMDRadeon
                                            "AMDRadeonX4050HWLibs.kext/Contents/MacOS/AMDRadeonX4050HWLibs";
 
 static const char *pathRadeonX4070HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
-										   "AMDRadeonX4070HWLibs.kext/Contents/MacOS/AMDRadeonX4070HWLibs";
+                                           "AMDRadeonX4070HWLibs.kext/Contents/MacOS/AMDRadeonX4070HWLibs";
 
 static KernelPatcher::KextInfo kextRadeonX4050HWLibs {"com.apple.kext.AMDRadeonX4050HWLibs", &pathRadeonX4050HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 static KernelPatcher::KextInfo kextRadeonX4070HWLibs {"com.apple.kext.AMDRadeonX4070HWLibs", &pathRadeonX4070HWLibs, 1,
-	{}, {}, KernelPatcher::KextInfo::Unloaded};
-
-
+    {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 HWLibs *HWLibs::callback = nullptr;
 
@@ -65,7 +63,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
             };
             PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-					   "Failed to resolve symbols");
+                "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using A0 Kalindi and Kaveri Golden Settings and DDI Caps");
         }
 
@@ -77,7 +75,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
             //{"_RAVEN1_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Raven)]},
         };
-        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs", "Failed to resolve symbols");
+        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+            "Failed to resolve symbols");
 
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN15AmdCailServicesC2EP11IOPCIDevice", wrapAmdCailServicesConstructor, orgAmdCailServicesConstructor},
@@ -153,7 +152,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
             //{"_Raven_SendMsgToSmc", this->orgRavenSendMsgToSmc},
         };
-        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs", "Failed to resolve symbols");
+        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+            "Failed to resolve symbols");
 
         KernelPatcher::RouteRequest requests[] = {
             {"__ZN15AmdCailServicesC2EP11IOPCIDevice", wrapAmdCailServicesConstructor, orgAmdCailServicesConstructor},
@@ -188,8 +188,9 @@ void HWLibs::wrapAmdCailServicesConstructor(void *that, IOPCIDevice *provider) {
 }
 
 void *HWLibs::wrapCreatePowerTuneServices(void *that, void *param2) {
-    auto *ret = operator new (0x18);
-	LRed::callback->isGcn3Derivative ? callback->orgTongaPowerTuneConstructor(ret, that, param2) : callback->orgHawaiiPowerTuneConstructor(ret, that, param2);
+    auto *ret = operator new(0x18);
+    LRed::callback->isGcn3Derivative ? callback->orgTongaPowerTuneConstructor(ret, that, param2) :
+                                       callback->orgHawaiiPowerTuneConstructor(ret, that, param2);
     return ret;
 }
 
