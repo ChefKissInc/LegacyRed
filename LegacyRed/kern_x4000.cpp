@@ -118,7 +118,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         callback->orgGFX8SDMAEngineConstructor(sdma0);
         getMember<void *>(that, 0x3B8) = sdma0;
 
-        // Only one SDMA channel is present on Stoney APUs
+        // Only one SDMA engine is present on Stoney APUs
 
         if (LRed::callback->chipType == ChipType::Stoney) {
             DBGLOG("x4000", "Using only 1 SDMA Engine for Stoney.");
