@@ -31,7 +31,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", wrapGetMatchProperty, !useGcn3Logic},
             {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesVI16getMatchPropertyEv", wrapGetMatchProperty, useGcn3Logic},
         };
-        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
+        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "hwservices",
             "Failed to route symbols");
     } else if (kextRadeonX4000.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
