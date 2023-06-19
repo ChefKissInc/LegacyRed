@@ -9,19 +9,7 @@
 static const char *pathRadeonX4000HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
                                            "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs";
 
-static const char *pathRadeonX4050HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
-                                           "AMDRadeonX4050HWLibs.kext/Contents/MacOS/AMDRadeonX4050HWLibs";
-
-static const char *pathRadeonX4070HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
-                                           "AMDRadeonX4070HWLibs.kext/Contents/MacOS/AMDRadeonX4070HWLibs";
-
-static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4000HWLibs", &pathRadeonX4050HWLibs, 1,
-    {}, {}, KernelPatcher::KextInfo::Unloaded};
-
-static KernelPatcher::KextInfo kextRadeonX4050HWLibs {"com.apple.kext.AMDRadeonX4050HWLibs", &pathRadeonX4050HWLibs, 1,
-    {}, {}, KernelPatcher::KextInfo::Unloaded};
-
-static KernelPatcher::KextInfo kextRadeonX4070HWLibs {"com.apple.kext.AMDRadeonX4070HWLibs", &pathRadeonX4070HWLibs, 1,
+static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4000HWLibs", &pathRadeonX4000HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 HWLibs *HWLibs::callback = nullptr;
