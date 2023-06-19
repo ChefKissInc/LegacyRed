@@ -22,15 +22,23 @@ class X4000 {
     t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8SAMUEngineConstructor {nullptr};
     mach_vm_address_t orgAccelStart {0};
+    mach_vm_address_t orgConfigureDevice {0};
+    mach_vm_address_t orgCreateHWHandler {0};
+    mach_vm_address_t orgCreateHWInterface {0};
     mach_vm_address_t orgGetHWChannel {0};
+    mach_vm_address_t orgInitLinkToPeer {0};
     mach_vm_address_t orgSetupAndInitializeHWCapabilities {0};
 
     void *callbackAccelerator = nullptr;
 
     static bool wrapAccelStart(void *that, IOService *provider);
     static bool wrapAllocateHWEngines(void *that);
+    static uint64_t wrapConfigureDevice(void *that, IOPCIDevice *device);
     static void *wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId);
     static void wrapInitializeFamilyType(void *that);
+    static IOService *wrapInitLinkToPeer(void *that, const char *matchCategoryName);
+    static uint64_t wrapCreateHWHandler(void *that);
+    static uint64_t wrapCreateHWInterface(void *that, IOPCIDevice *dev);
     static void wrapSetupAndInitializeHWCapabilities(void *that);
     static char *forceX4000HWLibs(void);
 };

@@ -86,10 +86,10 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         }
 
         SolveRequestPlus solveRequests[] = {
-			{"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
-				this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
-			{"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
-				this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
+            {"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
+                this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
+            {"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
+                this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
             {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
             {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc},
             //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
@@ -113,7 +113,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
 
         PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
             "Failed to enable kernel writing");
-        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId =
+            LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
         orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
         orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;
         orgAsicInitCapsTable->emulatedRev = orgAsicCapsTable->emulatedRev =
