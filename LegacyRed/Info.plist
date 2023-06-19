@@ -335,7 +335,7 @@
 				<integer>0</integer>
 			</dict>
 		</dict>
-		<key>com.ZormIndustries.LegacyRed</key>
+		<key>com.NootInc.LegacyRed</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
@@ -387,7 +387,7 @@
 					<key>CFBundleIdentifier</key>
 					<string>com.apple.kext.AMDRadeonX4000</string>
 					<key>GpuDebugPolicy</key>
-					<integer>0</integer>
+					<integer>-1</integer>
 					<key>IOClass</key>
 					<string>AMDRadeonX4000_AMDBonaireGraphicsAccelerator</string>
 					<key>IODVDBundleName</key>
@@ -414,7 +414,7 @@
 					<key>CFBundleIdentifier</key>
 					<string>com.apple.kext.AMDRadeonX4000</string>
 					<key>GpuDebugPolicy</key>
-					<integer>0</integer>
+					<integer>-1</integer>
 					<key>IOClass</key>
 					<string>AMDRadeonX4000_AMDTongaGraphicsAccelerator</string>
 					<key>IODVDBundleName</key>
