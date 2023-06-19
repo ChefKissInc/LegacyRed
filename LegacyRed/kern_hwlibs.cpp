@@ -6,11 +6,17 @@
 #include "kern_patches.hpp"
 #include <Headers/kern_api.hpp>
 
+static const char *pathRadeonX4000HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
+                                           "AMDRadeonX4000HWLibs.kext/Contents/MacOS/AMDRadeonX4000HWLibs";
+
 static const char *pathRadeonX4050HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
                                            "AMDRadeonX4050HWLibs.kext/Contents/MacOS/AMDRadeonX4050HWLibs";
 
 static const char *pathRadeonX4070HWLibs = "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/PlugIns/"
                                            "AMDRadeonX4070HWLibs.kext/Contents/MacOS/AMDRadeonX4070HWLibs";
+
+static KernelPatcher::KextInfo kextRadeonX4000HWLibs {"com.apple.kext.AMDRadeonX4000HWLibs", &pathRadeonX4050HWLibs, 1,
+    {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 static KernelPatcher::KextInfo kextRadeonX4050HWLibs {"com.apple.kext.AMDRadeonX4050HWLibs", &pathRadeonX4050HWLibs, 1,
     {}, {}, KernelPatcher::KextInfo::Unloaded};
@@ -22,11 +28,11 @@ HWLibs *HWLibs::callback = nullptr;
 
 void HWLibs::init() {
     callback = this;
-    lilu.onKextLoadForce(&kextRadeonX4050HWLibs);
+    lilu.onKextLoadForce(&kextRadeonX4000HWLibs);
 }
 
 bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
-    if (kextRadeonX4050HWLibs.loadIndex == index) {
+    if (kextRadeonX4000HWLibs.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
 
         CailAsicCapEntry *orgAsicCapsTable = nullptr;
@@ -52,69 +58,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                 "Failed to resolve symbols");
             DBGLOG("hwlibs", "Using 'E' Kaveri Golden Settings and DDI Caps");
-        } else {
-            SolveRequestPlus solveRequests[] = {
-                {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-                {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
-                /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using A0 Kalindi and Kaveri Golden Settings and DDI Caps");
-        }
-
-        SolveRequestPlus solveRequests[] = {
-            {"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
-                this->orgHawaiiPowerTuneConstructor},
-            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
-            //{"_Raven_SendMsgToSmc", this->orgRavenSendMsgToSmc},
-            //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
-            //{"_RAVEN1_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Raven)]},
-        };
-        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-            "Failed to resolve symbols");
-
-        KernelPatcher::RouteRequest requests[] = {
-            {"__ZN15AmdCailServicesC2EP11IOPCIDevice", wrapAmdCailServicesConstructor, orgAmdCailServicesConstructor},
-            {"__ZN25AtiApplePowerTuneServices23createPowerTuneServicesEP11PP_InstanceP18PowerPlayCallbacks",
-                wrapCreatePowerTuneServices},
-            {"__ZN15AmdCailServices23queryEngineRunningStateEP17CailHwEngineQueueP22CailEngineRunningState",
-                wrapCAILQueryEngineRunningState, orgCAILQueryEngineRunningState},
-            {"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
-            {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
-            {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
-            //{"_SmuRaven_Initialize", wrapSmuRavenInitialize, this->orgSmuRavenInitialize},
-        };
-        PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "hwlibs", "Failed to route symbols");
-
-        PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
-            "Failed to enable kernel writing");
-        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = AMDGPU_FAMILY_KV;
-        orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
-        orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;
-        orgAsicInitCapsTable->emulatedRev = orgAsicCapsTable->emulatedRev =
-            static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;
-        orgAsicInitCapsTable->pciRev = orgAsicCapsTable->pciRev = 0xFFFFFFFF;
-        orgAsicInitCapsTable->caps = orgAsicCapsTable->caps = ddiCaps[static_cast<uint32_t>(LRed::callback->chipType)];
-        orgAsicInitCapsTable->goldenCaps = goldenSettings[static_cast<uint32_t>(LRed::callback->chipType)];
-        MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-        DBGLOG("hwlibs", "Applied DDI Caps patches");
-
-        return true;
-    } else if (kextRadeonX4070HWLibs.loadIndex == index) {
-        LRed::callback->setRMMIOIfNecessary();
-
-        CailAsicCapEntry *orgAsicCapsTable = nullptr;
-        CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
-        const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-        const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-
-        /** The Bristol Ridge else if is a complete shot in the dark, it is not guaranteed it will work */
-        if (LRed::callback->chipVariant == ChipVariant::s3CU) {
+        } else if (LRed::callback->chipVariant == ChipVariant::s3CU) {
             SolveRequestPlus solveRequests[] = {
                 {"_STONEY_GoldenSettings_A0_3CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
             };
@@ -138,19 +82,30 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             DBGLOG("hwlibs", "Using A1 Carrizo Golden Settings and DDI Caps");
         } else {
             SolveRequestPlus solveRequests[] = {
+                {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
+                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
+                {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
+                {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
+                {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
                 {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
                 {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
             };
             PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                 "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using A0 Carrizo Golden Settings and DDI Caps");
+            DBGLOG("hwlibs", "Using Normal Golden Settings and DDI Caps");
         }
 
         SolveRequestPlus solveRequests[] = {
-            {"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
-                this->orgTongaPowerTuneConstructor},
+			{"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
+				this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
+			{"__ZN31AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
+				this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
             {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
-            //{"_Raven_SendMsgToSmc", this->orgRavenSendMsgToSmc},
+            {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc},
+            //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
+            //{"_RAVEN1_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Raven)]},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
             "Failed to resolve symbols");
@@ -159,13 +114,18 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             {"__ZN15AmdCailServicesC2EP11IOPCIDevice", wrapAmdCailServicesConstructor, orgAmdCailServicesConstructor},
             {"__ZN25AtiApplePowerTuneServices23createPowerTuneServicesEP11PP_InstanceP18PowerPlayCallbacks",
                 wrapCreatePowerTuneServices},
+            {"__ZN15AmdCailServices23queryEngineRunningStateEP17CailHwEngineQueueP22CailEngineRunningState",
+                wrapCAILQueryEngineRunningState, orgCAILQueryEngineRunningState},
+            {"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
+            {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
+            {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
             //{"_SmuRaven_Initialize", wrapSmuRavenInitialize, this->orgSmuRavenInitialize},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "hwlibs", "Failed to route symbols");
 
         PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
             "Failed to enable kernel writing");
-        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = AMDGPU_FAMILY_CZ;
+        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
         orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
         orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;
         orgAsicInitCapsTable->emulatedRev = orgAsicCapsTable->emulatedRev =

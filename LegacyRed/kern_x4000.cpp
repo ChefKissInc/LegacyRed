@@ -8,8 +8,14 @@
 
 static const char *pathRadeonX4000 = "/System/Library/Extensions/AMDRadeonX4000.kext/Contents/MacOS/AMDRadeonX4000";
 
+static const char *pathRadeonX4000HWServices =
+    "/System/Library/Extensions/AMDRadeonX4000HWServices.kext/Contents/MacOS/AMDRadeonX4000HWServices";
+
 static KernelPatcher::KextInfo kextRadeonX4000 {"com.apple.kext.AMDRadeonX4000", &pathRadeonX4000, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
+
+static KernelPatcher::KextInfo kextRadeonX4000HWServices {"com.apple.kext.AMDRadeonX4000HWServices",
+    &pathRadeonX4000HWServices, 1, {}, {}, KernelPatcher::KextInfo::Unloaded};
 
 X4000 *X4000::callback = nullptr;
 
@@ -19,7 +25,15 @@ void X4000::init() {
 }
 
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
-    if (kextRadeonX4000.loadIndex == index) {
+    if (kextRadeonX4000HWServices.loadIndex == index) {
+        bool useGcn3Logic = LRed::callback->isGCN3;
+        RouteRequestPlus requests[] = {
+            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", wrapGetMatchProperty, !useGcn3Logic},
+            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesVI16getMatchPropertyEv", wrapGetMatchProperty, useGcn3Logic},
+        };
+        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
+            "Failed to route symbols");
+    } else if (kextRadeonX4000.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
         bool useGcn3Logic = LRed::callback->isGCN3;
 
@@ -37,7 +51,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
                 this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
-            {"__ZN26AMDRadeonX5000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
+            {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
                 orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };
         PANIC_COND(SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
@@ -161,3 +175,5 @@ void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) 
     /** Redirect SDMA1 engine type to SDMA0 */
     return FunctionCast(wrapGetHWChannel, callback->orgGetHWChannel)(that, (engineType == 2) ? 1 : engineType, ringId);
 }
+
+char *X4000::wrapGetMatchProperty() { return "Load4000"; }

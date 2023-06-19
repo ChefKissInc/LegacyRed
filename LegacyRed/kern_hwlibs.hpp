@@ -20,7 +20,8 @@ class HWLibs {
     private:
     t_XPowerTuneConstructor orgHawaiiPowerTuneConstructor {nullptr};
     t_XPowerTuneConstructor orgTongaPowerTuneConstructor {nullptr};
-    t_sendMsgToSmc orgRavenSendMsgToSmc {nullptr};
+    t_sendMsgToSmc orgCISendMsgToSmc {nullptr};
+    t_sendMsgToSmc orgVISendMsgToSmc {nullptr};
     mach_vm_address_t orgAmdCailServicesConstructor {};
     mach_vm_address_t orgCAILQueryEngineRunningState {};
     mach_vm_address_t orgCailMonitorEngineInternalState {};
