@@ -22,14 +22,15 @@ X4000 *X4000::callback = nullptr;
 void X4000::init() {
     callback = this;
     lilu.onKextLoadForce(&kextRadeonX4000);
+	lilu.onKextLoadForce(&kextRadeonX4000HWServices);
 }
 
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4000HWServices.loadIndex == index) {
         bool useGcn3Logic = LRed::callback->isGCN3;
         RouteRequestPlus requests[] = {
-            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", wrapGetMatchProperty, !useGcn3Logic},
-            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesVI16getMatchPropertyEv", wrapGetMatchProperty, useGcn3Logic},
+            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", forceX4000HWLibs, !useGcn3Logic},
+            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesVI16getMatchPropertyEv", forceX4000HWLibs, useGcn3Logic},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "hwservices",
             "Failed to route symbols");
@@ -176,4 +177,4 @@ void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) 
     return FunctionCast(wrapGetHWChannel, callback->orgGetHWChannel)(that, (engineType == 2) ? 1 : engineType, ringId);
 }
 
-char *X4000::wrapGetMatchProperty() { return "Load4000"; }
+char *X4000::forceX4000HWLibs() { return "Load4000"; }

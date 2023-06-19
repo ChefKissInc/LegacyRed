@@ -32,7 +32,7 @@ class X4000 {
     static void *wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId);
     static void wrapInitializeFamilyType(void *that);
     static void wrapSetupAndInitializeHWCapabilities(void *that);
-    static char *wrapGetMatchProperty(void);
+    static char *forceX4000HWLibs(void);
 };
 
 #endif /* kern_x4000_hpp */
