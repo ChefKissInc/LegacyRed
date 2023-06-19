@@ -58,13 +58,13 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
+            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
-            {"__ZN31AMDRadeonX4000_AMDTongaHardware32setupAndInitializeHWCapabilitiesEv",
+            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
+            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
             {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
                 wrapGetHWChannel, this->orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };

@@ -49,9 +49,9 @@
 		<key>AtiGpuWrangler (GCN 3)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMD9000Controller</string>
+			<string>com.apple.kext.AMD9500Controller</string>
 			<key>IOClass</key>
-			<string>AMD9000ControllerWrangler</string>
+			<string>AMD9500ControllerWrangler</string>
 			<key>IOMatchCategory</key>
 			<string>IOFramebuffer</string>
 			<key>IOPCIMatch</key>
@@ -65,24 +65,6 @@
 		</dict>
 		<key>Controller (GCN 2)</key>
 		<dict>
-			<key>ATY,Exmoor</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_FB_LIMIT</key>
-					<integer>6</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>WgAAAFIAAABMAAAARwAAAEMAAAA/AAAAOwAAADcAAAAzAAAALwAAACsAAAAnAAAAIwAAAB8AAAAbAAAAFwAAAA==</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kext.AMD8000Controller</string>
 			<key>IOClass</key>
@@ -166,7 +148,7 @@
 				<key>PP_EnableBAPM</key>
 				<integer>0</integer>
 				<key>PP_EnableLoadFalconSmcFirmware</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>PP_Falcon_QuickTransition_Enable</key>
 				<integer>1</integer>
 				<key>PP_MclkActivityTarget</key>
@@ -177,66 +159,14 @@
 		</dict>
 		<key>Controller (GCN 3)</key>
 		<dict>
-			<key>ATY,Basset</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>bgAAAGwAAABpAAAAZwAAAGUAAABjAAAAYAAAAF4AAABcAAAAWQAAAFcAAABVAAAAUwAAAFAAAABOAAAAMgAAAA==</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,Greyhound</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,GreyhoundS</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,Labrador</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_FB_LIMIT</key>
-					<integer>6</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>lgAAAI4AAACGAAAAfgAAAHYAAABuAAAAZgAAAF4AAABWAAAATgAAAEYAAAA+AAAANgAAAC4AAAAmAAAAHgAAAA==</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-					<key>CFG_WDTH_ALGN</key>
-					<integer>256</integer>
-				</dict>
-			</dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMD9000Controller</string>
+			<string>com.apple.kext.AMD9500Controller</string>
 			<key>IOClass</key>
-			<string>AMD9000Controller</string>
+			<string>AMD9500Controller</string>
 			<key>IOMatchCategory</key>
 			<string>ATIFramebuffer</string>
 			<key>IOName</key>
-			<string>AMD9000Controller</string>
+			<string>AMD9500Controller</string>
 			<key>IOPCIMatch</key>
 			<string>0x98E41002 0x98741002</string>
 			<key>IOProbeScore</key>
@@ -326,7 +256,7 @@
 				<key>PP_EnableBAPM</key>
 				<integer>0</integer>
 				<key>PP_EnableLoadFalconSmcFirmware</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>PP_Falcon_QuickTransition_Enable</key>
 				<integer>1</integer>
 				<key>PP_MclkActivityTarget</key>
@@ -366,7 +296,7 @@
 					<key>CFBundleIdentifier</key>
 					<string>com.apple.kext.AMDRadeonX4000HWServices</string>
 					<key>IOClass</key>
-					<string>AMDRadeonX4000_AMDRadeonHWServicesVI</string>
+					<string>AMDRadeonX4000_AMDRadeonHWServicesEllesmere</string>
 					<key>IOMatchCategory</key>
 					<string>AMDRadeonX4000HWServices</string>
 					<key>IOPCIMatch</key>
@@ -416,9 +346,9 @@
 					<key>GpuDebugPolicy</key>
 					<integer>-1</integer>
 					<key>IOClass</key>
-					<string>AMDRadeonX4000_AMDTongaGraphicsAccelerator</string>
+					<string>AMDRadeonX4000_AMDEllesmereGraphicsAccelerator</string>
 					<key>IODVDBundleName</key>
-					<string>AMDRadeonVADriver</string>
+					<string>AMDRadeonVADriver2</string>
 					<key>IOKitDebug</key>
 					<integer>0</integer>
 					<key>IOMatchCategory</key>
