@@ -10,12 +10,12 @@ static const char *pathRadeonGFX7Con =
     "/System/Library/Extensions/AMD8000Controller.kext/Contents/MacOS/AMD8000Controller";
 
 static const char *pathRadeonGFX8Con =
-    "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9500Controller";
+    "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9000Controller";
 
 static KernelPatcher::KextInfo kextRadeonGFX7Con = {"com.apple.kext.AMD8000Controller", &pathRadeonGFX7Con, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
 
-static KernelPatcher::KextInfo kextRadeonGFX8Con = {"com.apple.kext.AMD9500Controller", &pathRadeonGFX8Con, 1, {}, {},
+static KernelPatcher::KextInfo kextRadeonGFX8Con = {"com.apple.kext.AMD9000Controller", &pathRadeonGFX8Con, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
 
 GFXCon *GFXCon::callback = nullptr;
@@ -43,9 +43,9 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         LRed::callback->setRMMIOIfNecessary();
 
         RouteRequestPlus requests[] = {
-            {"__ZNK22BaffinSharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId},
-            {"__ZN21BaffinRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
-            {"__ZN17ASIC_INFO__BAFFIN18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo},
+            {"__ZNK18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId},
+            {"__ZN17VIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
+            {"__ZN13ASIC_INFO__VI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "gfxcon",
             "Failed to route symbols");
