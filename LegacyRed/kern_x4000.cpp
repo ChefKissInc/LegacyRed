@@ -46,10 +46,12 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor, useGcn3Logic},
             {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor, useGcn3Logic},
             {"__ZN31AMDRadeonX4000_AMDVIVCEHWEngineC1Ev", this->orgGFX8VCEEngineConstructor, useGcn3Logic},
+			{"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
+				this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
+			{"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
+				this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes,
                 LRed::callback->chipType == ChipType::Stoney},
-            {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
-                orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };
         PANIC_COND(SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
             "Failed to resolve symbols");
@@ -57,24 +59,24 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
             {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
-            {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities, this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities, this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
+            {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
+                wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
+            {"__ZN31AMDRadeonX4000_AMDTongaHardware32setupAndInitializeHWCapabilitiesEv",
+                wrapSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
             {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
-                wrapGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
+                wrapGetHWChannel, this->orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
             "Failed to route symbols");
 
-        // PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
-        //  "Failed to enable kernel writing");
-        /** TODO: Port this */
-        // orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
-        // orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
-        // MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
+        PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
+          "Failed to enable kernel writing");
+        /** TODO: Test this */
+		orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
+        orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
+        MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
 
         if (LRed::callback->chipType == ChipType::Stoney) {
             KernelPatcher::LookupPatch patch = {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesPatched,
