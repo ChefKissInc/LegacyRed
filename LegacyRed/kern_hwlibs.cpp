@@ -88,7 +88,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         SolveRequestPlus solveRequests[] = {
 			{"__ZN31AtiAppleHawaiiPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
 				this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
-			{"__ZN31AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
+			{"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
 				this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
             {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
             {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc},

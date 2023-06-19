@@ -35,8 +35,9 @@ static const char kAGDPBoardIDKeyPatched[] = "applehax";
  * Patch originally came from NootedRed, since the code for startHWEngines is nearly identical on X4000, this patch, in
  * theory, should work
  */
-static const uint8_t kStartHWEnginesOriginal[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x02, 0x74, 0x50};
-static const uint8_t kStartHWEnginesPatched[] = {0x49, 0x89, 0xFE, 0x31, 0xDB, 0x48, 0x83, 0xFB, 0x01, 0x74, 0x50};
+static const uint8_t kStartHWEnginesOriginal[] = {0x40, 0x83, 0xF0, 0x02};
+static const uint8_t kStartHWEnginesMask[] = {0xF0, 0xFF, 0xF0, 0xFF};
+static const uint8_t kStartHWEnginesPatched[] = {0x40, 0x83, 0xF0, 0x01};
 
 /** VideoToolbox DRM model check */
 static const char kVideoToolboxDRMModelOriginal[] = "MacPro5,1\0MacPro6,1\0IOService";

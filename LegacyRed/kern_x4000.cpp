@@ -39,6 +39,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         bool useGcn3Logic = LRed::callback->isGCN3;
 
         uint32_t *orgChannelTypes = nullptr;
+		mach_vm_address_t startHWEngines = 0;
 
         SolveRequestPlus solveRequests[] = {
             {"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor, useGcn3Logic},
@@ -52,6 +53,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 				this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes,
                 LRed::callback->chipType == ChipType::Stoney},
+			{"__ZN26AMDRadeonX4000_AMDHardware14startHWEnginesEv", startHWEngines},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
             "Failed to resolve symbols");
@@ -71,18 +73,17 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
             "Failed to route symbols");
 
-        PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
-          "Failed to enable kernel writing");
-        /** TODO: Test this */
-		orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
-        orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
-        MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
-
         if (LRed::callback->chipType == ChipType::Stoney) {
-            KernelPatcher::LookupPatch patch = {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesPatched,
-                arrsize(kStartHWEnginesOriginal), 1};
-            patcher.applyLookupPatch(&patch);
-            patcher.clearError();
+			PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
+			  "Failed to enable kernel writing");
+			/** TODO: Test this */
+			orgChannelTypes[5] = 1;     // Fix createAccelChannels so that it only starts SDMA0
+			orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
+			MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
+			
+			LookupPatchPlus const patch {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesMask,
+				kStartHWEnginesPatched, kStartHWEnginesMask, 1};
+			PANIC_COND(!patch.apply(&patcher, startHWEngines, PAGE_SIZE), "x4000", "Failed to patch startHWEngines");
             DBGLOG("x4000", "Applied Singular SDMA lookup patch");
         }
         return true;
@@ -175,4 +176,7 @@ void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) 
     return FunctionCast(wrapGetHWChannel, callback->orgGetHWChannel)(that, (engineType == 2) ? 1 : engineType, ringId);
 }
 
-char *X4000::forceX4000HWLibs() { return "Load4000"; }
+char *X4000::forceX4000HWLibs() {
+	DBGLOG("hwservices", "Forcing HWServices to load X4000HWLibs");
+	return "Load4000";
+}
