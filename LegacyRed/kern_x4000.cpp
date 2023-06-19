@@ -53,7 +53,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes,
                 LRed::callback->chipType == ChipType::Stoney},
         };
-        PANIC_COND(SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
+        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
             "Failed to resolve symbols");
 
         RouteRequestPlus requests[] = {
