@@ -27,8 +27,6 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
                 orgPopulateDeviceMemory},
             {"__ZN16AtiDeviceControl16notifyLinkChangeE31kAGDCRegisterLinkControlEvent_tmj", wrapNotifyLinkChange,
                 orgNotifyLinkChange},
-            {"__ZN13AtomBiosProxy19createAtomBiosProxyER16AtomBiosInitData", wrapCreateAtomBiosProxy,
-                orgCreateAtomBiosProxy},
             {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
@@ -76,11 +74,4 @@ bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] u
     [[maybe_unused]] bool retryOnFail) {
     DBGLOG("support", "TestVRAM called! Returning true");
     return true;
-}
-
-void *Support::wrapCreateAtomBiosProxy(void *param1) {
-    DBGLOG("support", "createAtomBiosProxy: param1 = %p", param1);
-    auto ret = FunctionCast(wrapCreateAtomBiosProxy, callback->orgCreateAtomBiosProxy)(param1);
-    DBGLOG("support", "createAtomBiosProxy returned %p", ret);
-    return ret;
 }

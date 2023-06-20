@@ -85,9 +85,7 @@ class Support {
     private:
     mach_vm_address_t orgPopulateDeviceMemory {};
     mach_vm_address_t orgNotifyLinkChange {};
-    mach_vm_address_t orgCreateAtomBiosProxy {};
 
-    static void *wrapCreateAtomBiosProxy(void *param1);
     static bool wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkControlEvent_t event, void *eventData,
         uint32_t eventFlags);
     static bool doNotTestVram(IOService *ctrl, uint32_t reg, bool retryOnFail);
