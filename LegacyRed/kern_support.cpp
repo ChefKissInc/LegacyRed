@@ -21,6 +21,7 @@ void Support::init() {
 bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonSupport.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
+		auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
 
         RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
@@ -34,7 +35,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
 
         LookupPatchPlus const patches[] = {
             {&kextRadeonSupport, kVRAMInfoNullCheckOriginal, kVRAMInfoNullCheckPatched,
-                arrsize(kVRAMInfoNullCheckOriginal), 1},
+                arrsize(kVRAMInfoNullCheckOriginal), !highsierra, 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
