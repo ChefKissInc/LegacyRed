@@ -78,7 +78,11 @@
 					<key>CFG_NVV</key>
 					<integer>2</integer>
 					<key>CFG_PTPL2_TBL</key>
-					<data>WgAAAFIAAABMAAAARwAAAEMAAAA/AAAAOwAAADcAAAAzAAAALwAAACsAAAAnAAAAIwAAAB8AAAAbAAAAFwAAAA==</data>
+					<data>
+					WgAAAFIAAABMAAAARwAAAEMAAAA/AAAAOwAA
+					ADcAAAAzAAAALwAAACsAAAAnAAAAIwAAAB8A
+					AAAbAAAAFwAAAA==
+					</data>
 					<key>CFG_USE_AGDC</key>
 					<true/>
 				</dict>
@@ -188,7 +192,11 @@
 					<key>CFG_NVV</key>
 					<integer>2</integer>
 					<key>CFG_PTPL2_TBL</key>
-					<data>bgAAAGwAAABpAAAAZwAAAGUAAABjAAAAYAAAAF4AAABcAAAAWQAAAFcAAABVAAAAUwAAAFAAAABOAAAAMgAAAA==</data>
+					<data>
+					bgAAAGwAAABpAAAAZwAAAGUAAABjAAAAYAAA
+					AF4AAABcAAAAWQAAAFcAAABVAAAAUwAAAFAA
+					AABOAAAAMgAAAA==
+					</data>
 					<key>CFG_USE_AGDC</key>
 					<true/>
 				</dict>
@@ -222,7 +230,11 @@
 					<key>CFG_NVV</key>
 					<integer>2</integer>
 					<key>CFG_PTPL2_TBL</key>
-					<data>lgAAAI4AAACGAAAAfgAAAHYAAABuAAAAZgAAAF4AAABWAAAATgAAAEYAAAA+AAAANgAAAC4AAAAmAAAAHgAAAA==</data>
+					<data>
+					lgAAAI4AAACGAAAAfgAAAHYAAABuAAAAZgAA
+					AF4AAABWAAAATgAAAEYAAAA+AAAANgAAAC4A
+					AAAmAAAAHgAAAA==
+					</data>
 					<key>CFG_USE_AGDC</key>
 					<true/>
 					<key>CFG_WDTH_ALGN</key>

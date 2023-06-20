@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -495,7 +495,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MODULE_NAME = com.ZormIndustries.LegacyRed;
 				MODULE_START = "$(PRODUCT_NAME)_kern_start";
 				MODULE_STOP = "$(PRODUCT_NAME)_kern_stop";
@@ -517,7 +517,7 @@
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = "-static";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ZormIndustries.LegacyRed;
+				PRODUCT_BUNDLE_IDENTIFIER = com.NootInc.LegacyRed;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				RUN_CLANG_STATIC_ANALYZER = YES;
 				WRAPPER_EXTENSION = kext;
@@ -549,7 +549,7 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				LLVM_LTO = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MODULE_NAME = com.ZormIndustries.LegacyRed;
 				MODULE_START = "$(PRODUCT_NAME)_kern_start";
 				MODULE_STOP = "$(PRODUCT_NAME)_kern_stop";
@@ -571,7 +571,7 @@
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = "-static";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ZormIndustries.LegacyRed;
+				PRODUCT_BUNDLE_IDENTIFIER = com.NootInc.LegacyRed;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRIP_STYLE = "non-global";
 				WRAPPER_EXTENSION = kext;
@@ -663,7 +663,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.15;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MODULE_NAME = com.ZormIndustries.LegacyRed;
 				MODULE_START = "$(PRODUCT_NAME)_kern_start";
 				MODULE_STOP = "$(PRODUCT_NAME)_kern_stop";
@@ -687,7 +687,7 @@
 					"$(inherited)",
 				);
 				OTHER_LDFLAGS = "-static";
-				PRODUCT_BUNDLE_IDENTIFIER = com.ZormIndustries.LegacyRed;
+				PRODUCT_BUNDLE_IDENTIFIER = com.NootInc.LegacyRed;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = kext;
 			};
