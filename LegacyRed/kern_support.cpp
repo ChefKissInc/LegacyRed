@@ -35,7 +35,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
 
         LookupPatchPlus const patches[] = {
             {&kextRadeonSupport, kVRAMInfoNullCheckOriginal, kVRAMInfoNullCheckPatched,
-                arrsize(kVRAMInfoNullCheckOriginal), !highsierra, 1},
+                arrsize(kVRAMInfoNullCheckOriginal), 1, !highsierra},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
