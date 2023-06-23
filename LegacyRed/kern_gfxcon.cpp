@@ -29,13 +29,14 @@ void GFXCon::init() {
 bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonGFX7Con.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
-		auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+        auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
 
         RouteRequestPlus requests[] = {
-			{"__ZN18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
+            {"__ZN18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
             {"__ZNK18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
             {"__ZN17CIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
-            {"__ZN13ASIC_INFO__CI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo, !highsierra},
+            {"__ZN13ASIC_INFO__CI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
+                !highsierra},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "gfxcon",
             "Failed to route symbols");
@@ -43,13 +44,14 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         return true;
     } else if (kextRadeonGFX8Con.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
-		auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+        auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
 
         RouteRequestPlus requests[] = {
-			{"__ZN18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
+            {"__ZN18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
             {"__ZNK18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
             {"__ZN17VIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
-            {"__ZN13ASIC_INFO__VI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo, !highsierra},
+            {"__ZN13ASIC_INFO__VI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
+                !highsierra},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "gfxcon",
             "Failed to route symbols");

@@ -22,7 +22,6 @@
 	<string>$(MODULE_VERSION)</string>
 	<key>GPUCompanionBundles</key>
 	<array>
-		<string>AMDShared.bundle</string>
 		<string>AMDRadeonX4000GLDriver.bundle</string>
 		<string>AMDRadeonVADriver.bundle</string>
 		<string>AMDMTLBronzeDriver.bundle</string>
@@ -65,28 +64,6 @@
 		</dict>
 		<key>Controller (GCN 2)</key>
 		<dict>
-			<key>ATY,Exmoor</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_FB_LIMIT</key>
-					<integer>6</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>
-					WgAAAFIAAABMAAAARwAAAEMAAAA/AAAAOwAA
-					ADcAAAAzAAAALwAAACsAAAAnAAAAIwAAAB8A
-					AAAbAAAAFwAAAA==
-					</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kext.AMD8000Controller</string>
 			<key>IOClass</key>
@@ -170,7 +147,7 @@
 				<key>PP_EnableBAPM</key>
 				<integer>0</integer>
 				<key>PP_EnableLoadFalconSmcFirmware</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>PP_Falcon_QuickTransition_Enable</key>
 				<integer>1</integer>
 				<key>PP_MclkActivityTarget</key>
@@ -181,66 +158,6 @@
 		</dict>
 		<key>Controller (GCN 3)</key>
 		<dict>
-			<key>ATY,Basset</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>
-					bgAAAGwAAABpAAAAZwAAAGUAAABjAAAAYAAA
-					AF4AAABcAAAAWQAAAFcAAABVAAAAUwAAAFAA
-					AABOAAAAMgAAAA==
-					</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,Greyhound</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,GreyhoundS</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-				</dict>
-			</dict>
-			<key>ATY,Labrador</key>
-			<dict>
-				<key>aty_config</key>
-				<dict>
-					<key>CFG_DEF_DITH</key>
-					<integer>0</integer>
-					<key>CFG_DIAG_LED</key>
-					<integer>1</integer>
-					<key>CFG_FB_LIMIT</key>
-					<integer>6</integer>
-					<key>CFG_NVV</key>
-					<integer>2</integer>
-					<key>CFG_PTPL2_TBL</key>
-					<data>
-					lgAAAI4AAACGAAAAfgAAAHYAAABuAAAAZgAA
-					AF4AAABWAAAATgAAAEYAAAA+AAAANgAAAC4A
-					AAAmAAAAHgAAAA==
-					</data>
-					<key>CFG_USE_AGDC</key>
-					<true/>
-					<key>CFG_WDTH_ALGN</key>
-					<integer>256</integer>
-				</dict>
-			</dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kext.AMD9000Controller</string>
 			<key>IOClass</key>
@@ -338,7 +255,7 @@
 				<key>PP_EnableBAPM</key>
 				<integer>0</integer>
 				<key>PP_EnableLoadFalconSmcFirmware</key>
-				<integer>1</integer>
+				<integer>0</integer>
 				<key>PP_Falcon_QuickTransition_Enable</key>
 				<integer>1</integer>
 				<key>PP_MclkActivityTarget</key>
@@ -378,7 +295,7 @@
 					<key>CFBundleIdentifier</key>
 					<string>com.apple.kext.AMDRadeonX4000HWServices</string>
 					<key>IOClass</key>
-					<string>AMDRadeonX4000_AMDRadeonHWServicesVI</string>
+					<string>AMDRadeonX4000_AMDRadeonHWServicesFiji</string>
 					<key>IOMatchCategory</key>
 					<string>AMDRadeonX4000HWServices</string>
 					<key>IOPCIMatch</key>
@@ -428,11 +345,11 @@
 					<key>GpuDebugPolicy</key>
 					<integer>-1</integer>
 					<key>IOClass</key>
-					<string>AMDRadeonX4000_AMDTongaGraphicsAccelerator</string>
+					<string>AMDRadeonX4000_AMDFijiGraphicsAccelerator</string>
 					<key>IODVDBundleName</key>
 					<string>AMDRadeonVADriver</string>
 					<key>IOKitDebug</key>
-					<integer>0</integer>
+					<integer>-1</integer>
 					<key>IOMatchCategory</key>
 					<string>IOAccelerator</string>
 					<key>IOPCIMatch</key>

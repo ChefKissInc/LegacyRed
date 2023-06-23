@@ -16,7 +16,7 @@ class X4000 {
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
 
     private:
-    t_GenericConstructor orgGFX8PM4EngineConstructor {nullptr};
+    t_GenericConstructor orgFijiPM4EngineConstructor {nullptr};
     t_GenericConstructor orgGFX8SDMAEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8VCEEngineConstructor {nullptr};
     t_GenericConstructor orgGFX8UVDEngineConstructor {nullptr};

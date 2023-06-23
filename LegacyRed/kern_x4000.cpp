@@ -30,7 +30,6 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         bool useGcn3Logic = LRed::callback->isGCN3;
         RouteRequestPlus requests[] = {
             {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", forceX4000HWLibs, !useGcn3Logic},
-            {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesVI16getMatchPropertyEv", forceX4000HWLibs, useGcn3Logic},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "hwservices",
             "Failed to route symbols");
@@ -42,7 +41,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         mach_vm_address_t startHWEngines = 0;
 
         SolveRequestPlus solveRequests[] = {
-            {"__ZN29AMDRadeonX4000_AMDVIPM4EngineC1Ev", this->orgGFX8PM4EngineConstructor, useGcn3Logic},
+            {"__ZN31AMDRadeonX4000_AMDFijiPM4EngineC1Ev", this->orgFijiPM4EngineConstructor, useGcn3Logic},
             {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor, useGcn3Logic},
             {"__ZN31AMDRadeonX4000_AMDVIUVDHWEngineC1Ev", this->orgGFX8UVDEngineConstructor, useGcn3Logic},
             {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor, useGcn3Logic},
@@ -60,10 +59,10 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            {"__ZN28AMDRadeonX4000_AMDVIHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
+            {"__ZN30AMDRadeonX4000_AMDFijiHardware17allocateHWEnginesEv", wrapAllocateHWEngines, useGcn3Logic},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
-            {"__ZN31AMDRadeonX4000_AMDTongaHardware32setupAndInitializeHWCapabilitiesEv",
+            {"__ZN31AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
@@ -141,7 +140,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         // want to maximise compatibility, we use OSObject here rather than an IOMallocZero([engine value]).
 
         auto *pm4 = OSObject::operator new(0x198);
-        callback->orgGFX8PM4EngineConstructor(pm4);
+        callback->orgFijiPM4EngineConstructor(pm4);
         getMember<void *>(that, 0x3B0) = pm4;
 
         auto *sdma0 = OSObject::operator new(0x100);
@@ -171,7 +170,6 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         callback->orgGFX8VCEEngineConstructor(vce);
         getMember<void *>(that, 0x3E8) = vce;
 
-        // is it even worth it to have these just for pre-Catalina support? lol
     } else {
         PANIC("x4000", "Using VI logic on unsupported ASIC!");
     }
