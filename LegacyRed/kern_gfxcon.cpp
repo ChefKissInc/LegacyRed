@@ -12,11 +12,17 @@ static const char *pathRadeonGFX7Con =
 static const char *pathRadeonGFX8Con =
     "/System/Library/Extensions/AMD9000Controller.kext/Contents/MacOS/AMD9000Controller";
 
+static const char *pathRadeonPolarisCon =
+    "/System/Library/Extensions/AMD9500Controller.kext/Contents/MacOS/AMD9500Controller";
+
 static KernelPatcher::KextInfo kextRadeonGFX7Con = {"com.apple.kext.AMD8000Controller", &pathRadeonGFX7Con, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
 
 static KernelPatcher::KextInfo kextRadeonGFX8Con = {"com.apple.kext.AMD9000Controller", &pathRadeonGFX8Con, 1, {}, {},
     KernelPatcher::KextInfo::Unloaded};
+
+static KernelPatcher::KextInfo kextRadeonPolarisCon = {"com.apple.kext.AMD9500Controller", &pathRadeonPolarisCon, 1, {},
+    {}, KernelPatcher::KextInfo::Unloaded};
 
 GFXCon *GFXCon::callback = nullptr;
 
@@ -24,6 +30,7 @@ void GFXCon::init() {
     callback = this;
     lilu.onKextLoadForce(&kextRadeonGFX7Con);
     lilu.onKextLoadForce(&kextRadeonGFX8Con);
+    lilu.onKextLoadForce(&kextRadeonPolarisCon);
 }
 
 bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
@@ -57,6 +64,20 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             "Failed to route symbols");
 
         return true;
+    } else if (kextRadeonPolarisCon.loadIndex == index) {
+        LRed::callback->setRMMIOIfNecessary();
+        auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+
+        RouteRequestPlus requests[] = {
+            {"__ZNK22BaffinSharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
+            {"__ZN21BaffinRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
+            {"__ZN17ASIC_INFO__BAFFIN18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
+                !highsierra},
+        };
+        PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "gfxcon",
+            "Failed to route symbols");
+
+        return true;
     }
 
     return false;
@@ -68,7 +89,7 @@ uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
 
 uint16_t GFXCon::wrapGetFamilyId(void) {
     FunctionCast(wrapGetFamilyId, callback->orgGetFamilyId)();
-    DBGLOG("gfxcon", "getFamilyId >> %x", LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV);
+    DBGLOG("gfxcon", "getFamilyId << %x", LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV);
     return LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
 }
 

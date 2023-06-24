@@ -48,9 +48,9 @@
 		<key>AtiGpuWrangler (GCN 3)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMD9000Controller</string>
+			<string>com.apple.kext.AMD9500Controller</string>
 			<key>IOClass</key>
-			<string>AMD9000ControllerWrangler</string>
+			<string>AMD9500ControllerWrangler</string>
 			<key>IOMatchCategory</key>
 			<string>IOFramebuffer</string>
 			<key>IOPCIMatch</key>
@@ -159,13 +159,13 @@
 		<key>Controller (GCN 3)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kext.AMD9000Controller</string>
+			<string>com.apple.kext.AMD9500Controller</string>
 			<key>IOClass</key>
-			<string>AMD9000Controller</string>
+			<string>AMD9500Controller</string>
 			<key>IOMatchCategory</key>
 			<string>ATIFramebuffer</string>
 			<key>IOName</key>
-			<string>AMD9000Controller</string>
+			<string>AMD9500Controller</string>
 			<key>IOPCIMatch</key>
 			<string>0x98E41002 0x98741002</string>
 			<key>IOProbeScore</key>
@@ -240,12 +240,16 @@
 			</dict>
 			<key>aty_properties</key>
 			<dict>
+				<key>MM_EnableHEVCDecode</key>
+				<true/>
+				<key>MM_EnableHEVCEncode</key>
+				<false/>
 				<key>PP_DisableCAC</key>
 				<integer>0</integer>
 				<key>PP_DisableDIDT</key>
-				<integer>1</integer>
-				<key>PP_DisablePPLib</key>
 				<integer>0</integer>
+				<key>PP_DisableFFC</key>
+				<integer>1</integer>
 				<key>PP_DisablePowerContainment</key>
 				<integer>0</integer>
 				<key>PP_DisableULV</key>
@@ -256,12 +260,36 @@
 				<integer>0</integer>
 				<key>PP_EnableLoadFalconSmcFirmware</key>
 				<integer>0</integer>
+				<key>PP_EnablePerDPM</key>
+				<integer>1</integer>
 				<key>PP_Falcon_QuickTransition_Enable</key>
 				<integer>1</integer>
 				<key>PP_MclkActivityTarget</key>
 				<integer>5</integer>
+				<key>PP_MclkDpmDisabled</key>
+				<integer>0</integer>
+				<key>PP_MclkDpmTuning0</key>
+				<integer>2057216</integer>
+				<key>PP_MclkDpmTuning1</key>
+				<integer>2057216</integer>
 				<key>PP_PhmUseDummyBackEnd</key>
 				<integer>0</integer>
+				<key>PP_SclkDpmTuning0</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning1</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning2</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning3</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning4</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning5</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning6</key>
+				<integer>1991680</integer>
+				<key>PP_SclkDpmTuning7</key>
+				<integer>1991680</integer>
 			</dict>
 		</dict>
 		<key>com.NootInc.LegacyRed</key>

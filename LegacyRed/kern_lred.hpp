@@ -210,6 +210,7 @@ class LRed {
     ChipType chipType = ChipType::Unknown;
     ChipVariant chipVariant = ChipVariant::Normal;
     bool isGCN3 = false;
+    bool isMullins = false;
     uint64_t fbOffset {0};
     IOMemoryMap *rmmio {nullptr};
     volatile uint32_t *rmmioPtr {nullptr};
