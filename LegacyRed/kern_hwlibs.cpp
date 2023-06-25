@@ -28,61 +28,54 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
 
-        if (LRed::callback->chipVariant == ChipVariant::KLE) {
-            SolveRequestPlus solveRequests[] = {
-                {"_CAIL_DDI_CAPS_KALINDI_A0_E", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_KALINDI_GoldenSettings_A0_4882_E", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using 'E' Kalindi Golden Settings");
-        } else if (LRed::callback->chipVariant == ChipVariant::KVE) {
-            SolveRequestPlus solveRequests[] = {
-                {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-                {"_SPECTRE_GoldenSettings_A0_8812_E", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using 'E' Kaveri Golden Settings and DDI Caps");
-        } else if (LRed::callback->chipVariant == ChipVariant::s3CU) {
-            SolveRequestPlus solveRequests[] = {
-                {"_STONEY_GoldenSettings_A0_3CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using 3CU Stoney Golden Settings");
-        } else if (LRed::callback->chipVariant == ChipVariant::s2CU) {
-            SolveRequestPlus solveRequests[] = {
-                {"_STONEY_GoldenSettings_A0_2CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using 2CU Stoney Golden Settings");
-        } else if (LRed::callback->chipVariant == ChipVariant::Bristol) {
-            SolveRequestPlus solveRequests[] = {
-                {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
-                {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using A1 Carrizo Golden Settings and DDI Caps");
-        } else {
-            SolveRequestPlus solveRequests[] = {
-                {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-                {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
-                {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-                {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
-                {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
-                {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
-                /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
-            };
-            PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                "Failed to resolve symbols");
-            DBGLOG("hwlibs", "Using Normal Golden Settings and DDI Caps");
+        switch (LRed::callback->chipVariant) {
+            case (ChipVariant::s2CU): {
+                SolveRequestPlus solveRequests[] = {
+                    {"_STONEY_GoldenSettings_A0_2CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
+                    {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Stoney ASIC is 2CU model");
+                break;
+            }
+            case ChipVariant::s3CU: {
+                SolveRequestPlus solveRequests[] = {
+                    {"_STONEY_GoldenSettings_A0_3CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
+                    {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Stoney ASIC is 3CU model");
+                break;
+            }
+            case ChipVariant::Bristol: {
+                SolveRequestPlus solveRequests[] = {
+                    {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
+                    {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Carrizo ASIC is Bristol Ridge model");
+                break;
+            }
+            default: {
+                SolveRequestPlus solveRequests[] = {
+                    {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
+                    {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
+                    {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
+                    {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
+                    {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
+                    {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                    /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Using Normal Golden Settings and DDI Caps");
+                break;
+            }
         }
 
         SolveRequestPlus solveRequests[] = {
@@ -90,10 +83,9 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
             {"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
                 this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
-            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable}, {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
+            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
+            {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
             {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc},
-            //{"_CAIL_DDI_CAPS_RAVEN_A0", ddiCaps[static_cast<uint32_t>(ChipType::Raven)]},
-            //{"_RAVEN1_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Raven)]},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
             "Failed to resolve symbols");

@@ -203,9 +203,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x1313:
                 [[fallthrough]];
             case 0x1315:
-                this->chipType = ChipType::Kaveri;
-                DBGLOG("lred", "Chip type is Kaveri");
-                break;
+                [[fallthrough]];
             case 0x1316:
                 [[fallthrough]];
             case 0x1318:
@@ -217,10 +215,6 @@ void LRed::setRMMIOIfNecessary() {
             case 0x131D:
                 this->chipType = ChipType::Kaveri;
                 DBGLOG("lred", "Chip type is Kaveri");
-                if (this->deviceId == 0x1316) {
-                    this->chipVariant = ChipVariant::Spooky;
-                    DBGLOG("lred", "Chip variant is Spooky");
-                }
                 break;
             case 0x9830:
                 [[fallthrough]];
@@ -245,11 +239,6 @@ void LRed::setRMMIOIfNecessary() {
             case 0x983D:
                 this->chipType = ChipType::Kabini;
                 DBGLOG("lred", "Chip type is Kabini");
-                if (this->deviceId == 0x9831 || this->deviceId == 0x9833 || this->deviceId == 0x9835 ||
-                    this->deviceId == 0x9837) {
-                    DBGLOG("lred", "Chip variant is Kabini 'E'");
-                    this->chipVariant = ChipVariant::KLE;
-                }
                 break;
             case 0x9850:
                 this->chipType = ChipType::Mullins;
@@ -260,10 +249,6 @@ void LRed::setRMMIOIfNecessary() {
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
                 DBGLOG("lred", "Chip type is Mullins");
-                if (this->revision == 0x01 || this->revision == 0x06) {
-                    this->chipVariant = ChipVariant::KLE;
-                    DBGLOG("lred", "Chip variant is Mullins 'E'");
-                }
                 break;
             case 0x9852:
                 this->chipType = ChipType::Mullins;
@@ -273,18 +258,10 @@ void LRed::setRMMIOIfNecessary() {
             case 0x9853:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-                if (this->revision == 0x01 || (this->revision >= 0x05 && this->revision < 0x40)) {
-                    this->chipVariant = ChipVariant::KLE;
-                    DBGLOG("lred", "Chip variant is Mullins 'E'");
-                }
                 break;
             case 0x9854:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-                if (this->revision == 0x01) {
-                    this->chipVariant = ChipVariant::KLE;
-                    DBGLOG("lred", "Chip variant is Mullins 'E'");
-                }
                 break;
             case 0x9855:
                 this->chipType = ChipType::Mullins;

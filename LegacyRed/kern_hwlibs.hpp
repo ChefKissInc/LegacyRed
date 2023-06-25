@@ -21,7 +21,7 @@ class HWLibs {
     t_XPowerTuneConstructor orgHawaiiPowerTuneConstructor {nullptr};
     t_XPowerTuneConstructor orgTongaPowerTuneConstructor {nullptr};
     t_sendMsgToSmc orgCISendMsgToSmc {nullptr};
-    t_sendMsgToSmc orgVISendMsgToSmc {nullptr};
+    t_sendMsgToSmc orgCzSendMsgToSmc {nullptr};
     mach_vm_address_t orgAmdCailServicesConstructor {};
     mach_vm_address_t orgCAILQueryEngineRunningState {};
     mach_vm_address_t orgCailMonitorEngineInternalState {};
@@ -35,7 +35,7 @@ class HWLibs {
     static uint64_t wrapCailMonitorEngineInternalState(void *that, uint32_t param1, uint32_t *param2);
     static uint64_t wrapCailMonitorPerformanceCounter(void *that, uint32_t *param1);
     static void *wrapCreatePowerTuneServices(void *that, void *param2);
-    static AMDReturn wrapSmuRavenInitialize(void *smum, uint32_t param2);
+    static AMDReturn wrapSmuCzInitialize(void *smum, uint32_t param2);
     static uint64_t wrapSMUMInitialize(uint64_t param1, uint32_t *param2, uint64_t param3);
     static void wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, uint64_t param4, uint64_t param5,
         uint level);

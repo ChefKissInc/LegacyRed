@@ -27,14 +27,9 @@ enum struct ChipType : uint32_t {
     Stoney,
     Unknown,
 };
-/**
- *  With research into the hardware constants, we may or may not ditch KVE and KLE
- */
+
 enum struct ChipVariant : uint32_t {
-    KVE = 0,
-    Spooky,    // A revision of APU? More research needed
-    KLE,       // Unsure about the three above
-    s2CU,      // s2CU && s3CU have different Golden Settings
+    s2CU,    // s2CU && s3CU have different Golden Settings
     s3CU,
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
     Normal,

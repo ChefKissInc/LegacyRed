@@ -381,7 +381,7 @@
 					<key>IOMatchCategory</key>
 					<string>IOAccelerator</string>
 					<key>IOPCIMatch</key>
-					<string>0x98E41002 0x98741002</string>
+					<string>0x98741002</string>
 					<key>IOPropertyMatch</key>
 					<dict>
 						<key>LoadAccelerator</key>
@@ -406,6 +406,51 @@
 						<key>CAIL_DisableUVDPowerGating</key>
 						<integer>0</integer>
 						<key>CAIL_DisableVCEPowerGating</key>
+						<integer>0</integer>
+					</dict>
+				</dict>
+				<dict>
+					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000</string>
+					<key>GpuDebugPolicy</key>
+					<integer>-1</integer>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDEllesmereGraphicsAccelerator</string>
+					<key>IODVDBundleName</key>
+					<string>AMDRadeonVADriver2</string>
+					<key>IOGVACodec</key>
+					<string>AMDU6V3</string>
+					<key>IOGVAH264EncodeCapabilities</key>
+					<dict>
+						<key>VTQualityRating</key>
+						<integer>50</integer>
+						<key>VTRating</key>
+						<integer>300</integer>
+					</dict>
+					<key>IOKitDebug</key>
+					<integer>-1</integer>
+					<key>IOMatchCategory</key>
+					<string>IOAccelerator</string>
+					<key>IOPCIMatch</key>
+					<string>0x98E41002</string>
+					<key>IOPCITunnelCompatible</key>
+					<true/>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadAccelerator</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+					<key>IOSourceVersion</key>
+					<string>0.0.0.0.0</string>
+					<key>IOVARendererID</key>
+					<integer>16908288</integer>
+					<key>cail_properties</key>
+					<dict>
+						<key>CAIL_EnableLBPWSupport</key>
+						<integer>0</integer>
+						<key>CAIL_EnableMaxPayloadSizeSync</key>
 						<integer>0</integer>
 					</dict>
 				</dict>

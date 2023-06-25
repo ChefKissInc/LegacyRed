@@ -179,4 +179,7 @@ struct CailDeviceTypeEntry {
     uint32_t deviceType;
 } PACKED;
 
+constexpr uint32_t ADDR_CHIP_FAMILY_VI = 7;
+constexpr uint32_t ADDR_CHIP_FAMILY_CI = 6;
+
 #endif /* kern_amd.hpp */
