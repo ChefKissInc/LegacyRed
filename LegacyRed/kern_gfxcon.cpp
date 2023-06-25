@@ -96,8 +96,10 @@ uint16_t GFXCon::wrapGetFamilyId(void) {
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
     getMember<uint32_t>(that, 0x40) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
-	getMember<uint32_t>(that, 0x44) = LRed::callback->deviceId;
-	getMember<uint16_t>(that, 0x48) = LRed::callback->revision;
-	getMember<uint32_t>(that, 0x4c) = LRed::callback->revision + LRed::callback->enumeratedRevision; // rough guess
+    getMember<uint32_t>(that, 0x44) = LRed::callback->deviceId;
+    getMember<uint16_t>(that, 0x48) = LRed::callback->revision;
+    getMember<uint32_t>(that, 0x4c) =
+        LRed::callback->isKabini ? LRed::callback->enumeratedRevision :
+                                   LRed::callback->revision + LRed::callback->enumeratedRevision;    // rough guess
     return ret;
 }

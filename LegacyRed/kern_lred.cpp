@@ -213,15 +213,15 @@ void LRed::setRMMIOIfNecessary() {
             case 0x131C:
                 [[fallthrough]];
             case 0x131D:
-				if (this->deviceId == 0x1312 || this->deviceId == 0x1316 || this->deviceId == 0x1317) {
-					this->chipType = ChipType::Kaveri;
-					DBGLOG("lred", "Chip type is Kaveri");
-					this->enumeratedRevision = 0x41;
-					break;
-				}
-				this->chipType = ChipType::Kaveri;
-				DBGLOG("lred", "Chip type is Kaveri");
-				this->enumeratedRevision = 0x1;
+                if (this->deviceId == 0x1312 || this->deviceId == 0x1316 || this->deviceId == 0x1317) {
+                    this->chipType = ChipType::Kaveri;
+                    DBGLOG("lred", "Chip type is Kaveri");
+                    this->enumeratedRevision = 0x41;
+                    break;
+                }
+                this->chipType = ChipType::Kaveri;
+                DBGLOG("lred", "Chip type is Kaveri");
+                this->enumeratedRevision = 0x1;
                 break;
             case 0x9830:
                 [[fallthrough]];
@@ -244,68 +244,71 @@ void LRed::setRMMIOIfNecessary() {
             case 0x9839:
                 [[fallthrough]];
             case 0x983D:
-				if (this->revision == 0x00) {
-					this->chipType = ChipType::Kabini;
-					DBGLOG("lred", "Chip type is Kabini");
-					this->enumeratedRevision = 0x81;
-					break;
-				} else if (this->revision == 0x01) {
-					this->chipType = ChipType::Kabini;
-					DBGLOG("lred", "Chip type is Kabini");
-					this->enumeratedRevision = 0x82;
-					break;
-				} else if (this->revision == 0x02) {
-					this->chipType = ChipType::Kabini;
-					DBGLOG("lred", "Chip type is Kabini");
-					this->enumeratedRevision = 0x85;
-					break;
-				}
+                if (this->revision == 0x00) {
+                    this->chipType = ChipType::Kabini;
+                    this->isKabini = true;
+                    DBGLOG("lred", "Chip type is Kabini");
+                    this->enumeratedRevision = 0x81;
+                    break;
+                } else if (this->revision == 0x01) {
+                    this->chipType = ChipType::Kabini;
+                    this->isKabini = true;
+                    DBGLOG("lred", "Chip type is Kabini");
+                    this->enumeratedRevision = 0x82;
+                    break;
+                } else if (this->revision == 0x02) {
+                    this->chipType = ChipType::Kabini;
+                    this->isKabini = true;
+                    DBGLOG("lred", "Chip type is Kabini");
+                    this->enumeratedRevision = 0x85;
+                    break;
+                }
                 break;
             case 0x9850:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 DBGLOG("lred", "Chip type is Mullins");
                 break;
             case 0x9851:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 DBGLOG("lred", "Chip type is Mullins");
                 break;
             case 0x9852:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 DBGLOG("lred", "Chip type is Mullins");
                 break;
             case 0x9853:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 break;
             case 0x9854:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 break;
             case 0x9855:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 DBGLOG("lred", "Chip type is Mullins");
                 break;
             case 0x9856:
                 this->chipType = ChipType::Mullins;
                 this->isMullins = true;
-				this->enumeratedRevision = 0xA1;
+                this->enumeratedRevision = 0xA1;
                 DBGLOG("lred", "Chip type is Mullins");
                 break;
             case 0x9874:
                 this->chipType = ChipType::Carrizo;
                 DBGLOG("lred", "Chip type is Carrizo");
                 this->isGCN3 = true;
-				this->enumeratedRevision = 0x1;
+                this->enumeratedRevision = 0x1;
                 if ((this->revision >= 0xC8 && this->revision <= 0xCE) ||
                     (this->revision >= 0xE1 && this->revision <= 0xE6)) {
                     this->chipVariant = ChipVariant::Bristol;
@@ -315,7 +318,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x98E4:
                 this->chipType = ChipType::Stoney;
                 this->isGCN3 = true;
-				this->enumeratedRevision = 0x61;
+                this->enumeratedRevision = 0x61;
                 DBGLOG("lred", "Chip type is Stoney");
                 /** R4 and up iGPUs have 3 compute units while the others have 2 CUs, hence the chip variations */
                 if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) ||
