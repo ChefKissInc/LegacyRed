@@ -17,11 +17,6 @@ constexpr uint32_t AMDGPU_FAMILY_KV = 0x7D;
 
 // asicRevision definitions, source:
 // https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/amd/amdgpu/cik.c#L2019
-constexpr uint32_t KV_ASICREV0 = 0x41;
-constexpr uint32_t KV_ASICREV1 = 0x1;
-constexpr uint32_t KB_ASICREV0 = 0x81;
-constexpr uint32_t KB_ASICREV1 = 0x82;
-constexpr uint32_t KB_ASICREV2 = 0x85;
 
 constexpr uint32_t PPSMC_MSG_GetSmuVersion = 0x2;
 constexpr uint32_t PPSMC_MSG_PowerUpSdma = 0xE;
