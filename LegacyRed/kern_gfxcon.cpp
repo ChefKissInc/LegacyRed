@@ -95,6 +95,6 @@ uint16_t GFXCon::wrapGetFamilyId(void) {
 
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
-    getMember<uint32_t>(that, 0x60) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    getMember<uint32_t>(that, 0x40) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
     return ret;
 }
