@@ -99,7 +99,8 @@ IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     getMember<uint32_t>(that, 0x44) = LRed::callback->deviceId;
     getMember<uint16_t>(that, 0x48) = LRed::callback->revision;
     getMember<uint32_t>(that, 0x4c) =
-        LRed::callback->isKabini ? LRed::callback->enumeratedRevision :
-                                   LRed::callback->revision + LRed::callback->enumeratedRevision;    // rough guess
+        LRed::callback->isKabini ?
+            static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
+            static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;    // rough guess
     return ret;
 }
