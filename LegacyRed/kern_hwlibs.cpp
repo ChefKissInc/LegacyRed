@@ -97,6 +97,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             {"__ZN15AmdCailServices23queryEngineRunningStateEP17CailHwEngineQueueP22CailEngineRunningState",
                 wrapCAILQueryEngineRunningState, orgCAILQueryEngineRunningState},
             {"_CailMonitorPerformanceCounter", wrapCailMonitorPerformanceCounter, orgCailMonitorPerformanceCounter},
+            {"_CailMonitorEngineInternalState", wrapCailMonitorEngineInternalState, orgCailMonitorEngineInternalState},
             {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
             {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
             //{"_SmuRaven_Initialize", wrapSmuRavenInitialize, this->orgSmuRavenInitialize},
@@ -147,6 +148,36 @@ void HWLibs::wrapMCILDebugPrint(uint32_t level_max, char *fmt, uint64_t param3, 
     printf("_MCILDebugPrint PARAM1 = 0x%X: ", level_max);
     printf(fmt, param3, param4, param5, level);
     FunctionCast(wrapMCILDebugPrint, callback->orgMCILDebugPrint)(level_max, fmt, param3, param4, param5, level);
+}
+
+uint64_t HWLibs::wrapCAILQueryEngineRunningState(void *param1, uint32_t *param2, uint64_t param3) {
+    DBGLOG("hwlibs", "_CAILQueryEngineRunningState: param1 = %p param2 = %p param3 = %llX", param1, param2, param3);
+    DBGLOG("hwlibs", "_CAILQueryEngineRunningState: *param2 = 0x%X", *param2);
+    auto ret =
+        FunctionCast(wrapCAILQueryEngineRunningState, callback->orgCAILQueryEngineRunningState)(param1, param2, param3);
+    DBGLOG("hwlibs", "_CAILQueryEngineRunningState: after *param2 = 0x%X", *param2);
+    DBGLOG("hwlibs", "_CAILQueryEngineRunningState returned 0x%llX", ret);
+    return ret;
+}
+
+uint64_t HWLibs::wrapCailMonitorEngineInternalState(void *that, uint32_t param1, uint32_t *param2) {
+    DBGLOG("hwlibs", "_CailMonitorEngineInternalState: this = %p param1 = 0x%X param2 = %p", that, param1, param2);
+    DBGLOG("hwlibs", "_CailMonitorEngineInternalState: *param2 = 0x%X", *param2);
+    auto ret = FunctionCast(wrapCailMonitorEngineInternalState, callback->orgCailMonitorEngineInternalState)(that,
+        param1, param2);
+    DBGLOG("hwlibs", "_CailMonitorEngineInternalState: after *param2 = 0x%X", *param2);
+    DBGLOG("hwlibs", "_CailMonitorEngineInternalState returned 0x%llX", ret);
+    return ret;
+}
+
+uint64_t HWLibs::wrapCailMonitorPerformanceCounter(void *that, uint32_t *param1) {
+    DBGLOG("hwlibs", "_CailMonitorPerformanceCounter: this = %p param1 = %p", that, param1);
+    DBGLOG("hwlibs", "_CailMonitorPerformanceCounter: *param1 = 0x%X", *param1);
+    auto ret =
+        FunctionCast(wrapCailMonitorPerformanceCounter, callback->orgCailMonitorPerformanceCounter)(that, param1);
+    DBGLOG("hwlibs", "_CailMonitorPerformanceCounter: after *param1 = 0x%X", *param1);
+    DBGLOG("hwlibs", "_CailMonitorPerformanceCounter returned 0x%llX", ret);
+    return ret;
 }
 
 /** For future reference */
