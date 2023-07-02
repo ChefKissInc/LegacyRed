@@ -18,7 +18,7 @@ Since the kext isn't functioning yet: None, but in the future, due to how we onl
 
 ### How functional is the kext?
 
-Great news, FB-Only is confirmed to work on Kabini APUs, the Accelerator is still broken so stay tuned for future updates
+Great news, FB-Only is confirmed to work on Kabini and Kaveri APUs, the Accelerator is still broken so stay tuned for future updates
 
 ### On which macOS versions am I able to use this on?
 
