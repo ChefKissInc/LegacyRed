@@ -1,8 +1,8 @@
 //  Copyright © 2022-2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef kern_x4050_hwlibs_hpp
-#define kern_x4050_hwlibs_hpp
+#ifndef kern_hwlibs_hpp
+#define kern_hwlibs_hpp
 #include "kern_amd.hpp"
 #include "kern_lred.hpp"
 #include "kern_patcherplus.hpp"
@@ -27,7 +27,7 @@ class HWLibs {
     mach_vm_address_t orgCailMonitorEngineInternalState {};
     mach_vm_address_t orgCailMonitorPerformanceCounter {};
     mach_vm_address_t orgSMUMInitialize {};
-    mach_vm_address_t orgSmuRavenInitialize {0};
+    mach_vm_address_t orgSmuCzInitialize {0};
     mach_vm_address_t orgMCILDebugPrint {};
 
     static void wrapAmdCailServicesConstructor(void *that, IOPCIDevice *provider);
@@ -41,4 +41,4 @@ class HWLibs {
         uint level);
 };
 
-#endif /* kern_x4050_hwlibs_hpp */
+#endif /* kern_hwlibs_hpp */

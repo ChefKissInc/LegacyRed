@@ -100,7 +100,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             {"_CailMonitorEngineInternalState", wrapCailMonitorEngineInternalState, orgCailMonitorEngineInternalState},
             {"_MCILDebugPrint", wrapMCILDebugPrint, orgMCILDebugPrint},
             {"_SMUM_Initialize", wrapSMUMInitialize, orgSMUMInitialize},
-            //{"_SmuRaven_Initialize", wrapSmuRavenInitialize, this->orgSmuRavenInitialize},
+            //{"_SmuCz_Initialize", wrapSmuCzInitialize, this->orgSmuCzInitialize},
         };
         PANIC_COND(!patcher.routeMultiple(index, requests, address, size), "hwlibs", "Failed to route symbols");
 

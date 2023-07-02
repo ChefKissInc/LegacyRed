@@ -83,8 +83,8 @@ class Support {
     bool processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size);
 
     private:
-    mach_vm_address_t orgPopulateDeviceMemory {};
-    mach_vm_address_t orgNotifyLinkChange {};
+    mach_vm_address_t orgPopulateDeviceMemory {0};
+    mach_vm_address_t orgNotifyLinkChange {0};
 
     static bool wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkControlEvent_t event, void *eventData,
         uint32_t eventFlags);

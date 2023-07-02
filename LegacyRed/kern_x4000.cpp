@@ -144,26 +144,29 @@ void X4000::wrapInitializeFamilyType(void *that) {
 bool X4000::wrapAllocateHWEngines(void *that) {
     DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
     if (LRed::callback->isGCN3) {
+        auto catalina = getKernelVersion() == KernelVersion::Catalina;
+        auto fieldBase = catalina ? 0x340 : 0x3B0;
+
         auto *pm4 = OSObject::operator new(0x198);
         callback->orgBaffinPM4EngineConstructor(pm4);
-        getMember<void *>(that, 0x3B0) = pm4;
+        getMember<void *>(that, fieldBase) = pm4;
 
-        auto *sdma0 = OSObject::operator new(0x100);
-        callback->orgGFX8SDMAEngineConstructor(sdma0);
-        getMember<void *>(that, 0x3B8) = sdma0;
+        auto *sdma = OSObject::operator new(0x100);
+        callback->orgGFX8SDMAEngineConstructor(sdma);
+        getMember<void *>(that, fieldBase + 0x8) = sdma;
 
         auto *uvd = OSObject::operator new(0x2F0);
         callback->orgPolarisUVDEngineConstructor(uvd);
-        getMember<void *>(that, 0x3D8) = uvd;
+        getMember<void *>(that, fieldBase + catalina ? 0x18 : 0x28) = uvd;
 
         // I swear to god, this one infuriates me to no end, I love ghidra.
         auto *samu = OSObject::operator new(0x1D0);
         callback->orgGFX8SAMUEngineConstructor(samu);
-        getMember<void *>(that, 0x3E0) = samu;
+        getMember<void *>(that, fieldBase + catalina ? 0x40 : 0x50) = samu;
 
         auto *vce = OSObject::operator new(0x258);
         callback->orgPolarisVCEEngineConstructor(vce);
-        getMember<void *>(that, 0x3E8) = vce;
+        getMember<void *>(that, fieldBase + catalina ? 0x28 : 0x38) = vce;
 
     } else {
         PANIC("x4000", "Using Polaris/VI logic on unsupported ASIC!");

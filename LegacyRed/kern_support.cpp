@@ -3,6 +3,7 @@
 
 #include "kern_support.hpp"
 #include "kern_lred.hpp"
+#include "kern_model.hpp"
 #include "kern_patches.hpp"
 #include <Headers/kern_api.hpp>
 
@@ -74,5 +75,14 @@ bool Support::wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkCont
 bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] uint32_t reg,
     [[maybe_unused]] bool retryOnFail) {
     DBGLOG("support", "TestVRAM called! Returning true");
+    auto *model = getBranding(LRed::callback->deviceId,
+        WIOKit::readPCIConfigValue(LRed::callback->iGPU, WIOKit::kIOPCIConfigRevisionID));
+    if (model) {
+        auto len = static_cast<uint32_t>(strlen(model) + 1);
+        LRed::callback->iGPU->setProperty("model", const_cast<char *>(model), len);
+        LRed::callback->iGPU->setProperty("ATY,FamilyName", const_cast<char *>("Radeon"), 7);
+        LRed::callback->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11,
+            len - 11); /** TODO: Figure out if this works on LRed or not */
+    }
     return true;
 }

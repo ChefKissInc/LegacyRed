@@ -1,7 +1,4 @@
-//  Copyright © 2022 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
-//  details.
-
-//  Copyright © 2023 Zormeister. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  Copyright © 2022-2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
 #ifndef kern_amd_hpp
@@ -15,12 +12,20 @@ using t_pspLoadExtended = uint32_t (*)(void *, uint64_t, uint64_t, const void *,
 constexpr uint32_t AMDGPU_FAMILY_CZ = 0x87;
 constexpr uint32_t AMDGPU_FAMILY_KV = 0x7D;
 
-// asicRevision definitions, source:
-// https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/amd/amdgpu/cik.c#L2019
-
 constexpr uint32_t PPSMC_MSG_GetSmuVersion = 0x2;
 constexpr uint32_t PPSMC_MSG_PowerUpSdma = 0xE;
 constexpr uint32_t PPSMC_MSG_PowerGateMmHub = 0x35;
+// applies to Carrizo
+constexpr uint16_t PPSMC_MSG_UVDPowerOff = 0x7;
+constexpr uint16_t PPSMC_MSG_UVDPowerOn = 0x8;
+constexpr uint16_t PPSMC_MSG_VCEPowerOff = 0x9;
+constexpr uint16_t PPSMC_MSG_VCEPowerOn = 0xA;
+constexpr uint16_t PPSMC_MSG_ACPPowerOff = 0xB;
+constexpr uint16_t PPSMC_MSG_ACPPowerOn = 0xC;
+constexpr uint16_t PPSMC_MSG_SDMAPowerOff = 0xD;
+constexpr uint16_t PPSMC_MSG_SDMAPowerOn = 0xE;
+constexpr uint16_t PPSMC_MSG_XDMAPowerOff = 0xF;
+constexpr uint16_t PPSMC_MSG_XDMAPowerOn = 0x10;
 
 constexpr uint32_t GFX_FW_TYPE_CP_MEC = 5;
 constexpr uint32_t GFX_FW_TYPE_CP_MEC_ME2 = 6;

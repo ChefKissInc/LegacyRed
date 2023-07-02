@@ -92,14 +92,6 @@ void LRed::processPatcher(KernelPatcher &patcher) {
         static uint8_t builtin[] = {0x01};
         this->iGPU->setProperty("built-in", builtin, arrsize(builtin));
         this->deviceId = WIOKit::readPCIConfigValue(this->iGPU, WIOKit::kIOPCIConfigDeviceID);
-        auto *model = getBranding(this->deviceId, WIOKit::readPCIConfigValue(iGPU, WIOKit::kIOPCIConfigRevisionID));
-        if (model) {
-            auto len = static_cast<uint32_t>(strlen(model) + 1);
-            this->iGPU->setProperty("model", const_cast<char *>(model), len);
-            this->iGPU->setProperty("ATY,FamilyName", const_cast<char *>("Radeon"), 7);
-            this->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11,
-                len - 11); /** TODO: Figure out if this works on LRed or not */
-        }
 
         if (UNLIKELY(this->iGPU->getProperty("ATY,bin_image"))) {
             DBGLOG("lred", "VBIOS manually overridden");
@@ -334,8 +326,19 @@ void LRed::setRMMIOIfNecessary() {
             default:
                 PANIC("lred", "Unknown device ID: %x", deviceId);
         }
+        DBGLOG_COND(this->isGCN3, "lred", "iGPU is GCN 3 derivative");
+        int PGOff = 1;
+        if (this->chipType < ChipType::Carrizo) {
+            //  https://github.com/torvalds/linux/blob/master/drivers/gpu/drm/amd/amdgpu/cik.c#L2078
+            this->iGPU->setProperty("CAIL_DisableAcpPowerGating", PGOff, 0);
+            this->iGPU->setProperty("CAIL_DisableDrmdmaPowerGating", PGOff, 0);
+            this->iGPU->setProperty("CAIL_DisableDynamicGfxMGPowerGating", PGOff, 0);
+            this->iGPU->setProperty("CAIL_DisableGfxCGPowerGating", PGOff, 0);
+            this->iGPU->setProperty("CAIL_DisableGmcPowerGating", PGOff, 0);
+            this->iGPU->setProperty("CAIL_DisableSAMUPowerGating", PGOff, 0);
+            if (this->chipType > ChipType::Kaveri) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
+        };
     }
-    DBGLOG_COND(this->isGCN3, "lred", "iGPU is GCN 3 derivative");
 }
 
 void LRed::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
