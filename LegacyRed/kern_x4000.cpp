@@ -145,7 +145,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
     DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
     if (LRed::callback->isGCN3) {
         auto catalina = getKernelVersion() == KernelVersion::Catalina;
-        auto fieldBase = catalina ? 0x340 : 0x3B0;
+        auto fieldBase = catalina ? 0x340 : 0x3A0;
 
         auto *pm4 = OSObject::operator new(0x198);
         callback->orgBaffinPM4EngineConstructor(pm4);

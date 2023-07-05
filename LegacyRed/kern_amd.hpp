@@ -101,16 +101,6 @@ struct RlcFwHeaderV2_1 : public CommonFirmwareHeader {
     uint32_t saveRestoreListSrmOff;
 } PACKED;
 
-struct PspFwLegacyBinDesc {
-    uint32_t fwVer;
-    uint32_t off;
-    uint32_t size;
-} PACKED;
-
-struct PspTaFwHeaderV1 : public CommonFirmwareHeader {
-    PspFwLegacyBinDesc xgmi, ras, hdcp, dtm, securedisplay;
-} PACKED;
-
 struct GcFwConstant {
     const char *firmwareVer;
     uint32_t featureVer, size;

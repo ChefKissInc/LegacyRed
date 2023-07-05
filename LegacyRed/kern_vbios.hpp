@@ -128,6 +128,39 @@ struct ATOMSrcDstTable {
     uint16_t usDstObjectID[1];
 } PACKED;
 
+struct ATOMObjHeader : public ATOMCommonTableHeader {
+    uint16_t deviceSupport;
+    uint16_t connectorObjectTableOffset;
+    uint16_t routerObjectTableOffset;
+    uint16_t encoderObjectTableOffset;
+    uint16_t protectionObjectTableOffset;
+    uint16_t displayPathTableOffset;
+} PACKED;
+
+struct ATOMDispObjPath {
+    uint16_t deviceTag;
+    uint16_t size;
+    uint16_t connObjectId;
+    uint16_t GPUObjectId;
+    uint16_t graphicObjIds[];
+} PACKED;
+
+struct ATOMObjHeader_V3 : public ATOMObjHeader {
+    uint16_t miscObjectTableOffset;
+} PACKED;
+
+struct ATOMDispObjPath_V2 {
+  uint16_t displayObjId;
+  uint16_t dispRecordOffset;
+  uint16_t encoderObjId;
+  uint16_t extEncoderObjId;
+  uint16_t encoderRecordOffset;
+  uint16_t extEncoderRecordOffset;
+  uint16_t deviceTag;
+  uint8_t  priorityId;
+  uint8_t  reserved;
+};
+
 // Above new ATOM structs are for later.
 
 #endif /* kern_vbios_hpp */
