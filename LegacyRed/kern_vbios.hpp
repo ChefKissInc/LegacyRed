@@ -150,15 +150,15 @@ struct ATOMObjHeader_V3 : public ATOMObjHeader {
 } PACKED;
 
 struct ATOMDispObjPath_V2 {
-  uint16_t displayObjId;
-  uint16_t dispRecordOffset;
-  uint16_t encoderObjId;
-  uint16_t extEncoderObjId;
-  uint16_t encoderRecordOffset;
-  uint16_t extEncoderRecordOffset;
-  uint16_t deviceTag;
-  uint8_t  priorityId;
-  uint8_t  reserved;
+    uint16_t displayObjId;
+    uint16_t dispRecordOffset;
+    uint16_t encoderObjId;
+    uint16_t extEncoderObjId;
+    uint16_t encoderRecordOffset;
+    uint16_t extEncoderRecordOffset;
+    uint16_t deviceTag;
+    uint8_t priorityId;
+    uint8_t reserved;
 };
 
 // Above new ATOM structs are for later.

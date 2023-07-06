@@ -29,7 +29,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
 
         switch (LRed::callback->chipVariant) {
-            case (ChipVariant::s2CU): {
+            case ChipVariant::s2CU: {
                 SolveRequestPlus solveRequests[] = {
                     {"_STONEY_GoldenSettings_A0_2CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
                     {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
@@ -51,8 +51,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             }
             case ChipVariant::Bristol: {
                 SolveRequestPlus solveRequests[] = {
-                    {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
-                    {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
+                    {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
+                    {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
@@ -61,15 +61,16 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             }
             default: {
                 SolveRequestPlus solveRequests[] = {
-                    {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kabini)]},
-                    {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kabini)]},
-                    {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Mullins)]},
-                    {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Mullins)]},
-                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kaveri)]},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Kaveri)]},
+                    {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)]},
+                    {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kalindi)]},
+                    {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Godavari)]},
+                    {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Godavari)]},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)]},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spectre)]},
                     {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
                     {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                     /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
+                    // Spooky has no DDI caps or GoldenSettings in X4000HWLibs, research required
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
@@ -85,7 +86,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
             {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
             {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
-            {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc},
+            {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc, LRed::callback->chipType < ChipType::Carrizo},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
             "Failed to resolve symbols");

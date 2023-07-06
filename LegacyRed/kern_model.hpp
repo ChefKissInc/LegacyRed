@@ -16,7 +16,7 @@ struct DevicePair {
     size_t modelNum;
 };
 
-// Kaveri
+// Kaveri/Spectre/Spooky
 
 static constexpr Model dev1309[] = {
     {0x00, "AMD Radeon R7 Graphics"},
@@ -77,7 +77,7 @@ static constexpr Model dev131B[] = {
     {0x00, "AMD Radeon R4 Graphics"},
 };
 
-// Kabini
+// Kabini/Kalindi
 
 static constexpr Model dev9830[] = {
     {0x00, "AMD Radeon HD 8400 / R3 Series"},
@@ -123,7 +123,7 @@ static constexpr Model dev983D[] = {
     {0x00, "AMD Radeon HD 8250"},
 };
 
-// Mullins
+// Mullins/Godavari
 
 static constexpr Model dev9850[] = {
     {0x00, "AMD Radeon R3 Graphics"},

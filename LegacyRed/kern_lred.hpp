@@ -19,20 +19,28 @@ class EXPORT PRODUCT_NAME : public IOService {
     bool start(IOService *provider) override;
 };
 
+// GFX core codenames
 enum struct ChipType : uint32_t {
-    Kaveri = 0,
-    Kabini,
-    Mullins,
+    Spectre = 0,    // Kaveri
+    Spooky,         // Kaveri 2? downgraded from Spectre core
+    Kalindi,        // Kabini/Bhavani
+    Godavari,       // Mullins
     Carrizo,
     Stoney,
     Unknown,
 };
 
+// Front-end consumer names, includes non-consumer names as-well
 enum struct ChipVariant : uint32_t {
+    Kaveri = 0,
+    Kabini,
+    Temash,
+    Bhavani,
+    Mullins,
     s2CU,    // s2CU && s3CU have different Golden Settings
     s3CU,
     Bristol,    // Bristol is acctually just a Carrizo+, hence why it isn't in ChipType
-    Normal,
+    Unknown,
 };
 
 // Hack
@@ -203,10 +211,8 @@ class LRed {
 
     OSData *vbiosData {nullptr};
     ChipType chipType = ChipType::Unknown;
-    ChipVariant chipVariant = ChipVariant::Normal;
+    ChipVariant chipVariant = ChipVariant::Unknown;
     bool isGCN3 = false;
-    bool isMullins = false;
-    bool isKabini = false;
     uint64_t fbOffset {0};
     IOMemoryMap *rmmio {nullptr};
     volatile uint32_t *rmmioPtr {nullptr};

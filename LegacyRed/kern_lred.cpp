@@ -206,13 +206,15 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x131D:
                 if (this->deviceId == 0x1312 || this->deviceId == 0x1316 || this->deviceId == 0x1317) {
-                    this->chipType = ChipType::Kaveri;
-                    DBGLOG("lred", "Chip type is Kaveri");
+                    this->chipType = ChipType::Spooky;
+                    this->chipVariant = ChipVariant::Kaveri;
+                    DBGLOG("lred", "Chip type is Spooky, Chip variant is Kaveri");
                     this->enumeratedRevision = 0x41;
                     break;
                 }
-                this->chipType = ChipType::Kaveri;
-                DBGLOG("lred", "Chip type is Kaveri");
+                this->chipType = ChipType::Spectre;
+                this->chipVariant = ChipVariant::Kaveri;
+                DBGLOG("lred", "Chip type is Spectre, Chip variant is Kaveri");
                 this->enumeratedRevision = 0x1;
                 break;
             case 0x9830:
@@ -237,64 +239,66 @@ void LRed::setRMMIOIfNecessary() {
                 [[fallthrough]];
             case 0x983D:
                 if (this->revision == 0x00) {
-                    this->chipType = ChipType::Kabini;
-                    this->isKabini = true;
-                    DBGLOG("lred", "Chip type is Kabini");
+                    this->chipType = ChipType::Kalindi;
+                    this->chipVariant = ChipVariant::Kabini;
+                    DBGLOG("lred", "Chip type is Kalindi, Chip variant is Kabini");
                     this->enumeratedRevision = 0x81;
                     break;
                 } else if (this->revision == 0x01) {
-                    this->chipType = ChipType::Kabini;
-                    this->isKabini = true;
-                    DBGLOG("lred", "Chip type is Kabini");
+                    this->chipType = ChipType::Kalindi;
+                    this->chipVariant = ChipVariant::Kabini;
+                    DBGLOG("lred", "Chip type is Kalindi, Chip variant is Kabini");
                     this->enumeratedRevision = 0x82;
                     break;
                 } else if (this->revision == 0x02) {
-                    this->chipType = ChipType::Kabini;
-                    this->isKabini = true;
-                    DBGLOG("lred", "Chip type is Kabini");
+                    this->chipType = ChipType::Kalindi;
+                    this->chipVariant = ChipVariant::Bhavani;
+                    DBGLOG("lred", "Chip type is Kabini, Chip variant is Bhavani");
                     this->enumeratedRevision = 0x85;
                     break;
                 }
                 break;
             case 0x9850:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
-                DBGLOG("lred", "Chip type is Mullins");
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9851:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
-                DBGLOG("lred", "Chip type is Mullins");
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9852:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
-                DBGLOG("lred", "Chip type is Mullins");
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9853:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9854:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9855:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
-                DBGLOG("lred", "Chip type is Mullins");
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9856:
-                this->chipType = ChipType::Mullins;
-                this->isMullins = true;
+                this->chipType = ChipType::Godavari;
+                this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
-                DBGLOG("lred", "Chip type is Mullins");
+                DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9874:
                 this->chipType = ChipType::Carrizo;
@@ -336,7 +340,7 @@ void LRed::setRMMIOIfNecessary() {
             this->iGPU->setProperty("CAIL_DisableGfxCGPowerGating", PGOff, 0);
             this->iGPU->setProperty("CAIL_DisableGmcPowerGating", PGOff, 0);
             this->iGPU->setProperty("CAIL_DisableSAMUPowerGating", PGOff, 0);
-            if (this->chipType > ChipType::Kaveri) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
+            if (this->chipType > ChipType::Spectre) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
         };
     }
 }
