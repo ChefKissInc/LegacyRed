@@ -76,6 +76,8 @@ struct AGDCValidateDetailedTiming_t {
     uint16_t padding3[2];
 };
 
+struct AtomConnectorInfo; // Needs more reversing, here as a place holder
+
 class Support {
     public:
     static Support *callback;
@@ -85,11 +87,13 @@ class Support {
     private:
     mach_vm_address_t orgPopulateDeviceMemory {0};
     mach_vm_address_t orgNotifyLinkChange {0};
+    mach_vm_address_t orgGetAtomConnectorInfo {0};
 
     static bool wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkControlEvent_t event, void *eventData,
         uint32_t eventFlags);
     static bool doNotTestVram(IOService *ctrl, uint32_t reg, bool retryOnFail);
     static IOReturn wrapPopulateDeviceMemory(void *that, uint32_t reg);
+    static IOReturn wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomConnectorInfo *coninfo);
 };
 
 #endif /* kern_support_hpp */

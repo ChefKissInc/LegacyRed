@@ -30,6 +30,8 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
             {"__ZN16AtiDeviceControl16notifyLinkChangeE31kAGDCRegisterLinkControlEvent_tmj", wrapNotifyLinkChange,
                 orgNotifyLinkChange},
             {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
+            {"__ZN30AtiObjectInfoTableInterface_V120getAtomConnectorInfoEjRNS_17AtomConnectorInfoE",
+                wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
             "Failed to route symbols");
@@ -85,4 +87,11 @@ bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] u
             len - 11); /** TODO: Figure out if this works on LRed or not */
     }
     return true;
+}
+
+IOReturn Support::wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomConnectorInfo *coninfo) {
+    DBGLOG("support", "getAtomConnectorInfo: connector %x", connector);
+    auto ret = FunctionCast(wrapGetAtomConnectorInfo, callback->orgGetAtomConnectorInfo)(that, connector, coninfo);
+    DBGLOG("support", "getAtomConnectorInfo: returned %x", ret);
+    return ret;
 }
