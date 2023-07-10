@@ -84,7 +84,9 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
 }
 
 uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
-    return FunctionCast(wrapHwReadReg32, callback->orgHwReadReg32)(that, reg == 0xD31 ? 0xD2F : reg);
+    DBGLOG("gfxcon", "readReg32: reg: %x", reg);
+    // here for short-term debugging
+    return FunctionCast(wrapHwReadReg32, callback->orgHwReadReg32)(that, reg);
 }
 
 uint16_t GFXCon::wrapGetFamilyId(void) {
@@ -95,10 +97,10 @@ uint16_t GFXCon::wrapGetFamilyId(void) {
 
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
-    getMember<uint32_t>(that, 0x40) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
-    getMember<uint32_t>(that, 0x44) = LRed::callback->deviceId;
-    getMember<uint16_t>(that, 0x48) = LRed::callback->revision;
-    getMember<uint32_t>(that, 0x4c) =
+    getMember<uint32_t>(that, 0x38) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    getMember<uint32_t>(that, 0x3C) = LRed::callback->deviceId;
+    //getMember<uint16_t>(that, 0x40) = LRed::callback->revision;
+    getMember<uint32_t>(that, 0x44) =
         ((LRed::callback->chipVariant == ChipVariant::Kabini) ||
             (LRed::callback->chipVariant == ChipVariant::Bhavani)) ?
             static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
