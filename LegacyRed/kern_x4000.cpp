@@ -75,7 +75,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
             {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
-                wrapGetHWChannel, this->orgGetHWChannel, LRed::callback->chipType == ChipType::Stoney},
+                wrapGetHWChannel, this->orgGetHWChannel, useGcn4AndPatchLogic},
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15configureDeviceEP11IOPCIDevice", wrapConfigureDevice,
                 this->orgConfigureDevice},
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator14initLinkToPeerEPKc", wrapInitLinkToPeer,
@@ -210,5 +210,6 @@ IOService *X4000::wrapInitLinkToPeer(void *that, const char *matchCategoryName) 
 
 char *X4000::forceX4000HWLibs() {
     DBGLOG("hwservices", "Forcing HWServices to load X4000HWLibs");
+    // By default, X4000HWServices on CI loads X4050HWLibs, we override this here
     return "Load4000";
 }

@@ -37,11 +37,14 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
     if (kextRadeonGFX7Con.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
         auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+        auto regDbg = checkKernelArgument("-lredregdbg");
 
         RouteRequestPlus requests[] = {
             {"__ZN18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
             {"__ZNK18CISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
-            {"__ZN17CIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
+            {"__ZN17CIRegisterService10hwReadReg8Ej", wrapHwReadReg8, this->orgHwReadReg8, regDbg},
+            {"__ZN17CIRegisterService11hwReadReg16Ej", wrapHwReadReg16, this->orgHwReadReg16, regDbg},
+            {"__ZN17CIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32, regDbg},
             {"__ZN13ASIC_INFO__CI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
                 !highsierra},
         };
@@ -52,11 +55,14 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
     } else if (kextRadeonGFX8Con.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
         auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+        auto regDbg = checkKernelArgument("-lredregdbg");
 
         RouteRequestPlus requests[] = {
             {"__ZN18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, highsierra},
             {"__ZNK18VISharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
-            {"__ZN17VIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
+            {"__ZN17VIRegisterService10hwReadReg8Ej", wrapHwReadReg8, this->orgHwReadReg8, regDbg},
+            {"__ZN17VIRegisterService11hwReadReg16Ej", wrapHwReadReg16, this->orgHwReadReg16, regDbg},
+            {"__ZN17VIRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32, regDbg},
             {"__ZN13ASIC_INFO__VI18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
                 !highsierra},
         };
@@ -67,10 +73,13 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
     } else if (kextRadeonPolarisCon.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
         auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
+        auto regDbg = checkKernelArgument("-lredregdbg");
 
         RouteRequestPlus requests[] = {
             {"__ZNK22BaffinSharedController11getFamilyIdEv", wrapGetFamilyId, orgGetFamilyId, !highsierra},
-            {"__ZN21BaffinRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32},
+            {"__ZN21BaffinRegisterService10hwReadReg8Ej", wrapHwReadReg8, this->orgHwReadReg8, regDbg},
+            {"__ZN21BaffinRegisterService11hwReadReg16Ej", wrapHwReadReg16, this->orgHwReadReg16, regDbg},
+            {"__ZN21BaffinRegisterService11hwReadReg32Ej", wrapHwReadReg32, this->orgHwReadReg32, regDbg},
             {"__ZN17ASIC_INFO__BAFFIN18populateDeviceInfoEv", wrapPopulateDeviceInfo, this->orgPopulateDeviceInfo,
                 !highsierra},
         };
@@ -83,9 +92,21 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
     return false;
 }
 
+uint8_t GFXCon::wrapHwReadReg8(void *that, uint8_t reg) {
+    DBGLOG("gfxcon", "readReg8: reg: %x", reg);
+    // turned on by using -lredregdbg
+    return FunctionCast(wrapHwReadReg8, callback->orgHwReadReg8)(that, reg);
+}
+
+uint16_t GFXCon::wrapHwReadReg16(void *that, uint16_t reg) {
+    DBGLOG("gfxcon", "readReg16: reg: %x", reg);
+    // turned on by using -lredregdbg
+    return FunctionCast(wrapHwReadReg16, callback->orgHwReadReg16)(that, reg);
+}
+
 uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
     DBGLOG("gfxcon", "readReg32: reg: %x", reg);
-    // here for short-term debugging
+    // turned on by using -lredregdbg
     return FunctionCast(wrapHwReadReg32, callback->orgHwReadReg32)(that, reg);
 }
 
@@ -101,8 +122,8 @@ IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     getMember<uint32_t>(that, 0x3C) = LRed::callback->deviceId;
     //getMember<uint16_t>(that, 0x40) = LRed::callback->revision;
     getMember<uint32_t>(that, 0x44) =
-        ((LRed::callback->chipVariant == ChipVariant::Kabini) ||
-            (LRed::callback->chipVariant == ChipVariant::Bhavani)) ?
+        // why ChipType instead of ChipVariant? - For mullins we set it as 'Godavari', which is technically just Kalindi+, by the looks of AMDGPU code
+        ((LRed::callback->chipType == ChipType::Kalindi)) ?
             static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
             static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;    // rough guess
     return ret;

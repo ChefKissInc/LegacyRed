@@ -236,4 +236,4 @@ class LRed {
         int *validated_p, int *tainted_p, int *nx_p);
 };
 
-#endif /* AMDRadeonX6000_hpp */
+#endif /* kern_lred_hpp */
