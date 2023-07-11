@@ -92,6 +92,7 @@ bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] u
 IOReturn Support::wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomConnectorInfo *coninfo) {
     auto connectorCount = getMember<uint32_t>(that, 0x10);
     DBGLOG("support", "getAtomConnectorInfo: connector %x, connectorCount: %x", connector, connectorCount);
+    (void)connectorCount;
     auto ret = FunctionCast(wrapGetAtomConnectorInfo, callback->orgGetAtomConnectorInfo)(that, connector, coninfo);
     DBGLOG("support", "getAtomConnectorInfo: returned %x", ret);
     return ret;
