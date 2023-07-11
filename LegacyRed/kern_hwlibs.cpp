@@ -27,7 +27,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-
+        
+        // The pains of supporting more than two iGPU generations
         switch (LRed::callback->chipVariant) {
             case ChipVariant::s2CU: {
                 SolveRequestPlus solveRequests[] = {
@@ -61,16 +62,18 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             }
             default: {
                 SolveRequestPlus solveRequests[] = {
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)]},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spectre)]},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spooky)]},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spooky)]},
                     {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)]},
                     {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kalindi)]},
                     {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Godavari)]},
                     {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Godavari)]},
-                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)]},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spectre)]},
                     {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
                     {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                     /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
-                    // Spooky has no DDI caps or GoldenSettings in X4000HWLibs, research required
+                    // Spooky has no DDI caps or GoldenSettings, uses Spectre on AMDGPU so that's what we'll use
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
