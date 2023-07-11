@@ -27,7 +27,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
         const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
-        
+
         // The pains of supporting more than two iGPU generations
         switch (LRed::callback->chipVariant) {
             case ChipVariant::s2CU: {

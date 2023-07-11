@@ -32,6 +32,8 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
             {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
             {"__ZN30AtiObjectInfoTableInterface_V120getAtomConnectorInfoEjRNS_17AtomConnectorInfoE",
                 wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo},
+            {"__ZN30AtiObjectInfoTableInterface_V121getNumberOfConnectorsEv", wrapGetNumberOfConnectors,
+                orgGetNumberOfConnectors},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
             "Failed to route symbols");
@@ -90,10 +92,14 @@ bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] u
 }
 
 IOReturn Support::wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomConnectorInfo *coninfo) {
-    auto connectorCount = getMember<uint32_t>(that, 0x10);
-    DBGLOG("support", "getAtomConnectorInfo: connector %x, connectorCount: %x", connector, connectorCount);
-    (void)connectorCount;
+    DBGLOG("support", "getAtomConnectorInfo: connector %x", connector);
     auto ret = FunctionCast(wrapGetAtomConnectorInfo, callback->orgGetAtomConnectorInfo)(that, connector, coninfo);
     DBGLOG("support", "getAtomConnectorInfo: returned %x", ret);
+    return ret;
+}
+
+uint32_t Support::wrapGetNumberOfConnectors(void *that) {
+    auto ret = FunctionCast(wrapGetNumberOfConnectors, callback->orgGetNumberOfConnectors)(that);
+    DBGLOG("support", "getNumberOfConnectors returned: %x", ret);
     return ret;
 }
