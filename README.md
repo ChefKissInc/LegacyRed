@@ -6,6 +6,8 @@ The Source Code of this Derivative Work is licensed under the `Thou Shalt Not Pr
 
 Thanks to [Acidanthera](https://github.com/acidanthera) for the [WhateverGreen](https://github.com/acidanthera/WhateverGreen) kern_agdc code used in kern_support
 
+You almost certainly need to [add this custom lilu build to your system](https://github.com/Zorm-Industries/Lilu) to avoid kernel panics on 'No iGPU' as for some reason, Lilu's quirk **fails to trigger on older systems**
+
 ## FAQ
 
 ### Which iGPUs does this kext support?
@@ -22,4 +24,17 @@ Great news, FB-Only is confirmed to work on Kabini and Kaveri APUs, the Accelera
 
 ### On which macOS versions am I able to use this on?
 
-Big Sur.
+I/We plan to support as old High Sierra
+
+Now for Ventura and onwards we run into a problem
+
+Fiji, Tonga, Hawaii and Bonaire got dropped by macOS, so how do we support them all?
+Unfortunately for Kaveri, Kabini and Mullins, this is where your support ends.
+I/We do NOT condone using OCLP and any issues filed and encountered while using it will be disregarded.
+
+Stoney **will** be worked on for Ventura, as we use Ellesmere logic for it
+
+Now what about Carrizo?
+Since Fiji got dropped, we're going to have to workaround a lot of the Ellesmere logic, it will take time, but in the end, it could be possible
+
+For now, we only test using Big Sur.
