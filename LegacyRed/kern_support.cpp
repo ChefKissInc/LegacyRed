@@ -108,7 +108,7 @@ uint32_t Support::wrapGetNumberOfConnectors(void *that) {
     auto ret = FunctionCast(wrapGetNumberOfConnectors, callback->orgGetNumberOfConnectors)(that);
     DBGLOG("support", "getNumberOfConnectors returned: %x", ret);
     unsigned int conCountOverride;
-    if (PE_parse_boot_argn("lredconoverride", &conCountOverride, sizeof(conCountOverride)) != 0) {
+    if (conCountOverride = PE_parse_boot_argn("lredconoverride", &conCountOverride, sizeof(conCountOverride)) != 0) {
         // temporary fix for my main machine, still needs to be fixed, but, here for now.
         // AtomConnectorInfo should have all we need in the future.
         DBGLOG("support", "Connector Count override selected, using a count of %x", conCountOverride);
