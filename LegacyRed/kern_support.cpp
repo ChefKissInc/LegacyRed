@@ -81,12 +81,18 @@ bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] u
     DBGLOG("support", "TestVRAM called! Returning true");
     auto *model = getBranding(LRed::callback->deviceId,
         WIOKit::readPCIConfigValue(LRed::callback->iGPU, WIOKit::kIOPCIConfigRevisionID));
+    // Why do we set it here?
+    // Our controller kexts override it, and since TestVRAM is later on after the controllers have started up, it's
+    // desirable to do it here rather than later
     if (model) {
         auto len = static_cast<uint32_t>(strlen(model) + 1);
         LRed::callback->iGPU->setProperty("model", const_cast<char *>(model), len);
-        LRed::callback->iGPU->setProperty("ATY,FamilyName", const_cast<char *>("Radeon"), 7);
-        LRed::callback->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11,
-            len - 11); /** TODO: Figure out if this works on LRed or not */
+        if (LRed::callback->chipType >= ChipType::Carrizo) {
+            // ATY,FamilyName and ATY,DeviceName appears to only be set on Polaris+? confirmation needed
+            LRed::callback->iGPU->setProperty("ATY,FamilyName", const_cast<char *>("Radeon"), 7);
+            LRed::callback->iGPU->setProperty("ATY,DeviceName", const_cast<char *>(model) + 11,
+                len - 11); /** TODO: Figure out if this works on LRed or not */
+        }
     }
     return true;
 }
@@ -101,5 +107,13 @@ IOReturn Support::wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomC
 uint32_t Support::wrapGetNumberOfConnectors(void *that) {
     auto ret = FunctionCast(wrapGetNumberOfConnectors, callback->orgGetNumberOfConnectors)(that);
     DBGLOG("support", "getNumberOfConnectors returned: %x", ret);
+    unsigned int conCountOverride;
+    if (PE_parse_boot_argn("lredconoverride", &conCountOverride, sizeof(conCountOverride)) != 0) {
+        // temporary fix for my main machine, still needs to be fixed, but, here for now.
+        // AtomConnectorInfo should have all we need in the future.
+        DBGLOG("support", "Connector Count override selected, using a count of %x", conCountOverride);
+        getMember<unsigned int>(that, 0x10) = conCountOverride;
+        return conCountOverride;
+    }
     return ret;
 }

@@ -161,6 +161,54 @@ struct ATOMDispObjPath_V2 {
     uint8_t reserved;
 };
 
+// this is NOT the same as AtomConnectorInfo seen in AtiObjectInfoTableInterface_V1
+// as to how AtiObjectInfoTableInterface_V2's AtomConnectorInfo differs? I don't know exactly.
+struct AtomConnectorInfo_V2 {
+    uint16_t *atomObject;
+    uint16_t usConnObjectId;
+    uint16_t usGraphicObjIds;
+    uint8_t *hpdRecord;
+    uint8_t *i2cRecord;
+};
+
+struct Connector {
+    uint32_t type;
+    uint32_t flags;
+    uint16_t features;
+    uint16_t priority;
+    uint32_t reserved1;
+    uint8_t transmitter;
+    uint8_t encoder;
+    uint8_t hotplug;
+    uint8_t sense;
+    uint32_t reserved2;
+};
+// Made from analyzing AtiObjectInfoTableInterface_V1
+enum GraphObjectType : uint32_t {
+    GRAPH_OBJECT_TYPE_NONE = 0x0,
+    GRAPH_OBJECT_TYPE_GPU = 0x10,
+    GRAPH_OBJECT_TYPE_ENCODER = 0x20,
+    GRAPH_OBJECT_TYPE_CONNECTOR = 0x30,
+    GRAPH_OBJECT_TYPE_ROUTER = 0x40,
+    GRAPH_OBJECT_TYPE_DISPLAY_PATH = 0x60,
+    GRAPH_OBJECT_TYPE_GENERIC = 0x70,
+    // The formula found within V1 ANDs the Object Type with GRAPH_OBJECT_TYPE_GENERIC
+};
+
+struct GraphObjIdBits {
+    GraphObjectType objectType;
+};
+
+struct GraphObjId {
+    GraphObjIdBits bits;
+};
+// WIP.
+struct AtomConnectorInfo_V1 {
+    // A lot of data is still missing
+    GraphObjId grphObjId;
+    ATOMSrcDstTable srcDstTable;
+};
+
 // Above new ATOM structs are for later.
 
 #endif /* kern_vbios_hpp */
