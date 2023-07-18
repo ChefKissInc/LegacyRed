@@ -82,6 +82,27 @@ static bool checkAtomBios(const uint8_t *bios, size_t size) {
     return false;
 }
 
+/**
+ *  Console info structure, taken from osfmk/console/video_console.h
+ *  Last updated from XNU 4570.1.46.
+ */
+struct vc_info {
+    unsigned int v_height; /* pixels */
+    unsigned int v_width;  /* pixels */
+    unsigned int v_depth;
+    unsigned int v_rowbytes;
+    unsigned long v_baseaddr;
+    unsigned int v_type;
+    char v_name[32];
+    uint64_t v_physaddr;
+    unsigned int v_rows;         /* characters */
+    unsigned int v_columns;      /* characters */
+    unsigned int v_rowscanbytes; /* Actualy number of bytes used for display per row*/
+    unsigned int v_scale;
+    unsigned int v_rotate;
+    unsigned int v_reserved[3];
+};
+
 class LRed {
     friend class GFXCon;
     friend class HWLibs;
@@ -219,6 +240,7 @@ class LRed {
     uint32_t deviceId {0};
     uint16_t enumeratedRevision {0};
     uint16_t revision {0};
+    uint32_t currentFamilyId {0};
     IOPCIDevice *iGPU {nullptr};
 
     OSMetaClass *metaClassMap[4][2] = {{nullptr}};

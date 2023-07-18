@@ -176,6 +176,7 @@ void LRed::setRMMIOIfNecessary() {
 
         this->fbOffset = static_cast<uint64_t>(this->readReg32(0x296B)) << 24;
         this->revision = (this->readReg32(0xD2F) & 0xF000000) >> 0x18;
+        
         switch (this->deviceId) {
                 // Who thought it would be a good idea to use this many Device IDs and Revisions?
             case 0x1309:
@@ -205,6 +206,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x131C:
                 [[fallthrough]];
             case 0x131D:
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 if (this->deviceId == 0x1312 || this->deviceId == 0x1316 || this->deviceId == 0x1317) {
                     this->chipType = ChipType::Spooky;
                     this->chipVariant = ChipVariant::Kaveri;
@@ -238,6 +240,7 @@ void LRed::setRMMIOIfNecessary() {
             case 0x9839:
                 [[fallthrough]];
             case 0x983D:
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 if (this->revision == 0x00) {
                     this->chipType = ChipType::Kalindi;
                     this->chipVariant = ChipVariant::Kabini;
@@ -253,7 +256,7 @@ void LRed::setRMMIOIfNecessary() {
                 } else if (this->revision == 0x02) {
                     this->chipType = ChipType::Kalindi;
                     this->chipVariant = ChipVariant::Bhavani;
-                    DBGLOG("lred", "Chip type is Kabini, Chip variant is Bhavani");
+                    DBGLOG("lred", "Chip type is Kabini, Chip variant is Bhavani; using A1 DDI Caps for HWLibs");
                     this->enumeratedRevision = 0x85;
                     break;
                 }
@@ -262,42 +265,49 @@ void LRed::setRMMIOIfNecessary() {
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9851:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9852:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9853:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9854:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9855:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9856:
                 this->chipType = ChipType::Godavari;
                 this->chipVariant = ChipVariant::Mullins;
                 this->enumeratedRevision = 0xA1;
+                this->currentFamilyId = AMDGPU_FAMILY_KV;
                 DBGLOG("lred", "Chip type is Godavari, Chip variant is Mullins");
                 break;
             case 0x9874:
@@ -305,6 +315,7 @@ void LRed::setRMMIOIfNecessary() {
                 DBGLOG("lred", "Chip type is Carrizo");
                 this->isGCN3 = true;
                 this->enumeratedRevision = 0x1;
+                this->currentFamilyId = AMDGPU_FAMILY_CZ;
                 if ((this->revision >= 0xC8 && this->revision <= 0xCE) ||
                     (this->revision >= 0xE1 && this->revision <= 0xE6)) {
                     this->chipVariant = ChipVariant::Bristol;
@@ -315,6 +326,7 @@ void LRed::setRMMIOIfNecessary() {
                 this->chipType = ChipType::Stoney;
                 this->isGCN3 = true;
                 this->enumeratedRevision = 0x61;
+                this->currentFamilyId = AMDGPU_FAMILY_CZ;
                 DBGLOG("lred", "Chip type is Stoney");
                 /** R4 and up iGPUs have 3 compute units while the others have 2 CUs, hence the chip variations */
                 if (this->revision <= 0x81 || (this->revision >= 0xC0 && this->revision < 0xD0) ||
@@ -340,7 +352,7 @@ void LRed::setRMMIOIfNecessary() {
             this->iGPU->setProperty("CAIL_DisableGfxCGPowerGating", PGOff, 0);
             this->iGPU->setProperty("CAIL_DisableGmcPowerGating", PGOff, 0);
             this->iGPU->setProperty("CAIL_DisableSAMUPowerGating", PGOff, 0);
-            if (this->chipType > ChipType::Spectre) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
+            if (this->chipType > ChipType::Spooky) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
         };
     }
 }

@@ -23,61 +23,137 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
     if (kextRadeonX4000HWLibs.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
 
-        CailAsicCapEntry *orgAsicCapsTable = nullptr;
-        CailInitAsicCapEntry *orgAsicInitCapsTable = nullptr;
-        const void *goldenSettings[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
+        CAILAsicCapsEntry *orgCapsTable = nullptr;
+        CAILAsicCapsInitEntry *orgCapsInitTable = nullptr;
+        const void *goldenCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
 
+        
+
         // The pains of supporting more than two iGPU generations
-        switch (LRed::callback->chipVariant) {
-            case ChipVariant::s2CU: {
+        switch (LRed::callback->chipType) {
+            case ChipType::Spectre: {
+                auto needsECaps = (LRed::callback->deviceId >= 0x131B);
+
+
                 SolveRequestPlus solveRequests[] = {
-                    {"_STONEY_GoldenSettings_A0_2CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Set ASIC caps to Spectre");
+                break;
+            }
+            case ChipType::Spooky: {
+                auto needsECaps = (LRed::callback->deviceId >= 0x131B);
+
+
+                SolveRequestPlus solveRequests[] = {
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Set ASIC caps to Spectre");
+                break;
+            }
+            case ChipType::Kalindi: {
+                // Thanks AMD.
+                auto needsECaps = ((LRed::callback->deviceId == 0x9831) || (LRed::callback->deviceId == 0x9833) || (LRed::callback->deviceId == 0x9835) || (LRed::callback->deviceId == 0x9837) || (LRed::callback->deviceId == 0x9839));
+
+                switch (LRed::callback->enumeratedRevision) {
+                    case 0x81: {
+                        SolveRequestPlus solveRequests[] = {
+                            {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                        };
+                        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                            "Failed to resolve symbols");
+                        break;
+                    }
+                    case 0x82: {
+                        SolveRequestPlus solveRequests[] = {
+                            {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                        };
+                        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                            "Failed to resolve symbols");
+                        break;
+                    }
+                    case 0x85: {
+                        SolveRequestPlus solveRequests[] = {
+                            {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)]},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                        };
+                        PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                            "Failed to resolve symbols");
+                        break;
+                    }
+                }
+                break;
+            }
+            case ChipType::Godavari: {
+                // auto needsECaps = (LRed::callback->deviceId == 0x9851 );
+                // auto needsNoEyefinity = {LRed::callback->deviceId == 0x9855 && LRed::callback->pciRevision != 1}
+                // some of these need extra work, like grabbing pciRevision.
+
+                SolveRequestPlus solveRequests[] = {
+                    {"_CAIL_DDI_CAPS_GODAVARI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Godavari)]},
+                    {"_GODAVARI_GoldenSettings_A0_2411", goldenCaps[static_cast<uint32_t>(ChipType::Godavari)]},
+                };
+                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                        "Failed to resolve symbols");
+                DBGLOG("hwlibs", "Set ASIC Caps to Goadavari");
+                break;
+            }
+            case ChipType::Carrizo: {
+                // HWLibs uses A0 on Revision 0 hardware.
+                auto isRevZero = ((LRed::callback->revision + LRed::callback->enumeratedRevision) == 1); 
+                if (!isRevZero) {
+                    SolveRequestPlus solveRequests[] = {
+                        {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                        {"_CARRIZO_GoldenSettings_A1", goldenCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                    };
+                     PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                        "Failed to resolve symbols");
+                    DBGLOG("hwlibs", "Set ASIC Caps to Carrizo, variant A1");
+                    break;
+                } else {
+                    SolveRequestPlus solveRequests[] = {
+                        {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                        {"_CARRIZO_GoldenSettings_A0", goldenCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
+                    };
+                     PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                        "Failed to resolve symbols");
+                    DBGLOG("hwlibs", "Set ASIC Caps to Carrizo, variant A0");
+                    break;
+                }
+            }
+            case ChipType::Stoney: {
+                auto needs2cuSettings = (LRed::callback->chipVariant == ChipVariant::s2CU);
+
+                SolveRequestPlus solveRequests[] = {
+                    {"_STONEY_GoldenSettings_A0_2CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)], needs2cuSettings},
+                    {"_STONEY_GoldenSettings_A0_3CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)], !needs2cuSettings},
                     {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
-                DBGLOG("hwlibs", "Stoney ASIC is 2CU model");
-                break;
-            }
-            case ChipVariant::s3CU: {
-                SolveRequestPlus solveRequests[] = {
-                    {"_STONEY_GoldenSettings_A0_3CU", goldenSettings[static_cast<uint32_t>(ChipType::Stoney)]},
-                    {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
-                };
-                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                    "Failed to resolve symbols");
-                DBGLOG("hwlibs", "Stoney ASIC is 3CU model");
-                break;
-            }
-            case ChipVariant::Bristol: {
-                SolveRequestPlus solveRequests[] = {
-                    {"_CARRIZO_GoldenSettings_A1", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
-                    {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
-                };
-                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                    "Failed to resolve symbols");
-                DBGLOG("hwlibs", "Carrizo ASIC is Bristol Ridge model");
+                DBGLOG("hwlibs", "Set ASIC Caps to Stoney, needs2cuSettings: %x", needs2cuSettings);
                 break;
             }
             default: {
-                SolveRequestPlus solveRequests[] = {
-                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)]},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spectre)]},
-                    {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spooky)]},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenSettings[static_cast<uint32_t>(ChipType::Spooky)]},
-                    {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)]},
-                    {"_KALINDI_GoldenSettings_A0_4882", goldenSettings[static_cast<uint32_t>(ChipType::Kalindi)]},
-                    {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Godavari)]},
-                    {"_GODAVARI_GoldenSettings_A0_2411", goldenSettings[static_cast<uint32_t>(ChipType::Godavari)]},
-                    {"_CARRIZO_GoldenSettings_A0", goldenSettings[static_cast<uint32_t>(ChipType::Carrizo)]},
-                    {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
-                    /** Spectre appears to be another name for Kaveri, so that's the logic we'll use for it */
-                    // Spooky has no DDI caps or GoldenSettings, uses Spectre on AMDGPU so that's what we'll use
-                };
-                PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                    "Failed to resolve symbols");
-                DBGLOG("hwlibs", "Using Normal Golden Settings and DDI Caps");
+                PANIC("hwlibs", "ChipType not set!");
                 break;
             }
         }
@@ -87,8 +163,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 this->orgHawaiiPowerTuneConstructor, !LRed::callback->isGCN3},
             {"__ZN30AtiAppleTongaPowerTuneServicesC1EP11PP_InstanceP18PowerPlayCallbacks",
                 this->orgTongaPowerTuneConstructor, LRed::callback->isGCN3},
-            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgAsicCapsTable},
-            {"_CAILAsicCapsInitTable", orgAsicInitCapsTable},
+            {"__ZL20CAIL_ASIC_CAPS_TABLE", orgCapsTable},
+            {"_CAILAsicCapsInitTable", orgCapsInitTable},
             {"_CIslands_SendMsgToSmc", this->orgCISendMsgToSmc, LRed::callback->chipType < ChipType::Carrizo},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
@@ -110,15 +186,32 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
 
         PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "hwlibs",
             "Failed to enable kernel writing");
-        orgAsicInitCapsTable->familyId = orgAsicCapsTable->familyId =
-            LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
-        orgAsicInitCapsTable->deviceId = orgAsicCapsTable->deviceId = LRed::callback->deviceId;
-        orgAsicInitCapsTable->revision = orgAsicCapsTable->revision = LRed::callback->revision;
-        orgAsicInitCapsTable->emulatedRev = orgAsicCapsTable->emulatedRev =
-            static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;
-        orgAsicInitCapsTable->pciRev = orgAsicCapsTable->pciRev = 0xFFFFFFFF;
-        orgAsicInitCapsTable->caps = orgAsicCapsTable->caps = ddiCaps[static_cast<uint32_t>(LRed::callback->chipType)];
-        orgAsicInitCapsTable->goldenCaps = goldenSettings[static_cast<uint32_t>(LRed::callback->chipType)];
+
+        auto found = false;
+        auto targetDeviceId = LRed::callback->deviceId;
+        auto targetExtRev = ((LRed::callback->chipType == ChipType::Kalindi)) ? static_cast<uint32_t>(LRed::callback->enumeratedRevision) : static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;
+
+        while (orgCapsInitTable->deviceId != 0xFFFFFFFF) {
+            if (orgCapsInitTable->familyId == LRed::callback->currentFamilyId && orgCapsInitTable->deviceId == targetDeviceId) {
+                orgCapsInitTable->deviceId = LRed::callback->deviceId;
+                orgCapsInitTable->revision = LRed::callback->revision;
+                orgCapsInitTable->extRevision = static_cast<uint64_t>(targetExtRev);
+                orgCapsInitTable->pciRevision = 0xFFFFFFFF;
+                orgCapsInitTable->caps = ddiCaps[static_cast<uint32_t>(LRed::callback->chipType)];
+                orgCapsInitTable->goldenCaps = goldenCaps[static_cast<uint32_t>(LRed::callback->chipType)];
+                *orgCapsTable = {
+                    .familyId = LRed::callback->currentFamilyId,
+                    .deviceId = LRed::callback->deviceId,
+                    .revision = LRed::callback->revision,
+                    .extRevision = static_cast<uint32_t>(targetExtRev),
+                    .pciRevision = 0xFFFFFFFF,
+                    .caps = orgCapsInitTable->caps,
+                };
+                found = true;
+                break;
+            }
+            orgCapsInitTable++;
+        }
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
         DBGLOG("hwlibs", "Applied DDI Caps patches");
 

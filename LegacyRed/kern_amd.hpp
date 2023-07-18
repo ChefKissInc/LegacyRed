@@ -133,19 +133,19 @@ struct GPUInfoFirmware {
     uint32_t gcLdsSize;
 } PACKED;
 
-struct CailAsicCapEntry {
+struct CAILAsicCapsEntry {
     uint32_t familyId, deviceId;
-    uint32_t revision, emulatedRev;
-    uint32_t pciRev;
+    uint32_t revision, extRevision;
+    uint32_t pciRevision;
     uint32_t _reserved;
     const uint32_t *caps;
     const uint32_t *skeleton;
 } PACKED;
 
-struct CailInitAsicCapEntry {
+struct CAILAsicCapsInitEntry {
     uint64_t familyId, deviceId;
-    uint64_t revision, emulatedRev;
-    uint64_t pciRev;
+    uint64_t revision, extRevision;
+    uint64_t pciRevision;
     const uint32_t *caps;
     const void *goldenCaps;
 } PACKED;
