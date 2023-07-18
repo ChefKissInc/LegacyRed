@@ -28,8 +28,10 @@ void X4000::init() {
 bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonX4000HWServices.loadIndex == index) {
         bool useGcn3Logic = LRed::callback->isGCN3;
+        auto isStoney = (LRed::callback->chipType == ChipType::Stoney);
         RouteRequestPlus requests[] = {
             {"__ZN36AMDRadeonX4000_AMDRadeonHWServicesCI16getMatchPropertyEv", forceX4000HWLibs, !useGcn3Logic},
+            {"__ZN41AMDRadeonX4000_AMDRadeonHWServicesPolaris16getMatchPropertyEv", forceX4000HWLibs, isStoney},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "hwservices",
             "Failed to route symbols");
@@ -40,23 +42,23 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
          * reason, but Stoney can decode HEVC and so can Carrizo
          */
         bool useGcn3Logic = LRed::callback->isGCN3;
-        bool useGcn4AndPatchLogic = (LRed::callback->chipType == ChipType::Stoney);
+        auto isStoney = (LRed::callback->chipType == ChipType::Stoney);
 
         uint32_t *orgChannelTypes = nullptr;
         mach_vm_address_t startHWEngines = 0;
 
         SolveRequestPlus solveRequests[] = {
-            {"__ZN31AMDRadeonX4000_AMDBaffinPM4EngineC1Ev", this->orgBaffinPM4EngineConstructor, useGcn4AndPatchLogic},
-            {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor, useGcn4AndPatchLogic},
-            {"__ZN32AMDRadeonX4000_AMDUVD6v3HWEngineC1Ev", this->orgPolarisUVDEngineConstructor, useGcn4AndPatchLogic},
-            {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor, useGcn4AndPatchLogic},
-            {"__ZN32AMDRadeonX4000_AMDVCE3v4HWEngineC1Ev", this->orgPolarisVCEEngineConstructor, useGcn4AndPatchLogic},
+            {"__ZN31AMDRadeonX4000_AMDBaffinPM4EngineC1Ev", this->orgBaffinPM4EngineConstructor, isStoney},
+            {"__ZN30AMDRadeonX4000_AMDVIsDMAEngineC1Ev", this->orgGFX8SDMAEngineConstructor, isStoney},
+            {"__ZN32AMDRadeonX4000_AMDUVD6v3HWEngineC1Ev", this->orgPolarisUVDEngineConstructor, isStoney},
+            {"__ZN30AMDRadeonX4000_AMDVISAMUEngineC1Ev", this->orgGFX8SAMUEngineConstructor, isStoney},
+            {"__ZN32AMDRadeonX4000_AMDVCE3v4HWEngineC1Ev", this->orgPolarisVCEEngineConstructor, isStoney},
             {"__ZN28AMDRadeonX4000_AMDCIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware32setupAndInitializeHWCapabilitiesEv",
                 this->orgSetupAndInitializeHWCapabilities, useGcn3Logic},
             {"__ZZN37AMDRadeonX4000_AMDGraphicsAccelerator19createAccelChannelsEbE12channelTypes", orgChannelTypes,
-                useGcn4AndPatchLogic},
+                isStoney},
             {"__ZN26AMDRadeonX4000_AMDHardware14startHWEnginesEv", startHWEngines},
         };
         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "x4000",
@@ -65,17 +67,17 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
             {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines,
-                useGcn4AndPatchLogic},
+                isStoney},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN31AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities, (useGcn3Logic && !useGcn4AndPatchLogic)},
+                wrapSetupAndInitializeHWCapabilities, (useGcn3Logic && !isStoney)},
             {"__ZN35AMDRadeonX4000_AMDEllesmereHardware32setupAndInitializeHWCapabilitiesEv",
-                wrapSetupAndInitializeHWCapabilities, useGcn4AndPatchLogic},
+                wrapSetupAndInitializeHWCapabilities, isStoney},
             {"__ZN28AMDRadeonX4000_AMDCIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, !useGcn3Logic},
             {"__ZN28AMDRadeonX4000_AMDVIHardware20initializeFamilyTypeEv", wrapInitializeFamilyType, useGcn3Logic},
             {"__ZN26AMDRadeonX4000_AMDHardware12getHWChannelE20_eAMD_HW_ENGINE_TYPE18_eAMD_HW_RING_TYPE",
-                wrapGetHWChannel, this->orgGetHWChannel, useGcn4AndPatchLogic},
+                wrapGetHWChannel, this->orgGetHWChannel, isStoney},
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator15configureDeviceEP11IOPCIDevice", wrapConfigureDevice,
                 this->orgConfigureDevice},
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator14initLinkToPeerEPKc", wrapInitLinkToPeer,
@@ -88,7 +90,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "x4000",
             "Failed to route symbols");
 
-        if (useGcn4AndPatchLogic) {
+        if (isStoney) {
             PANIC_COND(MachInfo::setKernelWriting(true, KernelPatcher::kernelWriteLock) != KERN_SUCCESS, "x4000",
                 "Failed to enable kernel writing");
             /** TODO: Test this */
@@ -157,7 +159,7 @@ bool X4000::wrapAllocateHWEngines(void *that) {
 
         auto *uvd = OSObject::operator new(0x2F0);
         callback->orgPolarisUVDEngineConstructor(uvd);
-        getMember<void *>(that, fieldBase + catalina ? 0x18 : 0x28) = uvd;
+        getMember<void *>(that, fieldBase + (catalina ? 0x18 : 0x28)) = uvd;
 
         // I swear to god, this one infuriates me to no end, I love ghidra.
         auto *samu = OSObject::operator new(0x1D0);

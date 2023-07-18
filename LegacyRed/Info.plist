@@ -342,6 +342,27 @@
 				</dict>
 				<dict>
 					<key>CFBundleIdentifier</key>
+					<string>com.apple.kext.AMDRadeonX4000HWServices</string>
+					<key>IOClass</key>
+					<string>AMDRadeonX4000_AMDRadeonHWServicesPolaris</string>
+					<key>IOMatchCategory</key>
+					<string>AMDRadeonX4000HWServices</string>
+					<key>IOPCIMatch</key>
+					<string>0x98E41002</string>
+					<key>IOPCITunnelCompatible</key>
+					<true/>
+					<key>IOProbeScore</key>
+					<integer>65051</integer>
+					<key>IOPropertyMatch</key>
+					<dict>
+						<key>LoadHWServices</key>
+						<true/>
+					</dict>
+					<key>IOProviderClass</key>
+					<string>IOPCIDevice</string>
+				</dict>
+				<dict>
+					<key>CFBundleIdentifier</key>
 					<string>com.apple.kext.AMDRadeonX4000</string>
 					<key>GpuDebugPolicy</key>
 					<integer>-1</integer>
