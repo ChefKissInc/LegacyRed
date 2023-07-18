@@ -211,6 +211,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 break;
             }
             orgCapsInitTable++;
+            PANIC_COND(!found, "hwlibs", "Failed to find caps init table entry");
         }
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
         DBGLOG("hwlibs", "Applied DDI Caps patches");
