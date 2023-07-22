@@ -51,8 +51,10 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             "Failed to route symbols");
 
         LookupPatchPlus const patches[] = {
-            {&kextRadeonGFX7Con, kAsicInfoCIPopulateDeviceInfoOriginal, kAsicInfoCIPopulateDeviceInfoPatched, arrsize(kAsicInfoCIPopulateDeviceInfoOriginal), 1},
-            {&kextRadeonGFX7Con, kCISharedControllerGetFamilyIdOriginal, kCISharedControllerGetFamilyIdPatched, arrsize(kCISharedControllerGetFamilyIdOriginal), 1},
+            {&kextRadeonGFX7Con, kAsicInfoCIPopulateDeviceInfoOriginal, kAsicInfoCIPopulateDeviceInfoPatched,
+                arrsize(kAsicInfoCIPopulateDeviceInfoOriginal), 1},
+            {&kextRadeonGFX7Con, kCISharedControllerGetFamilyIdOriginal, kCISharedControllerGetFamilyIdPatched,
+                arrsize(kCISharedControllerGetFamilyIdOriginal), 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
@@ -74,8 +76,10 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             "Failed to route symbols");
 
         LookupPatchPlus const patches[] = {
-            {&kextRadeonGFX8Con, kAsicInfoVIPopulateDeviceInfoOriginal, kAsicInfoVIPopulateDeviceInfoPatched, arrsize(kAsicInfoVIPopulateDeviceInfoOriginal), 1},
-            {&kextRadeonGFX8Con, kVIBaffinSharedControllerGetFamilyIdOriginal, kVIBaffinSharedControllerGetFamilyIdPatched, arrsize(kVIBaffinSharedControllerGetFamilyIdOriginal), 1},
+            {&kextRadeonGFX8Con, kAsicInfoVIPopulateDeviceInfoOriginal, kAsicInfoVIPopulateDeviceInfoPatched,
+                arrsize(kAsicInfoVIPopulateDeviceInfoOriginal), 1},
+            {&kextRadeonGFX8Con, kVIBaffinSharedControllerGetFamilyIdOriginal,
+                kVIBaffinSharedControllerGetFamilyIdPatched, arrsize(kVIBaffinSharedControllerGetFamilyIdOriginal), 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
@@ -97,8 +101,10 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             "Failed to route symbols");
 
         LookupPatchPlus const patches[] = {
-            {&kextRadeonPolarisCon, kAsicInfoVIPopulateDeviceInfoOriginal, kAsicInfoVIPopulateDeviceInfoPatched, arrsize(kAsicInfoVIPopulateDeviceInfoOriginal), 1},
-            {&kextRadeonPolarisCon, kVIBaffinSharedControllerGetFamilyIdOriginal, kVIBaffinSharedControllerGetFamilyIdPatched, arrsize(kVIBaffinSharedControllerGetFamilyIdOriginal), 1},
+            {&kextRadeonPolarisCon, kAsicInfoVIPopulateDeviceInfoOriginal, kAsicInfoVIPopulateDeviceInfoPatched,
+                arrsize(kAsicInfoVIPopulateDeviceInfoOriginal), 1},
+            {&kextRadeonPolarisCon, kVIBaffinSharedControllerGetFamilyIdOriginal,
+                kVIBaffinSharedControllerGetFamilyIdPatched, arrsize(kVIBaffinSharedControllerGetFamilyIdOriginal), 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
