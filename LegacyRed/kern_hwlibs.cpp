@@ -28,19 +28,18 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         const void *goldenCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
         const uint32_t *ddiCaps[static_cast<uint32_t>(ChipType::Unknown)] = {nullptr};
 
-        
-
         // The pains of supporting more than two iGPU generations
         switch (LRed::callback->chipType) {
             case ChipType::Spectre: {
                 auto needsECaps = (LRed::callback->deviceId >= 0x131B);
 
-
                 SolveRequestPlus solveRequests[] = {
                     {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)],
+                        !needsECaps},
                     {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
-                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)],
+                        needsECaps},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
@@ -50,12 +49,13 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             case ChipType::Spooky: {
                 auto needsECaps = (LRed::callback->deviceId >= 0x131B);
 
-
                 SolveRequestPlus solveRequests[] = {
                     {"_CAIL_DDI_CAPS_SPECTRE_A0", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
-                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], !needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)],
+                        !needsECaps},
                     {"_CAIL_DDI_CAPS_SPECTRE_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
-                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)], needsECaps},
+                    {"_SPECTRE_GoldenSettings_A0_8812_E", goldenCaps[static_cast<uint32_t>(ChipType::Spectre)],
+                        needsECaps},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                     "Failed to resolve symbols");
@@ -64,15 +64,21 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             }
             case ChipType::Kalindi: {
                 // Thanks AMD.
-                auto needsECaps = ((LRed::callback->deviceId == 0x9831) || (LRed::callback->deviceId == 0x9833) || (LRed::callback->deviceId == 0x9835) || (LRed::callback->deviceId == 0x9837) || (LRed::callback->deviceId == 0x9839));
+                auto needsECaps = ((LRed::callback->deviceId == 0x9831) || (LRed::callback->deviceId == 0x9833) ||
+                                   (LRed::callback->deviceId == 0x9835) || (LRed::callback->deviceId == 0x9837) ||
+                                   (LRed::callback->deviceId == 0x9839));
 
                 switch (LRed::callback->enumeratedRevision) {
                     case 0x81: {
                         SolveRequestPlus solveRequests[] = {
-                            {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
-                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
-                            {"_CAIL_DDI_CAPS_KALINDI_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
-                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A0", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                !needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A0_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                needsECaps},
                         };
                         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                             "Failed to resolve symbols");
@@ -80,10 +86,14 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                     }
                     case 0x82: {
                         SolveRequestPlus solveRequests[] = {
-                            {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
-                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
-                            {"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
-                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                !needsECaps},
+                            {"_CAIL_DDI_CAPS_KALINDI_A1_E", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                needsECaps},
                         };
                         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                             "Failed to resolve symbols");
@@ -92,8 +102,10 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                     case 0x85: {
                         SolveRequestPlus solveRequests[] = {
                             {"_CAIL_DDI_CAPS_KALINDI_A1", ddiCaps[static_cast<uint32_t>(ChipType::Kalindi)]},
-                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], !needsECaps},
-                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)], needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                !needsECaps},
+                            {"_KALINDI_GoldenSettings_A0_4882_E", goldenCaps[static_cast<uint32_t>(ChipType::Kalindi)],
+                                needsECaps},
                         };
                         PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                             "Failed to resolve symbols");
@@ -112,19 +124,19 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                     {"_GODAVARI_GoldenSettings_A0_2411", goldenCaps[static_cast<uint32_t>(ChipType::Godavari)]},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
-                        "Failed to resolve symbols");
+                    "Failed to resolve symbols");
                 DBGLOG("hwlibs", "Set ASIC Caps to Goadavari");
                 break;
             }
             case ChipType::Carrizo: {
                 // HWLibs uses A0 on Revision 0 hardware.
-                auto isRevZero = ((LRed::callback->revision + LRed::callback->enumeratedRevision) == 1); 
+                auto isRevZero = ((LRed::callback->revision + LRed::callback->enumeratedRevision) == 1);
                 if (!isRevZero) {
                     SolveRequestPlus solveRequests[] = {
                         {"_CAIL_DDI_CAPS_CARRIZO_A1", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                         {"_CARRIZO_GoldenSettings_A1", goldenCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                     };
-                     PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                         "Failed to resolve symbols");
                     DBGLOG("hwlibs", "Set ASIC Caps to Carrizo, variant A1");
                     break;
@@ -133,7 +145,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                         {"_CAIL_DDI_CAPS_CARRIZO_A0", ddiCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                         {"_CARRIZO_GoldenSettings_A0", goldenCaps[static_cast<uint32_t>(ChipType::Carrizo)]},
                     };
-                     PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
+                    PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
                         "Failed to resolve symbols");
                     DBGLOG("hwlibs", "Set ASIC Caps to Carrizo, variant A0");
                     break;
@@ -143,8 +155,10 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 auto needs2cuSettings = (LRed::callback->chipVariant == ChipVariant::s2CU);
 
                 SolveRequestPlus solveRequests[] = {
-                    {"_STONEY_GoldenSettings_A0_2CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)], needs2cuSettings},
-                    {"_STONEY_GoldenSettings_A0_3CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)], !needs2cuSettings},
+                    {"_STONEY_GoldenSettings_A0_2CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)],
+                        needs2cuSettings},
+                    {"_STONEY_GoldenSettings_A0_3CU", goldenCaps[static_cast<uint32_t>(ChipType::Stoney)],
+                        !needs2cuSettings},
                     {"_CAIL_DDI_CAPS_STONEY_A0", ddiCaps[static_cast<uint32_t>(ChipType::Stoney)]},
                 };
                 PANIC_COND(!SolveRequestPlus::solveAll(&patcher, index, solveRequests, address, size), "hwlibs",
@@ -189,10 +203,13 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
 
         auto found = false;
         auto targetDeviceId = LRed::callback->deviceId;
-        auto targetExtRev = ((LRed::callback->chipType == ChipType::Kalindi)) ? static_cast<uint32_t>(LRed::callback->enumeratedRevision) : static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;
+        auto targetExtRev = ((LRed::callback->chipType == ChipType::Kalindi)) ?
+                                static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
+                                static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;
 
         while (orgCapsInitTable->deviceId != 0xFFFFFFFF) {
-            if (orgCapsInitTable->familyId == LRed::callback->currentFamilyId && orgCapsInitTable->deviceId == targetDeviceId) {
+            if (orgCapsInitTable->familyId == LRed::callback->currentFamilyId &&
+                orgCapsInitTable->deviceId == targetDeviceId) {
                 orgCapsInitTable->deviceId = LRed::callback->deviceId;
                 orgCapsInitTable->revision = LRed::callback->revision;
                 orgCapsInitTable->extRevision = static_cast<uint64_t>(targetExtRev);
@@ -212,6 +229,8 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
             }
             orgCapsInitTable++;
             PANIC_COND(!found, "hwlibs", "Failed to find caps init table entry");
+            found = false;
+            // we do not have the Device Capability table on X4000
         }
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
         DBGLOG("hwlibs", "Applied DDI Caps patches");

@@ -66,8 +66,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines,
-                isStoney},
+            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines, isStoney},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN31AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
@@ -164,11 +163,11 @@ bool X4000::wrapAllocateHWEngines(void *that) {
         // I swear to god, this one infuriates me to no end, I love ghidra.
         auto *samu = OSObject::operator new(0x1D0);
         callback->orgGFX8SAMUEngineConstructor(samu);
-        getMember<void *>(that, fieldBase + catalina ? 0x40 : 0x50) = samu;
+        getMember<void *>(that, fieldBase + (catalina ? 0x40 : 0x50)) = samu;
 
         auto *vce = OSObject::operator new(0x258);
         callback->orgPolarisVCEEngineConstructor(vce);
-        getMember<void *>(that, fieldBase + catalina ? 0x28 : 0x38) = vce;
+        getMember<void *>(that, fieldBase + (catalina ? 0x28 : 0x38)) = vce;
 
     } else {
         PANIC("x4000", "Using Polaris/VI logic on unsupported ASIC!");

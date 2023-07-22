@@ -39,8 +39,9 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
             "Failed to route symbols");
 
         LookupPatchPlus const patches[] = {
-            {&kextRadeonSupport, kVRAMInfoNullCheckOriginal, kVRAMInfoNullCheckPatched,
-                arrsize(kVRAMInfoNullCheckOriginal), 1, !highsierra},
+            {&kextRadeonSupport, kAtiDeviceControlGetVendorInfoOriginal, kAtiDeviceControlGetVendorInfoMask,
+                kAtiDeviceControlGetVendorInfoPatched, kAtiDeviceControlGetVendorInfoMask,
+                arrsize(kAtiDeviceControlGetVendorInfoOriginal), 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
