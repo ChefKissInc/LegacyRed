@@ -48,6 +48,14 @@ static const uint8_t kVIBaffinSharedControllerGetFamilyIdPatched[] = {0x66, 0xC7
     0x45, 0xF6, 0x87, 0x00, 0x0F, 0xB7, 0x45, 0xF6};
 
 /**
+ * `AtiBiosParser1::setDisplayClock`
+ * `AMDSupport.kext`
+ *  Bypass m_setDceClock Null check
+ */
+static const uint8_t kAtiBiosParser1SetDisplayClockOriginal[] = {0x48, 0x85, 0xFF, 0x74, 0x29};
+static const uint8_t kAtiBiosParser1SetDisplayClockPatched[] = {0x48, 0x85, 0xFF, 0x66, 0x90};
+
+/**
  * `AppleGraphicsDevicePolicy`
  * Symbols are stripped so function is unknown.
  * Removes framebuffer count >= 2 check.
@@ -91,6 +99,7 @@ static_assert(arrsize(kAsicInfoVIPopulateDeviceInfoOriginal) == arrsize(kAsicInf
 static_assert(arrsize(kCISharedControllerGetFamilyIdOriginal) == arrsize(kCISharedControllerGetFamilyIdPatched));
 static_assert(
     arrsize(kVIBaffinSharedControllerGetFamilyIdOriginal) == arrsize(kVIBaffinSharedControllerGetFamilyIdPatched));
+static_assert(arrsize(kAtiBiosParser1SetDisplayClockOriginal) == arrsize(kAtiBiosParser1SetDisplayClockPatched));
 static_assert(arrsize(kAGDPFBCountCheckOriginal) == arrsize(kAGDPFBCountCheckPatched));
 static_assert(arrsize(kAGDPBoardIDKeyOriginal) == arrsize(kAGDPBoardIDKeyPatched));
 static_assert(arrsize(kStartHWEnginesOriginal) == arrsize(kStartHWEnginesPatched));

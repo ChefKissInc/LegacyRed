@@ -41,6 +41,8 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
             {&kextRadeonSupport, kAtiDeviceControlGetVendorInfoOriginal, kAtiDeviceControlGetVendorInfoMask,
                 kAtiDeviceControlGetVendorInfoPatched, kAtiDeviceControlGetVendorInfoMask,
                 arrsize(kAtiDeviceControlGetVendorInfoOriginal), 1},
+            {&kextRadeonSupport, kAtiBiosParser1SetDisplayClockOriginal, kAtiBiosParser1SetDisplayClockPatched,
+                arrsize(kAtiBiosParser1SetDisplayClockOriginal), 1},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
