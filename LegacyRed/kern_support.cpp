@@ -22,7 +22,6 @@ void Support::init() {
 bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonSupport.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
-        auto highsierra = getKernelVersion() == KernelVersion::HighSierra;
 
         RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
@@ -80,8 +79,7 @@ bool Support::wrapNotifyLinkChange(void *atiDeviceControl, kAGDCRegisterLinkCont
 bool Support::doNotTestVram([[maybe_unused]] IOService *ctrl, [[maybe_unused]] uint32_t reg,
     [[maybe_unused]] bool retryOnFail) {
     DBGLOG("support", "TestVRAM called! Returning true");
-    auto *model = getBranding(LRed::callback->deviceId,
-        WIOKit::readPCIConfigValue(LRed::callback->iGPU, WIOKit::kIOPCIConfigRevisionID));
+    auto *model = getBranding(LRed::callback->deviceId, LRed::callback->pciRevision);
     // Why do we set it here?
     // Our controller kexts override it, and since TestVRAM is later on after the controllers have started up, it's
     // desirable to do it here rather than later

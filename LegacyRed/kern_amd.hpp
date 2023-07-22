@@ -38,6 +38,9 @@ constexpr uint32_t mmMP1_SMN_C2PMSG_90 = 0x29A;
 constexpr uint32_t mmMP1_SMN_C2PMSG_82 = 0x292;
 constexpr uint32_t mmMP1_SMN_C2PMSG_66 = 0x282;
 
+constexpr uint32_t mmMP0PUB_IND_INDEX = 0x180;
+constexpr uint32_t mmMP0PUB_IND_DATA = 0x181;
+
 constexpr uint32_t mmPCIE_INDEX2 = 0xE;
 constexpr uint32_t mmPCIE_DATA2 = 0xF;
 

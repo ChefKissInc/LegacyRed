@@ -214,6 +214,11 @@ class LRed {
         }
     }
 
+    uint32_t smcReadReg32Cz(uint32_t reg) {
+        writeReg32(mmMP0PUB_IND_INDEX, reg);
+        return readReg32(mmMP0PUB_IND_DATA);
+    }
+
     template<typename T>
     T *getVBIOSDataTable(uint32_t index) {
         auto *vbios = static_cast<const uint8_t *>(this->vbiosData->getBytesNoCopy());
@@ -240,6 +245,7 @@ class LRed {
     uint32_t deviceId {0};
     uint16_t enumeratedRevision {0};
     uint16_t revision {0};
+    uint32_t pciRevision {0};
     uint32_t currentFamilyId {0};
     IOPCIDevice *iGPU {nullptr};
 

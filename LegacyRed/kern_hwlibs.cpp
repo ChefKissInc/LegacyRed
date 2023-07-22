@@ -213,7 +213,7 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                 orgCapsInitTable->deviceId = LRed::callback->deviceId;
                 orgCapsInitTable->revision = LRed::callback->revision;
                 orgCapsInitTable->extRevision = static_cast<uint64_t>(targetExtRev);
-                orgCapsInitTable->pciRevision = 0xFFFFFFFF;
+                orgCapsInitTable->pciRevision = LRed::callback->pciRevision;
                 orgCapsInitTable->caps = ddiCaps[static_cast<uint32_t>(LRed::callback->chipType)];
                 orgCapsInitTable->goldenCaps = goldenCaps[static_cast<uint32_t>(LRed::callback->chipType)];
                 *orgCapsTable = {
@@ -221,15 +221,15 @@ bool HWLibs::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
                     .deviceId = LRed::callback->deviceId,
                     .revision = LRed::callback->revision,
                     .extRevision = static_cast<uint32_t>(targetExtRev),
-                    .pciRevision = 0xFFFFFFFF,
+                    .pciRevision = LRed::callback->pciRevision,
                     .caps = orgCapsInitTable->caps,
                 };
                 found = true;
+                SYSLOG("hwlibs", "found = %x", found);
                 break;
             }
             orgCapsInitTable++;
             PANIC_COND(!found, "hwlibs", "Failed to find caps init table entry");
-            found = false;
             // we do not have the Device Capability table on X4000
         }
         MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
