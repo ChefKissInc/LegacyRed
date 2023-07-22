@@ -58,6 +58,7 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
+        DBGLOG("gfxcon", "Applied patches.");
 
         return true;
     } else if (kextRadeonGFX8Con.loadIndex == index) {
@@ -83,6 +84,7 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
+        DBGLOG("gfxcon", "Applied patches.");
 
         return true;
     } else if (kextRadeonPolarisCon.loadIndex == index) {
@@ -108,6 +110,7 @@ bool GFXCon::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "gfxcon",
             "Failed to apply patches: %d", patcher.getError());
+        DBGLOG("gfxcon", "Applied patches.");
 
         return true;
     }

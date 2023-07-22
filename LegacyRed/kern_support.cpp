@@ -46,6 +46,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
+        DBGLOG("support", "Applied patches.");
 
         return true;
     }
