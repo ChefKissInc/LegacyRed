@@ -131,9 +131,19 @@ enum HWCapability : uint64_t {
     HasSDMAPageQueue = 0x98,    // bool
 };
 
+template<typename T>
+static inline void setHWCapability(void *that, HWCapability capability, T value) {
+    getMember<T>(that, (getKernelVersion() >= KernelVersion::Ventura ? 0x30 : 0x28) + capability) = value;
+}
+
 void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
     DBGLOG("x4000", "setupAndInitializeHWCapabilities: this = %p", that);
+
     FunctionCast(wrapSetupAndInitializeHWCapabilities, callback->orgSetupAndInitializeHWCapabilities)(that);
+
+    setHWCapability<bool>(that, HWCapability::HasUVD0, true);
+    setHWCapability<bool>(that, HWCapability::HasVCE, true);
+    setHWCapability<bool>(that, HWCapability::HasVCN0, false);
 }
 
 void X4000::wrapInitializeFamilyType(void *that) {
