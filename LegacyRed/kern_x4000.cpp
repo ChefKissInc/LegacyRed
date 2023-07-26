@@ -69,7 +69,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines, isStoney},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
-            {"__ZN31AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
+            {"__ZN30AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, (useGcn3Logic && !isStoney)},
             {"__ZN35AMDRadeonX4000_AMDEllesmereHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, isStoney},
