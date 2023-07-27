@@ -79,7 +79,7 @@ struct AGDCValidateDetailedTiming_t {
 struct AtomConnectorInfo;    // Needs more reversing, here as a place holder
 struct BiosParserServices;
 struct DCE_Version {
-    uint32_t dceVersion
+    uint32_t dceVersion;
 };
 class AtiBiosParser1;
 
