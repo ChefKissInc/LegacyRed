@@ -22,6 +22,7 @@ void Support::init() {
 bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t address, size_t size) {
     if (kextRadeonSupport.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
+        auto vbiosdbg = checkKernelArgument("-lredvbiosdbg");
 
         RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
@@ -33,6 +34,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
                 wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo},
             {"__ZN30AtiObjectInfoTableInterface_V121getNumberOfConnectorsEv", wrapGetNumberOfConnectors,
                 orgGetNumberOfConnectors},
+            {"__ZN24AtiAtomFirmwareInterface16createAtomParserEP18BiosParserServicesPh11DCE_Version", wrapCreateAtomBiosParser, orgCreateAtomBiosParser, vbiosdbg},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
             "Failed to route symbols");
@@ -117,5 +119,12 @@ uint32_t Support::wrapGetNumberOfConnectors(void *that) {
         getMember<unsigned int>(that, 0x10) = conCountOverride;
         return conCountOverride;
     }
+    return ret;
+}
+
+AtiBiosParser1 *wrapCreateAtomBiosParser(void *that, BiosParserServices *param1, unsigned char *param2, DCE_Version dceVersion) {
+    DBGLOG("support", "wrapCreateAtomBiosParser: DCE_Version: %d", dceVersion->dceVersion);
+    getMember(param1, 0x4) = 0xFF;
+    auto ret = FunctionCast(wrapCreateAtomBiosParser, callback->orgCreateAtomBiosParser)(that, param_1, dceVersion);
     return ret;
 }
