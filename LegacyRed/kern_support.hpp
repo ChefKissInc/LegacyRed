@@ -77,11 +77,6 @@ struct AGDCValidateDetailedTiming_t {
 };
 
 struct AtomConnectorInfo;    // Needs more reversing, here as a place holder
-class BiosParserServices;
-struct DCE_Version {
-    uint32_t dceVersion;
-};
-class AtiBiosParser1;
 
 class Support {
     public:
@@ -102,7 +97,7 @@ class Support {
     static IOReturn wrapPopulateDeviceMemory(void *that, uint32_t reg);
     static IOReturn wrapGetAtomConnectorInfo(void *that, uint32_t connector, AtomConnectorInfo *coninfo);
     static uint32_t wrapGetNumberOfConnectors(void *that);
-    static AtiBiosParser1 *wrapCreateAtomBiosParser(void *that, BiosParserServices *param1, unsigned char *param2, DCE_Version dceVersion);
+    static void *wrapCreateAtomBiosParser(void *that, void *param1, unsigned char *param2, uint32_t dceVersion);
 };
 
 #endif /* kern_support_hpp */
