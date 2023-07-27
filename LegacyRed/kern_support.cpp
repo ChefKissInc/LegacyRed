@@ -123,7 +123,7 @@ uint32_t Support::wrapGetNumberOfConnectors(void *that) {
 }
 
 AtiBiosParser1 *Support::wrapCreateAtomBiosParser(void *that, BiosParserServices *param1, unsigned char *param2, DCE_Version dceVersion) {
-    DBGLOG("support", "wrapCreateAtomBiosParser: DCE_Version: %d", dceVersion->dceVersion);
+    DBGLOG("support", "wrapCreateAtomBiosParser: DCE_Version: %d", dceVersion.dceVersion);
     getMember(param1, 0x4) = 0xFF;
     auto ret = FunctionCast(wrapCreateAtomBiosParser, callback->orgCreateAtomBiosParser)(that, param_1, dceVersion);
     return ret;
