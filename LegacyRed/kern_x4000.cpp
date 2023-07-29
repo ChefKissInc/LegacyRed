@@ -269,7 +269,8 @@ void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
 }
 
 void X4000::wrapInitializeFamilyType(void *that) {
-    getMember<uint32_t>(that, 0x308) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
+    DBGLOG("x4000", "initializeFamilyType << %x", LRed::callback->currentFamilyId);
+    getMember<uint32_t>(that, 0x2F8) = LRed::callback->currentFamilyId;
 }
 
 void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) {
