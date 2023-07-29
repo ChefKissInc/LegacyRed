@@ -32,7 +32,6 @@ class X4000 {
     void *callbackAccelerator = nullptr;
 
     static bool wrapAccelStart(void *that, IOService *provider);
-    static bool wrapAllocateHWEngines(void *that);
     static uint64_t wrapConfigureDevice(void *that, IOPCIDevice *device);
     static void *wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId);
     static void wrapInitializeFamilyType(void *that);

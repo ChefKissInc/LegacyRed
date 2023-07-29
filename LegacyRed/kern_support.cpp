@@ -34,7 +34,8 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
                 wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo},
             {"__ZN30AtiObjectInfoTableInterface_V121getNumberOfConnectorsEv", wrapGetNumberOfConnectors,
                 orgGetNumberOfConnectors},
-            {"__ZN24AtiAtomFirmwareInterface16createAtomParserEP18BiosParserServicesPh11DCE_Version", wrapCreateAtomBiosParser, orgCreateAtomBiosParser, vbiosdbg},
+            {"__ZN24AtiAtomFirmwareInterface16createAtomParserEP18BiosParserServicesPh11DCE_Version",
+                wrapCreateAtomBiosParser, orgCreateAtomBiosParser, vbiosdbg},
         };
         PANIC_COND(!RouteRequestPlus::routeAll(patcher, index, requests, address, size), "support",
             "Failed to route symbols");
@@ -125,6 +126,7 @@ uint32_t Support::wrapGetNumberOfConnectors(void *that) {
 void *Support::wrapCreateAtomBiosParser(void *that, void *param1, unsigned char *param2, uint32_t dceVersion) {
     DBGLOG("support", "wrapCreateAtomBiosParser: DCE_Version: %d", dceVersion);
     getMember<uint32_t>(param1, 0x4) = 0xFF;
-    auto ret = FunctionCast(wrapCreateAtomBiosParser, callback->orgCreateAtomBiosParser)(that, param1, param2, dceVersion);
+    auto ret =
+        FunctionCast(wrapCreateAtomBiosParser, callback->orgCreateAtomBiosParser)(that, param1, param2, dceVersion);
     return ret;
 }

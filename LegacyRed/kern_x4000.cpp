@@ -66,7 +66,6 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
         RouteRequestPlus requests[] = {
             {"__ZN37AMDRadeonX4000_AMDGraphicsAccelerator5startEP9IOService", wrapAccelStart, orgAccelStart},
-            {"__ZN35AMDRadeonX4000_AMDEllesmereHardware17allocateHWEnginesEv", wrapAllocateHWEngines, isStoney},
             {"__ZN33AMDRadeonX4000_AMDBonaireHardware32setupAndInitializeHWCapabilitiesEv",
                 wrapSetupAndInitializeHWCapabilities, !useGcn3Logic},
             {"__ZN30AMDRadeonX4000_AMDFijiHardware32setupAndInitializeHWCapabilitiesEv",
@@ -97,6 +96,11 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
             orgChannelTypes[11] = 0;    // Fix getPagingChannel so that it gets SDMA0
             MachInfo::setKernelWriting(false, KernelPatcher::kernelWriteLock);
 
+            LookupPatchPlus const allocHWEnginesPatch {&kextRadeonX4000, kAMDEllesmereHWallocHWEnginesOriginal,
+                kAMDEllesmereHWallocHWEnginesPatched, 1, isStoney};
+            PANIC_COND(!allocHWEnginesPatch.apply(patcher, slide, size), "x4000",
+                "Failed to apply AllocateHWEngines patch: %d", patcher.getError());
+
             LookupPatchPlus const patch {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesMask,
                 kStartHWEnginesPatched, kStartHWEnginesMask, 1};
             PANIC_COND(!patch.apply(&patcher, startHWEngines, PAGE_SIZE), "x4000", "Failed to patch startHWEngines");
@@ -118,17 +122,10 @@ bool X4000::wrapAccelStart(void *that, IOService *provider) {
 
 // Likely to be unused, here for incase we need to use it for X4000::setupAndInitializeHWCapabilities
 enum HWCapability : uint64_t {
-    DisplayPipeCount = 0x04,    // uint32_t
-    SECount = 0x34,             // uint32_t
-    SHPerSE = 0x3C,             // uint32_t
-    CUPerSH = 0x70,             // uint32_t
-    HasUVD0 = 0x84,             // bool
-    HasUVD1 = 0x85,             // bool
-    HasVCE = 0x86,              // bool
-    HasVCN0 = 0x87,             // bool
-    HasVCN1 = 0x88,             // bool
-    HasHDCP = 0x8D,             // bool
-    HasSDMAPageQueue = 0x98,    // bool
+    DisplayPipeCount = 0x04,    // uint32_t // unsure
+    SECount = 0x24,             // uint32_t
+    SHPerSE = 0x2C,             // uint32_t
+    CUPerSH = 0x60,             // uint32_t
 };
 
 template<typename T>
@@ -138,52 +135,141 @@ static inline void setHWCapability(void *that, HWCapability capability, T value)
 
 void X4000::wrapSetupAndInitializeHWCapabilities(void *that) {
     DBGLOG("x4000", "setupAndInitializeHWCapabilities: this = %p", that);
-
+    switch (LRed::callback->chipType) {
+        case ChipType::Spectre:
+            [[fallthrough]];
+        case ChipType::Spooky: {
+            setHWCapability<uint32_t>(that, HWCapability::SECount, 1);
+            setHWCapability<uint32_t>(that, HWCapability::SHPerSE, 1);
+            switch (LRed::callback->deviceId) {
+                case 0x1304:
+                    [[fallthrough]];
+                case 0x1305:
+                    [[fallthrough]];
+                case 0x130C:
+                    [[fallthrough]];
+                case 0x130F:
+                    [[fallthrough]];
+                case 0x1310:
+                    [[fallthrough]];
+                case 0x1311:
+                    [[fallthrough]];
+                case 0x131C:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 8);
+                    break;
+                case 0x1309:
+                    [[fallthrough]];
+                case 0x130A:
+                    [[fallthrough]];
+                case 0x130D:
+                    [[fallthrough]];
+                case 0x1313:
+                    [[fallthrough]];
+                case 0x131D:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 6);
+                    break;
+                case 0x1306:
+                    [[fallthrough]];
+                case 0x1307:
+                    [[fallthrough]];
+                case 0x130B:
+                    [[fallthrough]];
+                case 0x130E:
+                    [[fallthrough]];
+                case 0x1315:
+                    [[fallthrough]];
+                case 0x131B:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 4);
+                    break;
+                default:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 3);
+                    break;
+            }
+            break;
+        }
+        case ChipType::Kalindi:
+            [[fallthrough]];
+        case ChipType::Godavari: {
+            setHWCapability<uint32_t>(that, HWCapability::SECount, 1);
+            setHWCapability<uint32_t>(that, HWCapability::SHPerSE, 1);
+            setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 2);
+            break;
+        }
+        case ChipType::Carrizo: {
+            setHWCapability<uint32_t>(that, HWCapability::SECount, 1);
+            setHWCapability<uint32_t>(that, HWCapability::SHPerSE, 1);
+            switch (LRed::callback->revision) {
+                case 0xC4:
+                    [[fallthrough]];
+                case 0x84:
+                    [[fallthrough]];
+                case 0xC8:
+                    [[fallthrough]];
+                case 0xCC:
+                    [[fallthrough]];
+                case 0xE1:
+                    [[fallthrough]];
+                case 0xE3:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 8);
+                    break;
+                case 0xC5:
+                    [[fallthrough]];
+                case 0x81:
+                    [[fallthrough]];
+                case 0x85:
+                    [[fallthrough]];
+                case 0xC9:
+                    [[fallthrough]];
+                case 0xCD:
+                    [[fallthrough]];
+                case 0xE2:
+                    [[fallthrough]];
+                case 0xE4:
+                    [[fallthrough]];
+                case 0xC6:
+                    [[fallthrough]];
+                case 0xCA:
+                    [[fallthrough]];
+                case 0xCE:
+                    [[fallthrough]];
+                case 0x88:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 6);
+                    break;
+                default:
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 4);
+                    break;
+            }
+            break;
+        }
+        case ChipType::Stoney: {
+            setHWCapability<uint32_t>(that, HWCapability::SECount, 1);
+            setHWCapability<uint32_t>(that, HWCapability::SHPerSE, 1);
+            switch (LRed::callback->chipVariant) {
+                case ChipVariant::s3CU: {
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 3);
+                    break;
+                }
+                case ChipVariant::s2CU: {
+                    setHWCapability<uint32_t>(that, HWCapability::CUPerSH, 2);
+                    break;
+                }
+                default: {
+                    PANIC("x4000", "Using Stoney ChipType on unlabelled ChipVariant!");
+                    break;
+                }
+            }
+            break;
+        }
+        default: {
+            PANIC("x4000", "Unknown ChipType!");
+            break;
+        }
+    }
     FunctionCast(wrapSetupAndInitializeHWCapabilities, callback->orgSetupAndInitializeHWCapabilities)(that);
-
-    setHWCapability<bool>(that, HWCapability::HasUVD0, true);
-    setHWCapability<bool>(that, HWCapability::HasVCE, true);
-    setHWCapability<bool>(that, HWCapability::HasVCN0, false);
 }
 
 void X4000::wrapInitializeFamilyType(void *that) {
     getMember<uint32_t>(that, 0x308) = LRed::callback->isGCN3 ? AMDGPU_FAMILY_CZ : AMDGPU_FAMILY_KV;
-}
-
-/** Rough calculations based on AMDRadeonX4000's Assembly  */
-
-bool X4000::wrapAllocateHWEngines(void *that) {
-    DBGLOG("x4000", "Wrap for AllocateHWEngines starting...");
-    if (LRed::callback->isGCN3) {
-        auto catalina = getKernelVersion() == KernelVersion::Catalina;
-        auto fieldBase = catalina ? 0x340 : 0x3A0;
-
-        auto *pm4 = OSObject::operator new(0x198);
-        callback->orgBaffinPM4EngineConstructor(pm4);
-        getMember<void *>(that, fieldBase) = pm4;
-
-        auto *sdma = OSObject::operator new(0x100);
-        callback->orgGFX8SDMAEngineConstructor(sdma);
-        getMember<void *>(that, fieldBase + 0x8) = sdma;
-
-        auto *uvd = OSObject::operator new(0x2F0);
-        callback->orgPolarisUVDEngineConstructor(uvd);
-        getMember<void *>(that, fieldBase + (catalina ? 0x18 : 0x28)) = uvd;
-
-        // I swear to god, this one infuriates me to no end, I love ghidra.
-        auto *samu = OSObject::operator new(0x1D0);
-        callback->orgGFX8SAMUEngineConstructor(samu);
-        getMember<void *>(that, fieldBase + (catalina ? 0x40 : 0x50)) = samu;
-
-        auto *vce = OSObject::operator new(0x258);
-        callback->orgPolarisVCEEngineConstructor(vce);
-        getMember<void *>(that, fieldBase + (catalina ? 0x28 : 0x38)) = vce;
-
-    } else {
-        PANIC("x4000", "Using Polaris/VI logic on unsupported ASIC!");
-    }
-    DBGLOG("x4000", "Finished AllocateHWEngines wrap.");
-    return true;
 }
 
 void *X4000::wrapGetHWChannel(void *that, uint32_t engineType, uint32_t ringId) {
