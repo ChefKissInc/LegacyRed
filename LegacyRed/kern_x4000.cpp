@@ -98,7 +98,7 @@ bool X4000::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_t 
 
             LookupPatchPlus const allocHWEnginesPatch {&kextRadeonX4000, kAMDEllesmereHWallocHWEnginesOriginal,
                 kAMDEllesmereHWallocHWEnginesPatched, 1, isStoney};
-            PANIC_COND(!allocHWEnginesPatch.apply(patcher, address, size), "x4000",
+            PANIC_COND(!allocHWEnginesPatch.apply(&patcher, address, size), "x4000",
                 "Failed to apply AllocateHWEngines patch: %d", patcher.getError());
 
             LookupPatchPlus const patch {&kextRadeonX4000, kStartHWEnginesOriginal, kStartHWEnginesMask,
