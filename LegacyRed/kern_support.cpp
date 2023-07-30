@@ -25,7 +25,7 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
         auto vbiosdbg = checkKernelArgument("-lredvbiosdbg");
         auto condbg = checkKernelArgument("-lredcondbg");
         auto adcpatch = checkKernelArgument("-lredadcpatch");
-        auto isCarrizo = (LRed::callback->chipType == ChipType::Carrizo)
+        auto isCarrizo = (LRed::callback->chipType == ChipType::Carrizo);
 
         RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
