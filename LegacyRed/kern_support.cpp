@@ -23,6 +23,9 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
     if (kextRadeonSupport.loadIndex == index) {
         LRed::callback->setRMMIOIfNecessary();
         auto vbiosdbg = checkKernelArgument("-lredvbiosdbg");
+        auto condbg = checkKernelArgument("-lredcondbg");
+        auto adcpatch = checkKernelArgument("-lredadcpatch");
+        auto isCarrizo = (LRed::callback->chipType == ChipType::Carrizo)
 
         RouteRequestPlus requests[] = {
             {"__ZN13ATIController20populateDeviceMemoryE13PCI_REG_INDEX", wrapPopulateDeviceMemory,
@@ -31,9 +34,9 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
                 orgNotifyLinkChange},
             {"__ZN13ATIController8TestVRAME13PCI_REG_INDEXb", doNotTestVram},
             {"__ZN30AtiObjectInfoTableInterface_V120getAtomConnectorInfoEjRNS_17AtomConnectorInfoE",
-                wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo},
+                wrapGetAtomConnectorInfo, orgGetAtomConnectorInfo, condbg},
             {"__ZN30AtiObjectInfoTableInterface_V121getNumberOfConnectorsEv", wrapGetNumberOfConnectors,
-                orgGetNumberOfConnectors},
+                orgGetNumberOfConnectors, condbg},
             {"__ZN24AtiAtomFirmwareInterface16createAtomParserEP18BiosParserServicesPh11DCE_Version",
                 wrapCreateAtomBiosParser, orgCreateAtomBiosParser, vbiosdbg},
         };
@@ -43,9 +46,9 @@ bool Support::processKext(KernelPatcher &patcher, size_t index, mach_vm_address_
         LookupPatchPlus const patches[] = {
             {&kextRadeonSupport, kAtiDeviceControlGetVendorInfoOriginal, kAtiDeviceControlGetVendorInfoMask,
                 kAtiDeviceControlGetVendorInfoPatched, kAtiDeviceControlGetVendorInfoMask,
-                arrsize(kAtiDeviceControlGetVendorInfoOriginal), 1},
+                arrsize(kAtiDeviceControlGetVendorInfoOriginal), 1, adcpatch},
             {&kextRadeonSupport, kAtiBiosParser1SetDisplayClockOriginal, kAtiBiosParser1SetDisplayClockPatched,
-                arrsize(kAtiBiosParser1SetDisplayClockOriginal), 1},
+                arrsize(kAtiBiosParser1SetDisplayClockOriginal), 1, isCarrizo},
         };
         PANIC_COND(!LookupPatchPlus::applyAll(&patcher, patches, address, size), "support",
             "Failed to apply patches: %d", patcher.getError());
