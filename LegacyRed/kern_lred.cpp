@@ -365,6 +365,12 @@ void LRed::setRMMIOIfNecessary() {
             this->iGPU->setProperty("CAIL_DisableSAMUPowerGating", PGOff, 0);
             if (this->chipType > ChipType::Spooky) { this->iGPU->setProperty("CAIL_DisableVCEPowerGating", PGOff, 0); }
         };
+        this->currentEmulatedRevisionId = 
+        // why ChipType instead of ChipVariant? - For mullins we set it as 'Godavari', which is technically just
+        // Kalindi+, by the looks of AMDGPU code
+        ((LRed::callback->chipType == ChipType::Kalindi)) ?
+            static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
+            static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;    // rough guess
     }
 }
 

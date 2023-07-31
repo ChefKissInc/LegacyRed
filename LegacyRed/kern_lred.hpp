@@ -247,6 +247,7 @@ class LRed {
     uint16_t revision {0};
     uint32_t pciRevision {0};
     uint32_t currentFamilyId {0};
+    uint32_t currentEmulatedRevisionId {0};
     IOPCIDevice *iGPU {nullptr};
 
     OSMetaClass *metaClassMap[4][2] = {{nullptr}};

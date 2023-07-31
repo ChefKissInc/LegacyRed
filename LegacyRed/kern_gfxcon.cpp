@@ -148,13 +148,10 @@ uint16_t GFXCon::wrapGetFamilyId(void) {
 }
 
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
+    DBGLOG("gfxcon", "populateDeviceInfo called!");
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
     getMember<uint32_t>(that, 0x40) = LRed::callback->currentFamilyId;
-    getMember<uint32_t>(that, 0x4C) =
-        // why ChipType instead of ChipVariant? - For mullins we set it as 'Godavari', which is technically just
-        // Kalindi+, by the looks of AMDGPU code
-        ((LRed::callback->chipType == ChipType::Kalindi)) ?
-            static_cast<uint32_t>(LRed::callback->enumeratedRevision) :
-            static_cast<uint32_t>(LRed::callback->enumeratedRevision) + LRed::callback->revision;    // rough guess
+    getMember<uint32_t>(that, 0x4C) = LRed::callback->currentEmulatedRevisionId;
+    DBGLOG("gfxcon", "emulatedRevision == %x", LRed::callback->currentEmulatedRevisionId);
     return ret;
 }
