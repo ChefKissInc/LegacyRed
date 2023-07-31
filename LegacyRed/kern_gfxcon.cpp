@@ -142,14 +142,15 @@ uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
 uint16_t GFXCon::wrapGetFamilyId(void) {
     auto id = FunctionCast(wrapGetFamilyId, callback->orgGetFamilyId)();
     DBGLOG("gfxcon", "getFamilyId >> %d", id);
+    id = 0; // to get clang-analyze to shut up
     DBGLOG("gfxcon", "getFamilyId << %d", LRed::callback->currentFamilyId);
     return LRed::callback->currentFamilyId;
 }
 
 IOReturn GFXCon::wrapPopulateDeviceInfo(void *that) {
     auto ret = FunctionCast(wrapPopulateDeviceInfo, callback->orgPopulateDeviceInfo)(that);
-    getMember<uint32_t>(that, 0x38) = LRed::callback->currentFamilyId;
-    getMember<uint32_t>(that, 0x44) =
+    getMember<uint32_t>(that, 0x40) = LRed::callback->currentFamilyId;
+    getMember<uint32_t>(that, 0x4C) =
         // why ChipType instead of ChipVariant? - For mullins we set it as 'Godavari', which is technically just
         // Kalindi+, by the looks of AMDGPU code
         ((LRed::callback->chipType == ChipType::Kalindi)) ?
