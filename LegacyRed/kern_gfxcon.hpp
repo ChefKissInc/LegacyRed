@@ -18,6 +18,7 @@ class GFXCon {
     mach_vm_address_t orgHwReadReg16 {0};
     mach_vm_address_t orgHwReadReg32 {0};
     mach_vm_address_t orgPopulateDeviceInfo {0};
+    mach_vm_address_t orgGetFamilyId {0};
 
     static IOReturn wrapPopulateDeviceInfo(void *that);
     static uint8_t wrapHwReadReg8(void *that, uint8_t param1);
