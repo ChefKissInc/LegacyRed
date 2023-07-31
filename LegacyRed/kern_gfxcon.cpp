@@ -142,7 +142,7 @@ uint32_t GFXCon::wrapHwReadReg32(void *that, uint32_t reg) {
 uint16_t GFXCon::wrapGetFamilyId(void) {
     auto id = FunctionCast(wrapGetFamilyId, callback->orgGetFamilyId)();
     DBGLOG("gfxcon", "getFamilyId >> %d", id);
-    id = 0; // to get clang-analyze to shut up
+    (void)id; // to get clang-analyze to shut up
     DBGLOG("gfxcon", "getFamilyId << %d", LRed::callback->currentFamilyId);
     return LRed::callback->currentFamilyId;
 }
