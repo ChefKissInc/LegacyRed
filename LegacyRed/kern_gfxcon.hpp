@@ -24,7 +24,7 @@ class GFXCon {
     static uint8_t wrapHwReadReg8(void *that, uint8_t param1);
     static uint16_t wrapHwReadReg16(void *that, uint16_t param1);
     static uint32_t wrapHwReadReg32(void *that, uint32_t param1);
-    static uint16_t wrapGetFamilyId(void *that);
+    static uint16_t wrapGetFamilyId(void);
 };
 
 #endif /* kern_gfxcon_hpp */
